@@ -37,10 +37,11 @@ import * as API from '../../api/index';
 import { message, notification } from 'antd';
 import Auth from '../../util/middleware/auth';
 import jwt from 'jsonwebtoken';
-import { browserHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { isLoading } from '../../constants/actionsConstants';
 import config from '../../config/server';
 import ReactGA from 'react-ga';
+
 export function stopLoading() {
   return {
     type: 'STOP_LOADING',
@@ -121,7 +122,7 @@ export function authServerRegisterUser(data) {
             'Account successfully created. You can login now.',
             3,
           );
-          browserHistory.push('/auth/login');
+          window.location.href = '/auth/login';
         }
       })
       .catch((error) => {
@@ -226,19 +227,19 @@ export function authServerLoginUser(data) {
           dispatch(authUpdateUserData(userToken));
           dispatch(isLoading(false));
 
-          if (userToken.type === 'DISTRIBUTOR') {
+          if (userToken.type === 'xxx') {
             if (
               config.app_environment === 'uat' ||
               config.app_environment === 'prod'
             ) {
               ReactGA.event({
                 category: 'Login',
-                action: 'Successful Distributor Login',
+                action: 'Successful xxx Login',
               });
             }
-            browserHistory.push('/distributor/dashboard');
+            window.location.href = '/xxx/dashboard';
           } else {
-            // browserHistory.push(routes.vendor_dashboard);
+            // routes.vendor_dashboard);
           }
         }
       })
@@ -357,7 +358,6 @@ export function authServerResetPassword(data) {
             }),
           );
           dispatch(isLoading(false));
-          browserHistory.push('/auth/login');
         }
       })
       .catch((error) => {

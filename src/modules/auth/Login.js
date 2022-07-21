@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import * as Action from './action';
 import { browserHistory } from 'react-router';
 import { notification } from 'antd';
-import { AES } from 'crypto-js';
+// import { AES } from 'crypto-js';
 import config from '../../config/server';
 import '../../style/auth/Login.css';
 import ReactGA from 'react-ga';
@@ -57,16 +57,6 @@ let LoginPage = props => {
         'Error occurred',
         'Please enter valid password of minimum 6 characters in length.'
       )
-    } else {
-      const encryptedPassword = AES.encrypt(password, baseConfig.encryptionKey).toString();
-      props.authInvalidateLoginForm(true);
-      props.authServerLoginUser({ login_id: login_id, password: encryptedPassword });
-      if (config.app_environment === 'uat' || config.app_environment === 'prod') {
-        ReactGA.event({
-          category: 'Login',
-          action: 'Successful Login'
-        });
-      }
     }
   }
 

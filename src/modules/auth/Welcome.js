@@ -1,42 +1,22 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
-import { browserHistory } from 'react-router';
-import config from '../../config/server';
-import useAuth from './hooks/useAuth';
+import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import Auth from '../../util/middleware/auth';
 import * as Action from './action';
 
 let WelcomePage = (props) => {
+  const navigate = useNavigate();
 
   const { fetchAppLevelConfiguration } = props;
 
-  const { signIn } = useAuth({
-    provider: config.sso_login.provider,
-    options: {
-      userPoolId: config.sso_login.userPoolId,
-      userPoolWebClientId: config.sso_login.userPoolWebClientId,
-      oauth: {
-        domain: config.sso_login.domain,
-        scope: config.sso_login.scope,
-        redirectSignIn: config.sso_login.redirectSignIn,
-        redirectSignOut: config.sso_login.redirectSignOut,
-        region: config.sso_login.region,
-        responseType: config.sso_login.responseType
-      }
-    }
-  });
-
-  const handleSSOLogin = () => {
-    signIn();
-  }
 
   useEffect(() => {
     fetchAppLevelConfiguration();
     if (Auth.loggedIn()) {
-      browserHistory.push('/distributor/dashboard');
+      navigate('/distributor/dashboard');
     } else if (Auth.adminLoggedIn() && Auth.checkAdminLogin()) {
-      browserHistory.push('/admin/dashboard');
+      navigate('/admin/dashboard');
     }
   }, []);
 
@@ -51,9 +31,6 @@ let WelcomePage = (props) => {
         <Link to="/auth/login" className="default-btn"> Login</Link>
         <>
           <br />
-          <a className="sso-login" onClick={handleSSOLogin}>
-            Login with SSO
-          </a>
         </>
       </div>
     </div>

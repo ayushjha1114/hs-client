@@ -6,7 +6,7 @@ import config from './config/server';
 function App() {
 
     const updateCache = (cacheVersion) => {
-        window.localStorage.setItem("TCPL_CACHE_VERSION", config.cache_version);
+        window.localStorage.setItem("xx", config.cache_version);
         if (cacheVersion !== config.cache_version) {
             caches.keys().then((names) => {
                 names.forEach((name) => {
@@ -18,7 +18,7 @@ function App() {
 
     };
     useEffect(() => {
-        const cacheVersion = window.localStorage.getItem("TCPL_CACHE_VERSION");
+        const cacheVersion = window.localStorage.getItem("xx");
         updateCache(cacheVersion);
         if (config.app_environment === 'uat' || config.app_environment === 'prod') {
             ReactGA.initialize(config.google_analytics_id);

@@ -8,7 +8,6 @@ import { browserHistory, Link } from "react-router";
 import PasswordStrengthBar from 'react-password-strength-bar';
 import ReCAPTCHA from "react-google-recaptcha";
 import InputHelper from '../../util/helper/index';
-import { AES } from 'crypto-js';
 import ReactGA from 'react-ga';
 import config from '../../config/server';
 const baseConfig = config[config.serviceServerName['auth']];
@@ -204,10 +203,6 @@ let ResetPasswordPage = (props) => {
 			errorHandler('Invalid Password', 'Password must be atleast 6 alphanumeric characters')
 		} else if (!password_confirm || password_confirm === "" || password_confirm !== password) {
 			errorHandler('Invalid Password', 'Set password and confirm password do not match')
-		} else {
-			const encryptedPassword = AES.encrypt(password, baseConfig.encryptionKey).toString();
-			props.authInvalidateChangePasswordForm(false);
-			props.authServerResetPassword({ login_id, otp, password: encryptedPassword });
 		}
 	}
 
