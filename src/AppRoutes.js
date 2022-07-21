@@ -4,12 +4,12 @@ import {
     Route,
 } from 'react-router';
 
-// import { notLoggedIn, authenticatedUsersOnly } from './util/middleware/index';
+import { notLoggedIn, authenticatedUsersOnly } from './util/middleware/index';
 import WelcomePage from './modules/auth/Welcome';
-// import LoginPage from './modules/auth/Login';
+import LoginPage from './modules/auth/Login';
+import Dashboard from './modules/dashboard/Dashboard';
 // import ResetPasswordPage from './modules/auth/ResetPassword';
 // import ValidateTokenPage from './modules/auth/ValidateToken';
-// import AuthLayout from './layout/Auth';
 
 // import httpService from './axios-interceptors';
 
@@ -19,6 +19,8 @@ const AppRoutes = (props) => {
     return (
         <Routes>
             <Route path="/" element={<WelcomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
     );
 };

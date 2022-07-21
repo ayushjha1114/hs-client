@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Auth from '../../util/middleware/auth';
 import * as Action from './action';
+import AuthLayout from '../../layout/Auth';
 
 let WelcomePage = (props) => {
   const navigate = useNavigate();
@@ -21,19 +22,25 @@ let WelcomePage = (props) => {
   }, []);
 
   return (
-    <div className="-form-wrapper">
-      <h1>Login</h1>
-      <div className="-logo-block">
-        <img src="assets/images/-logo.svg" alt="" />
-        <h2>Pxzxzx PORTAL</h2>
+    <AuthLayout>
+      <div className="tcp-form-wrapper">
+        <h1>Login</h1>
+        <div className="tcp-logo-block">
+          <img src="assets/images/intel-icon.svg" alt="" />
+          <h2>SOME HEADING</h2>
+        </div>
+        <div className="distributer-btn">
+          <Link to="/login" className="default-btn"> Login</Link>
+          <>
+            <br />
+            <a href="/" className="sso-login" /* onClick={} */>
+            Admin Login
+          </a>
+          </>
+        </div>
       </div>
-      <div className="distributer-btn">
-        <Link to="/auth/login" className="default-btn"> Login</Link>
-        <>
-          <br />
-        </>
-      </div>
-    </div>
+
+    </AuthLayout>
   )
 }
 
