@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import * as Action from './action';
 import { notification } from 'antd';
 import config from '../../config/server';
-import '../../style/auth/Login.css';
 import AuthLayout from '../../layout/Auth';
 
 const baseConfig = config[config.serviceServerName['auth']];

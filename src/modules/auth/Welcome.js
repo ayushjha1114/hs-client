@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Auth from '../../util/middleware/auth';
 import * as Action from './action';
-import AuthLayout from '../../layout/Auth';
 
 let WelcomePage = (props) => {
   const navigate = useNavigate();
@@ -22,25 +21,31 @@ let WelcomePage = (props) => {
   }, []);
 
   return (
-    <AuthLayout>
-      <div className="tcp-form-wrapper">
-        <h1>Login</h1>
-        <div className="tcp-logo-block">
-          <img src="assets/images/intel-icon.svg" alt="" />
-          <h2>SOME HEADING</h2>
+      <div className="homeContainer">
+          <img src="assets/images/home.png" alt="" style={{ maxWidth:'100%', height: 'auto'}} />
+        <div className="HomeNavBarImg">
+          <img src="assets/images/fake.svg" alt="" />
         </div>
-        <div className="distributer-btn">
-          <Link to="/login" className="default-btn"> Login</Link>
-          <>
-            <br />
-            <a href="/" className="sso-login" /* onClick={} */>
-            Admin Login
-          </a>
-          </>
+        <div className="HomeNavBar">
+          <Link to="/login" className="navLink"> Home</Link>
+          <Link to="/login" className="navLink"> Product</Link>
+          <Link to="/login" className="navLink"> Service</Link>
+          <Link to="/login" className="navLink"> AMC</Link>
+          <Link to="/login" className="navLink"> Tech News</Link>
+          <Link to="/login" className="navLink"> About Us</Link>
+          <Link to="/login" className="navLink"> Contact Us</Link>
+          <Link to="/login" className="navLoginBtn"> Login</Link>
+        </div>
+        <div className="homeBody">
+          <h2>        
+            Communicate.
+            Collaborate. Create.
+          </h2>
+          <p>
+            XYZ provides an effective and powerful way to manage your projects
+          </p>
         </div>
       </div>
-
-    </AuthLayout>
   )
 }
 

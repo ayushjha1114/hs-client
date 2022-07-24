@@ -3,6 +3,7 @@ import ReactGA from 'react-ga';
 import Loader from './components/Loader';
 import AppRoutes from './AppRoutes';
 import config from './config/server';
+import './styles/App.scss';
 function App() {
 
     const updateCache = (cacheVersion) => {

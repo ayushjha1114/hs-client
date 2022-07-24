@@ -1,0 +1,50 @@
+.homeContainer {
+    position: relative;
+    color: #ffffff;
+    .HomeNavBarImg {
+        position: absolute;
+        top: 20px;
+        left: 16px;
+    }
+    .HomeNavBar {
+        display: flex;
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        width: 55%;
+        .navLink {
+            color: #000000;
+            padding: 3%;
+            font-size: 20px;
+            white-space: nowrap;
+        }
+        .navLink:hover {
+            color: #3498db;
+        }
+        .navLoginBtn {
+            display: block;
+            padding: 14px 0 19px;
+            font-size: 28px;
+            line-height: 28px;
+            text-align: center;
+            font-family: 'MyriadPro-Semibold', sans-serif;
+            color: #fff;
+            background: #1268B3;
+            border-radius: 4px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            height: 58px;
+            margin-top: 13px;
+        }
+    }
+    .homeBody {
+        position: absolute;
+        top: 60%;
+        left: 30%;
+        font-size: 28px;
+        width: 25%;
+        transform: translate(-50%, -50%);
+        color: #1268B3;
+    }
+}

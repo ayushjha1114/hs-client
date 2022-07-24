@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { browserHistory } from "react-router";
 import { message, notification } from 'antd';
 import * as Action from './action';
-import '../../style/auth/Otp.css';
 import config from '../../config/server';
 import ReactGA from 'react-ga';
 let OtpPage = props => {
