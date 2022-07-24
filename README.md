@@ -1,4 +1,4 @@
-## AAAA distributor order management application
+## AAAA application
 
 The platform should be able to serve as a single, unified portal for XXX.
 
