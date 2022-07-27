@@ -1,0 +1,171 @@
+.container {
+    // max-width: 750px;
+    // margin: 100px auto;
+    position: absolute;
+    font-size: 20px;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.silver,
+.plat {
+    float: left;
+    width: 250px;
+    background: white;
+    text-align: center;
+}
+
+.silver {
+    border-radius: 30px 0 0 30px;
+    height: 744px;
+}
+
+.silver:hover, .gold:hover {
+    position: relative;
+    top: -50px;
+    padding: 50px 0;
+    bottom: -50px;
+    background: #3498db;
+    border-radius: 30px;
+}
+.silver:hover ~ .plat {
+    top: 0;
+    padding-top: 0;
+    border-radius: 0 30px 30px 0;
+    background: white;
+} 
+
+.silver:hover ~ .plat > h1 {
+    color: black;
+} 
+
+.silver:hover ~ .plat > h2 {
+    color: black;
+} 
+
+.silver:hover ~ .plat > p {
+    color: black;
+} 
+
+.silver:hover ~ .plat > .price {
+    color: #bebebe;
+} 
+
+.plat {
+    top: -50px;
+    position: relative;
+    background: #3498db;
+    padding-top: 50px;
+    border-radius: 30px;
+}
+
+.plat > .price {
+    color: #ffffff;
+}
+
+.plat > h1,
+.plat > h2,
+.plat > p {
+    color: white;
+}
+
+.gold {
+    float: left;
+    // position: relative;
+    width: 250px;
+    // top: -50px;
+    // padding: 50px 0;
+    background: #ffffff;
+    text-align: center;
+    // border-radius: 5px;
+}
+
+.gold:hover ~ .plat {
+    top: 0;
+    padding-top: 0;
+    border-radius: 0 30px 30px 0;
+    background: white;
+} 
+
+.gold:hover ~ .plat > h1 {
+    color: black;
+} 
+
+.gold:hover ~ .plat > h2 {
+    color: black;
+} 
+
+.gold:hover ~ .plat > p {
+    color: black;
+} 
+
+.gold:hover ~ .plat > .price {
+    color: #bebebe;
+} 
+
+h1 {
+    margin: 20px 0 10px 0;
+    font-size: 1.25em;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+h2 {
+    font-size: .75em;
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 100;
+    letter-spacing: 1px;
+    padding: 4px;
+}
+
+p {
+    color: rgba(0, 0, 0, 0.4);
+    font-weight: 100;
+    font-size: .75em;
+    margin-left: 5%;
+}
+
+.price {
+    width: 100px;
+    text-align: center;
+    color: #bebebe;
+    font-size: 1.5em;
+    font-weight: 100;
+    margin: 20px auto;
+}
+
+button {
+    display: block;
+    margin: 20px auto;
+    width: 150px;
+    height: 35px;
+    border-bottom: 5px solid #c0392b;
+    background: blue;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: .75em;
+    font-weight: 100;
+    transition: all ease-in-out .2s;
+}
+
+button:hover {
+    background: #ffffff;
+    color: #000000
+}
+
+.AMCPlanDivider {
+    margin-left: 10%;
+    width: 80%;
+    min-width: 0%
+}
+
+.AMCPlanFeatures {
+    display: flex;
+}
+
+.AMCPlanFeatures > img {
+    width: 10%;
+    margin-left: 9%;
+    margin-bottom: 8%;
+}
