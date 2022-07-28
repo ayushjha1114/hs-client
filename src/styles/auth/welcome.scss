@@ -2,13 +2,12 @@
     position: relative;
     color: #ffffff;
     .HomeNavBarImg {
-        position: absolute;
-        top: 20px;
-        left: 16px;
+        position: fixed;
+        top: -45px;
     }
-    .HomeNavBar {
+    .HomeNavBarItem {
         display: flex;
-        position: absolute;
+        position: fixed;
         top: 8px;
         right: 16px;
         width: 55%;

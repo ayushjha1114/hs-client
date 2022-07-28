@@ -5,20 +5,22 @@ let PublicPage = (props) => {
 
   return (
       <div className="homeContainer">
-          <img src="assets/images/home.png" alt="" style={{ maxWidth:'100%', height: 'auto'}} />
-        <div className="HomeNavBarImg">
-          <img src="assets/images/fake.svg" alt="" />
-        </div>
-        <div className="HomeNavBar">
-          <Link to="/login" className="navLink"> Home</Link>
-          <Link to="/login" className="navLink"> Product</Link>
-          <Link to="/login" className="navLink"> Service</Link>
-          <Link to="/amc-plans" className="navLink"> AMC</Link>
-          <Link to="/login" className="navLink"> Tech News</Link>
-          <Link to="/login" className="navLink"> About Us</Link>
-          <Link to="/login" className="navLink"> Contact Us</Link>
-          <Link to="/login" className="navLoginBtn"> Login</Link>
-        </div>
+          <img src="assets/images/home.png" alt="" style={{ maxWidth:'100%', height: 'auto', marginTop: '100px'}} />
+        {/* <div className='HomeNavBar'> */}
+          <div className="HomeNavBarImg">
+            <img src="assets/images/DGsoft-logo.svg" alt="" style={{ maxWidth: '25%' }}/>
+          </div>
+          <div className="HomeNavBarItem">
+            <Link to="/" className="navLink"> Home</Link>
+            <Link to="/products" className="navLink"> Product</Link>
+            <Link to="/services" className="navLink"> Service</Link>
+            <Link to="/amc-plans" className="navLink"> AMC</Link>
+            <Link to="/" className="navLink"> Tech News</Link>
+            <Link to="/about-us" className="navLink"> About Us</Link>
+            <Link to="/contact-us" className="navLink"> Contact Us</Link>
+            <Link to="/login" className="navLoginBtn"> Login</Link>
+          </div>
+        {/* </div> */}
         {props.children}
       </div>
   )

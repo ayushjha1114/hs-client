@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import ReactGA from 'react-ga';
 import Loader from './components/Loader';
 import AppRoutes from './AppRoutes';
 import config from './config/server';
@@ -21,14 +20,6 @@ function App() {
     useEffect(() => {
         const cacheVersion = window.localStorage.getItem("xx");
         updateCache(cacheVersion);
-        if (config.app_environment === 'uat' || config.app_environment === 'prod') {
-            ReactGA.initialize(config.google_analytics_id);
-            ReactGA.pageview(window.location.pathname + window.location.search);
-            ReactGA.event({
-                category: 'Visits',
-                action: 'Visited Portal'
-            });
-        }
     }, []);
     return (
         <div>

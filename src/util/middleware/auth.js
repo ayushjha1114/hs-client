@@ -1,4 +1,3 @@
-import * as API from '../../api'
 import jwt from "jsonwebtoken";
 
 export default {
