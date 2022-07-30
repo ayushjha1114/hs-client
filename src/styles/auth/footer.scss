@@ -1,11 +1,11 @@
 .footerContainer {
-    margin-top: 10px;
-    height: 40vh;
+    // margin-top: 70px;
+    height: 20vh;
     background-color: blue;
     background-image: linear-gradient(#6c6cef, #9fbce7);
     color: #ffffff;
     .footerTop {
-        display: flex;
+        display: none;
         height: 25vh;
     }
     .footerTop h1 {
@@ -17,6 +17,7 @@
         display: flex;
         height: 15vh;
         .fListContainer {
+            margin-top: 2%;
             width: 70%;
             display: flex;
             font-size: 20px;
@@ -33,7 +34,8 @@
         }
     }
     .footerBottom img {
-        max-width: 31%;
+        margin-top: 3%;
+        max-width: 27%;
         height: 7vh;
         margin-left: 20px;
     }

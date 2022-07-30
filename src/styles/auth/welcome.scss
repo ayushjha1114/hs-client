@@ -1,9 +1,16 @@
 .homeContainer {
     position: relative;
     color: #ffffff;
+    .HomeNavBar {
+        background: #ffffff;
+        position: fixed;
+        width: 100%;
+        top: 0px;
+        height: 10vh;
+    }
     .HomeNavBarImg {
         position: fixed;
-        top: 15px;
+        top: 25px;
         left: 20px;
     }
     .HomeNavBarItem {
@@ -47,4 +54,11 @@
         transform: translate(-50%, -50%);
         color: #1268B3;
     }
+}
+.homeCarousel {
+    // border-style: solid;
+    // border-width: 5px;
+    height: 20vh;
+    // border-color: red;
+    background: #abbbed;
 }

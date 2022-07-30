@@ -1,9 +1,31 @@
+.amcCard {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 85%;
+    left: 50%;
+    width: 60%;
+    border-radius: 8px;
+    background: #ffffff;
+    height: 110vh;
+    color: #000000;
+    .amcCardHeading, .amcCardSlider {
+        margin-left: 5%;
+        font-size: 20px;
+        color: #348dff;
+    }
+}
+
+.amcCard p {
+    margin-left: 5%;
+    font-size: 20px;
+}
+
 .container {
     // max-width: 750px;
     // margin: 100px auto;
     position: absolute;
     font-size: 20px;
-    top: 85%;
+    top: 100%;
     left: 50%;
     transform: translate(-50%, -50%);
 }

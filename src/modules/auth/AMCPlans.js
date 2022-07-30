@@ -1,9 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import PublicPage from '../../layout/PublicLayout';
-import { Divider } from 'antd';
+import { Col, Divider, InputNumber, Row, Slider  } from 'antd';
+import { Link } from 'react-router-dom';
 
 
 const AMCPlans = (props) => {
+
+    const [inputValue, setInputValue] = useState(1);
+
+    const onChange = (value) => {
+      setInputValue(value);
+    };
+
     const bronzeFeatures = [
         'Consulting with experts 20 times for year', 
         'Add friends for free 1 months',
@@ -31,6 +39,20 @@ const AMCPlans = (props) => {
 
   return (
     <PublicPage>
+        <div className="amcCard">
+            <h1 className="amcCardHeading">AMC Plans</h1>
+            <Row className="amcCardSlider">
+                <Col span={12}>
+                    <Slider
+                    min={1}
+                    max={25}
+                    onChange={onChange}
+                    value={typeof inputValue === 'number' ? inputValue : 0}
+                    />
+                </Col>
+            </Row>
+            <p>You have selected {inputValue} devices. If you want to buy more than 25 devices <Link to='/'>Click here.</Link></p>
+        </div>
         <div className="container">
             <div className="silver">
                 <img src="assets/images/bronze-badge.svg" alt="" />

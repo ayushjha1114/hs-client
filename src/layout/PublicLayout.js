@@ -8,7 +8,7 @@ let PublicPage = (props) => {
     <>
       <div className="homeContainer">
           <img src="assets/images/home.png" alt="" style={{ maxWidth:'100%', height: 'auto', marginTop: '100px'}} />
-        {/* <div className='HomeNavBar'> */}
+        <div className='HomeNavBar'>
           <div className="HomeNavBarImg">
             <img src="assets/images/DGSoft-logo.png" alt="" style={{ maxWidth: '25%' }}/>
           </div>
@@ -22,7 +22,7 @@ let PublicPage = (props) => {
             <Link to="/contact-us" className="navLink"> Contact Us</Link>
             <Link to="/login" className="navLoginBtn"> Login</Link>
           </div>
-        {/* </div> */}
+        </div>
         {props.children}
       </div>
       <Footer />
