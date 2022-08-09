@@ -16,7 +16,7 @@ let PublicPage = (props) => {
             <Link to="/" className="navLink"> Home</Link>
             <Link to="/products" className="navLink"> Product</Link>
             <Link to="/services" className="navLink"> Service</Link>
-            <Link to="/amc-plans" className="navLink"> AMC</Link>
+            <Link to="/amc-plans" className="navLink"> AMC Plans</Link>
             {/* <Link to="/" className="navLink"> Tech News</Link> */}
             <Link to="/about-us" className="navLink"> About Us</Link>
             <Link to="/contact-us" className="navLink"> Contact Us</Link>

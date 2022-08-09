@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import appLevelConfig from '../config';
-import * as AuthAction from '../modules/auth/action';
 
 const appConfig = appLevelConfig.app_level_configuration;
 
@@ -167,7 +166,6 @@ const mapDispatchToProps = (dispatch) => {
         //     dispatch(Action.distributorResetCreateOrderCompleteFormFields()),
         // getSessionsLog: (data) => dispatch(Action.getSessionsLog(data)),
         // logout: () => dispatch(DashboardAction.logout()),
-        fetchAppLevelConfiguration: () => dispatch(AuthAction.fetchAppLevelSettings())
     }
 }
 

@@ -1,5 +1,5 @@
 .amcCard {
-    position: absolute;
+    position: relative;
     transform: translate(-50%, -50%);
     top: 85%;
     left: 50%;
@@ -21,11 +21,9 @@
 }
 
 .container {
-    // max-width: 750px;
-    // margin: 100px auto;
     position: absolute;
     font-size: 20px;
-    top: 100%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
@@ -94,13 +92,9 @@
 
 .gold {
     float: left;
-    // position: relative;
     width: 250px;
-    // top: -50px;
-    // padding: 50px 0;
     background: #ffffff;
     text-align: center;
-    // border-radius: 5px;
 }
 
 .gold:hover ~ .plat {

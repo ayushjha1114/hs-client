@@ -7,9 +7,15 @@ import { Link } from 'react-router-dom';
 const AMCPlans = (props) => {
 
     const [inputValue, setInputValue] = useState(1);
+    const [bronzePrice, setBronzePrice] = useState(299);
+    const [sliverPrice, setSliverPrice] = useState(599);
+    const [goldPrice, setGoldPrice] = useState(999);
 
     const onChange = (value) => {
-      setInputValue(value);
+        setInputValue(value);
+        setBronzePrice(value * 299);
+        setSliverPrice(value * 599);
+        setGoldPrice(value * 999);
     };
 
     const bronzeFeatures = [
@@ -58,7 +64,10 @@ const AMCPlans = (props) => {
                 <img src="assets/images/bronze-badge.svg" alt="" />
                 <h1>Bronze Plan</h1>
                 <h2>For trails and you can experience our first service.</h2>
-                <div className="price">FREE</div>
+                <div className="price">
+                    &#8377; {bronzePrice}
+                    <p>/devices</p>
+                </div>
                 <Divider className="AMCPlanDivider"/>
                 {
                     bronzeFeatures.map((feature) => (
@@ -74,7 +83,10 @@ const AMCPlans = (props) => {
                 <img src="assets/images/silver-badge.svg" alt="" />
                 <h1>Silver Plan</h1>
                 <h2>This plan gives our intermediate service.</h2>
-                <div className="price">$65</div>
+                <div className="price">
+                    &#8377; {sliverPrice}
+                    <p>/devices</p>
+                </div>
                 <Divider className="AMCPlanDivider" />
                 {
                     silverFeatures.map((feature) => (
@@ -90,7 +102,10 @@ const AMCPlans = (props) => {
                 <img src="assets/images/gold-badge.svg" alt="" />
                 <h1>Gold Plan</h1>
                 <h2>This plan gives the best service from us.</h2>
-                <div className="price">$110</div>
+                <div className="price">
+                    &#8377; {goldPrice}
+                    <p>/devices</p>
+                </div>
                 <Divider className="AMCPlanDivider" />
                 {
                     goldFeatures.map((feature) => (
