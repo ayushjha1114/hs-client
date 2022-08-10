@@ -1,5 +1,6 @@
 .service-card {
   margin-bottom: 10%;
+  border-radius: 2%;
   .ant-card-actions :hover {
     background-color: rgb(105, 105, 248);
     color: white;
@@ -12,6 +13,9 @@
   .ant-card-actions li {
     height: 8vh;
     margin: 0px;
+  }
+  .ant-card-body {
+    text-align: center;
   }
 }
 
