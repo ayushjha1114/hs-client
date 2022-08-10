@@ -66,15 +66,13 @@ const AMCPlanDetails = (props) => {
     <PublicPage>
       <div>
         <Card
-          className="AMC-card"
+          className="amc-card"
           title="AMC Plans"
           bordered={true}
           style={{
             width: 1300,
             borderRadius: 10,
-            marginTop: 50,
-            marginLeft: 170,
-            position: "absolute",
+            position: "inherit",
           }}
         >
           <div className="amc-card-slider">

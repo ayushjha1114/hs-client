@@ -1,83 +1,82 @@
-
-  .site-layout-content {
-    min-height: 720px;
-    background: #fff;
-    background-image: url('../../home.png');
-    background-repeat: no-repeat;
+.site-layout-content {
+  min-height: 720px;
+  max-height: 1200px;
+  background: #fff;
+  background-image: url("../../home.png");
+  background-repeat: no-repeat;
+  margin-bottom: 5%;
+}
+.layout-header {
+  .logo {
+    float: left;
+    width: 15%;
+    margin: 16px 24px 16px 0;
   }
-  .layout-header {
-    .logo {
-        float: left;
-        width: 15%;
-        margin: 16px 24px 16px 0;
-        
-      }
+}
+.layout-header {
+  .ant-row-rtl .logo {
+    float: right;
+    margin: 16px 0 16px 24px;
   }
-  .layout-header{
-    .ant-row-rtl .logo {
-        float: right;
-        margin: 16px 0 16px 24px;
-      }
-  } 
-  
-.layout{
-    .ant-layout-header {
-        height: 85px;
-    }
-    ul li {
-        font-size: x-large;
-        font-family: monospace;;
-    }
-    .ant-menu  {
-        margin-top: 1%;
-    margin-left: 50%
-    }
+}
 
+.layout {
+  .ant-layout-header {
+    height: 85px;
+  }
+  ul li {
+    font-size: x-large;
+    font-family: monospace;
+  }
+  .ant-menu {
+    margin-top: 1%;
+    margin-left: 50%;
+  }
 }
 
 .footerContainer {
-    // margin-top: 70px;
-    height: 20vh;
-    background-color: blue;
-    background-image: linear-gradient(#6c6cef, #9fbce7);
+  // margin-top: 70px;
+  height: 20vh;
+  background-color: blue;
+  background-image: linear-gradient(#6c6cef, #9fbce7);
+  color: #ffffff;
+  .footerTop {
+    display: none;
+    height: 25vh;
+  }
+  .footerTop h1 {
+    font-size: 35px;
+    margin: 25px;
     color: #ffffff;
-    .footerTop {
-        display: none;
-        height: 25vh;
+  }
+  .footerBottom {
+    display: flex;
+    height: 15vh;
+    .fListContainer {
+      margin-top: 2%;
+      width: 70%;
+      display: flex;
+      font-size: 20px;
+      justify-content: space-around;
     }
-    .footerTop h1 {
-        font-size: 35px;
-        margin: 25px;
-        color: #ffffff;
+    .footerList1 {
+      margin-left: 25%;
     }
-    .footerBottom {
-        display: flex;
-        height: 15vh;
-        .fListContainer {
-            margin-top: 2%;
-            width: 70%;
-            display: flex;
-            font-size: 20px;
-            justify-content: space-around;
-        }
-        .footerList1 {
-            margin-left: 25%;
-        }
-        .footerList3 p{
-            color: #ffffff;
-            font-size: 20px;
-            font-weight: 800;
-            margin: 0;
-        }
+    .footerList3 p {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
     }
-    .footerBottom img {
-        margin-top: 3%;
-        max-width: 27%;
-        height: 7vh;
-        margin-left: 20px;
-    }
+  }
+  .footerBottom img {
+    margin-top: 3%;
+    max-width: 27%;
+    height: 7vh;
+    margin-left: 20px;
+  }
 }
 
 .layout-footer {
-    padding: 0%;
+  padding: 0%;
 }
