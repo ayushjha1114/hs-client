@@ -1,6 +1,5 @@
 import React from 'react';
 import { Carousel } from 'antd';
-import PublicPage from '../../layout/PublicLayout';
 
 
 let WelcomePage = () => {
@@ -14,7 +13,7 @@ let WelcomePage = () => {
   };
 
   return (
-    <PublicPage>
+    <>
       <div className="homeBody">
         <h2>        
           Communicate.
@@ -43,7 +42,8 @@ let WelcomePage = () => {
           </div>
         </Carousel>
       </div>
-    </PublicPage>
+    </>
+
   )
 }
 

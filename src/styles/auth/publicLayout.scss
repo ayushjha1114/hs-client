@@ -1,3 +1,40 @@
+
+  .site-layout-content {
+    min-height: 720px;
+    background: #fff;
+    background-image: url('../../home.png');
+    background-repeat: no-repeat;
+  }
+  .layout-header {
+    .logo {
+        float: left;
+        width: 15%;
+        margin: 16px 24px 16px 0;
+        
+      }
+  }
+  .layout-header{
+    .ant-row-rtl .logo {
+        float: right;
+        margin: 16px 0 16px 24px;
+      }
+  } 
+  
+.layout{
+    .ant-layout-header {
+        height: 85px;
+    }
+    ul li {
+        font-size: x-large;
+        font-family: monospace;;
+    }
+    .ant-menu  {
+        margin-top: 1%;
+    margin-left: 50%
+    }
+
+}
+
 .footerContainer {
     // margin-top: 70px;
     height: 20vh;
@@ -39,4 +76,8 @@
         height: 7vh;
         margin-left: 20px;
     }
+}
+
+.layout-footer {
+    padding: 0%;
 }

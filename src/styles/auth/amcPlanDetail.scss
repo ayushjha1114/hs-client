@@ -1,0 +1,72 @@
+.AMC-card {
+  .ant-card-head-title {
+    text-align: center;
+    font-size: 20px;
+    color: #348dff;
+  }
+}
+
+.amc-card-slider {
+  .amc-slider-col {
+    transform: translate(15%, 15%);
+    .ant-slider-rail {
+      height: 7px;
+    }
+    .ant-slider-track {
+      height: 7px;
+    }
+    .ant-slider-handle {
+      width: 20px;
+      height: 20px;
+      margin-top: -7px;
+    }
+  }
+}
+
+.amc-card-slider p {
+  font-size: 15px;
+  transform: translate(25%, 15%);
+}
+
+.amc-plan-detail:hover {
+  color: #348dff;
+}
+
+.amc-plans {
+  margin-top: 5%;
+  text-align: -webkit-center;
+  .amc-plan-detail {
+    border-radius: 30px;
+    .ant-card-meta-title {
+      text-align: center;
+      font-size: xx-large;
+    }
+    .ant-card-cover {
+      text-align: -webkit-center;
+      img {
+        width: 70%;
+      }
+    }
+    .ant-card-meta-description {
+      text-align: -webkit-center;
+      font-size: larger;
+    }
+    h2 {
+      text-align: -webkit-center;
+      font-size: xxx-large;
+    }
+    .amc-plan-divider {
+      height: 2px;
+    }
+    .amc-plan-features {
+      p {
+        font-size: medium;
+        text-align: -webkit-auto;
+      }
+    }
+    .amc-plan-detail-button {
+      text-align: -webkit-center;
+      margin-top: 20%;
+    }
+  }
+}

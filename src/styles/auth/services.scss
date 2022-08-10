@@ -1,0 +1,28 @@
+.service-card{
+    margin-bottom: 10%;
+    .ant-card-actions :hover {
+        background-color: rgb(105, 105, 248);
+        color: white;
+    }
+    .ant-card-actions li span {
+        width:inherit;
+        margin-top: 6%;
+        font-size: x-large;
+    }
+    .ant-card-actions li {
+       height: 8vh;
+       margin: 0px;
+    }
+}
+
+.service-container {
+    position: relative;
+    transform: translate(-50%, -50%);
+    left: 60%;
+    width: 70%;
+}
+.service-meta {
+    .ant-card-meta-title {
+        font-size: x-large;
+    }
+}
