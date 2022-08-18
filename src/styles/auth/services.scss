@@ -19,6 +19,10 @@
   }
 }
 
+.service-card:hover {
+  transform: scale(1.1);
+}
+
 .service-container {
   position: inherit;
   transform: translate(40%, 5%);
