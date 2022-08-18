@@ -15,12 +15,12 @@ const menu = [
 let PublicPage = (props) => {
   return (
     <>
-      <Layout className="layout">
+      <Layout theme="light" className="layout">
         <Header className="layout-header">
           <div className="logo">
             <img src="/assets/images/DGSoft-logo.png" alt="" />
           </div>
-          <Menu theme="dark" mode="horizontal" items={menu} />
+          <Menu theme="light" mode="horizontal" items={menu} />
         </Header>
         <Content>
           <div className="site-layout-content ">{props.children}</div>
