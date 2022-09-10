@@ -1,29 +1,24 @@
-import React from 'react';
-import { Carousel } from 'antd';
-
+import React from "react";
+import { Carousel } from "antd";
 
 let WelcomePage = () => {
-
   const contentStyle = {
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
+    height: "160px",
+    color: "#fff",
+    lineHeight: "160px",
+    textAlign: "center",
     // background: 'black',
   };
 
   return (
     <>
       <div className="homeBody">
-        <h2>        
-          Communicate.
-          Collaborate. Create.
-        </h2>
+        <h2>Communicate. Collaborate. Create.</h2>
         <p>
           XYZ provides an effective and powerful way to manage your projects
         </p>
       </div>
-      <div className="homeCarousel"> 
+      {/* <div className="homeCarousel"> 
         <Carousel autoplay dots='false'>
           <div>
             <h3 style={contentStyle}>              
@@ -41,10 +36,9 @@ let WelcomePage = () => {
             <h3 style={contentStyle}>4</h3>
           </div>
         </Carousel>
-      </div>
+      </div> */}
     </>
-
-  )
-}
+  );
+};
 
 export default WelcomePage;

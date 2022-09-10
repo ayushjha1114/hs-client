@@ -1,15 +1,37 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Layout, Menu } from "antd";
 const { Header, Content, Footer } = Layout;
 
 const menu = [
-  { label: "Home", key: "/" },
-  { label: "Product", key: "/products" },
-  { label: "Service", key: "/services" },
-  { label: "AMC", key: "/amc-plans" },
-  { label: "About Us", key: "/about-us" },
-  { label: "Contact Us", key: "/contact-us" },
-  { label: "Login", key: "/login" },
+  {
+    label: <Link to="/">Home</Link>,
+    key: "home",
+  },
+  {
+    label: <Link to="/products">Product</Link>,
+    key: "products",
+  },
+  {
+    label: <Link to="/services">Service</Link>,
+    key: "services",
+  },
+  {
+    label: <Link to="/amc-plans-details">AMC</Link>,
+    key: "amc-plans-details",
+  },
+  {
+    label: <Link to="/about-us">About Us</Link>,
+    key: "about-us",
+  },
+  {
+    label: <Link to="/contact-us">Contact Us</Link>,
+    key: "contact-us",
+  },
+  {
+    label: <Link to="/">Login</Link>,
+    key: "login",
+  },
 ];
 
 let PublicPage = (props) => {
@@ -25,7 +47,6 @@ let PublicPage = (props) => {
         <Content>
           <div className="site-layout-content ">{props.children}</div>
         </Content>
-
         <Footer className="layout-footer">
           <div className="footerContainer">
             <div className="footerTop">
