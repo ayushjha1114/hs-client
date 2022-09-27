@@ -7,10 +7,21 @@ const { Meta } = Card;
 
 const AMCPlanDetails = (props) => {
   const [inputValue, setInputValue] = useState(1);
+  const [bronzePrice, setBronzePrice] = useState(999); //1-10 999 (strike out - 1500)/ 799 11-25 strike out - 1500
+  const [sliverPrice, setSliverPrice] = useState(2000);// 2000     (strike out - 1500)  1800    (strike out - 1500)
+  const [goldPrice, setGoldPrice] = useState(3000); // 3000        (strike out - 1500)   2800   (strike out - 1500)
   const [size] = useState("large");
-
   const onChange = (value) => {
     setInputValue(value);
+    if (value <= 10) {
+      setBronzePrice(value * 999);
+      setSliverPrice(value * 2000);
+      setGoldPrice(value * 3000);
+    } else if (value > 10 && value <= 25) {
+      setBronzePrice(value * 799);
+      setSliverPrice(value * 1800);
+      setGoldPrice(value * 2800);
+    }
   };
 
   const bronzeFeatures = [
@@ -42,21 +53,21 @@ const AMCPlanDetails = (props) => {
     {
       label: "Bronze Plan",
       description: "For trails and you can experience our first service.",
-      price: "Free",
+      price: `${bronzePrice}`,
       feature: bronzeFeatures,
       logo: "/assets/images/bronze-badge.svg",
     },
     {
       label: "Silver Plan",
       description: "This plan gives our intermediate service.",
-      price: "$65",
+      price: `${sliverPrice}`,
       feature: silverFeatures,
       logo: "/assets/images/silver-badge.svg",
     },
     {
       label: "Gold Plan",
       description: "This plan gives the best service from us.",
-      price: "$110",
+      price: `${goldPrice}`,
       feature: goldFeatures,
       logo: "/assets/images/gold-badge.svg",
     },
@@ -70,9 +81,10 @@ const AMCPlanDetails = (props) => {
           title="AMC Plans"
           bordered={true}
           style={{
-            width: 1300,
+            width: '75%',
             borderRadius: 10,
             position: "inherit",
+            marginLeft: '4%',
           }}
         >
           <div className="amc-card-slider">
@@ -102,7 +114,8 @@ const AMCPlanDetails = (props) => {
                   cover={<img src={plan.logo} alt="" />}
                 >
                   <Meta title={plan.label} description={plan.description} />
-                  <h2>{plan.price}</h2>
+                  <h2>&#8377; {/* <s>1500</s>  */}{plan.price}</h2>
+                  <p>/ devices</p>
                   <Divider className="amc-plan-divider" />
                   {plan.feature.map((data) => (
                     <div className="amc-plan-features">

@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import * as Action from './action';
 import { notification } from 'antd';
 import config from '../../config/server';
 import AuthLayout from '../../layout/Auth';
@@ -8,10 +6,6 @@ import AuthLayout from '../../layout/Auth';
 const baseConfig = config[config.serviceServerName['auth']];
 
 let LoginPage = props => {
-
-  let login_id = props.login.get('login_id');
-  let password = props.login.get('password');
-  const validationFlag = props.login.get('error');
 
   // fn to display error notification using antd libraray
   let errorHandler = (message, description) => {
@@ -63,30 +57,6 @@ let LoginPage = props => {
   let generateOtp = event => {
     event.preventDefault();
     props.authInvalidateLoginForm(false);
-    props.authSubmitLoginForm(false);
-    if (!login_id) {
-      errorHandler(
-        'Error Occurred',
-        'Please enter User ID to reset password.'
-      )
-    } else {
-      const response = Action.validateDistributorId(login_id);
-      response.then(result => {
-        if (result.data.success) {
-          // browserHistory.push({ pathname: "/auth/reset-password", state: { mobile: result.data.data.mobile } });
-        } else {
-          errorHandler(
-            'Error Occurred',
-            result.data.error || result.data.message || 'Error in validating User ID'
-          )
-        }
-      }).catch(error => {
-        errorHandler(
-          'Technical Error',
-          'There may be some error occurred while processing the request. Please try after some time.'
-        )
-      })
-    }
   }
 
   /**
@@ -130,7 +100,7 @@ let LoginPage = props => {
                 placeholder="Enter your User ID"
                 className="form-control"
                 autoFocus
-                defaultValue={login_id}
+                // defaultValue={login_id}
                 onChange={e => {
                   handleInputChange(e, 'login_id')
                 }}
@@ -144,7 +114,7 @@ let LoginPage = props => {
                 name="passwordlogin"
                 placeholder="Enter Password"
                 className="form-control"
-                defaultValue={password}
+                // defaultValue={password}
                 onChange={e => {
                   handleInputChange(e, 'password')
                 }}
@@ -165,27 +135,5 @@ let LoginPage = props => {
   )
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    status: state.auth.get('status'),
-    login: state.auth.get('login')
-  }
-}
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    authSubmitLoginForm: status => dispatch(Action.authSubmitLoginForm(status)),
-    authInvalidateLoginForm: value =>
-      dispatch(Action.authInvalidateLoginForm(value)),
-    authUpdateLoginFormField: data =>
-      dispatch(Action.authUpdateLoginFormField(data)),
-    authServerLoginUser: value => dispatch(Action.authServerLoginUser(value)),
-    // authServerGenerateOtpCode: value => dispatch(Action.authServerGenerateOtpCode(value))
-  }
-}
+export default LoginPage;
 
-const ConnectLoginPage = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(LoginPage)
-
-export default ConnectLoginPage

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-// import * as Action from '../modules/distributor/action';
 import { DistributorLink, AdminLink } from '../config/sideNav';
-import * as AuthAction from '../modules/auth/action';
 
 let Navigation = props => {
 
@@ -75,7 +73,7 @@ const mapDispatchToProps = dispatch => {
     return {
         // distributorResetCreateOrderCompleteFormFields: () =>
         //     dispatch(Action.distributorResetCreateOrderCompleteFormFields()),
-        fetchAppLevelConfiguration: () => dispatch(AuthAction.fetchAppLevelSettings())
+        // fetchAppLevelConfiguration: () => dispatch(AuthAction.fetchAppLevelSettings())
     }
 }
 

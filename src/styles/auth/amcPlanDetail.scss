@@ -3,7 +3,7 @@
   .ant-card-head-title {
     text-align: center;
     font-size: xx-large;
-    color: #348dff;
+    color: #3f7cca;
   }
 }
 
@@ -30,7 +30,7 @@
 }
 
 .amc-plan-detail:hover {
-  background: #348dff;
+  background: #3f7cca;
   transform: scale(1.1);
   h2,
   p {
@@ -70,6 +70,7 @@
     h2 {
       text-align: -webkit-center;
       font-size: xxx-large;
+      margin-bottom: 0;
     }
     .amc-plan-divider {
       height: 2px;

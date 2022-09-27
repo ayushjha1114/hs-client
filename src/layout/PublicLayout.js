@@ -17,7 +17,7 @@ const menu = [
     key: "services",
   },
   {
-    label: <Link to="/amc-plans-details">AMC</Link>,
+    label: <Link to="/amc-plans-details">AMC Plans</Link>,
     key: "amc-plans-details",
   },
   {
@@ -42,21 +42,13 @@ let PublicPage = (props) => {
           <div className="logo">
             <img src="/assets/images/DGSoft-logo.png" alt="" />
           </div>
-          <Menu theme="light" mode="horizontal" items={menu} />
+          <Menu className="header-menu" theme="light" mode="horizontal" items={menu} />
         </Header>
         <Content>
           <div className="site-layout-content ">{props.children}</div>
         </Content>
         <Footer className="layout-footer">
           <div className="footerContainer">
-            <div className="footerTop">
-              <h1>AAAAA MM DOOOOOO</h1>
-              <img
-                src="/assets/images/footer-side-image.png"
-                alt=""
-                style={{ maxWidth: "15%", marginLeft: "55%" }}
-              />
-            </div>
             <div className="footerBottom">
               <img src="/assets/images/DGSoft-footer.png" alt="" />
               <div className="fListContainer">
