@@ -29,7 +29,7 @@ const menu = [
     key: "contact-us",
   },
   {
-    label: <Link to="/">Login</Link>,
+    label: <Link to="/login">Login</Link>,
     key: "login",
   },
 ];

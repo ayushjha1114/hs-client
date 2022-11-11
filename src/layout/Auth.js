@@ -1,17 +1,20 @@
 import React from 'react';
-let AuthLayout = (props) => {
+import { Col, Row } from 'antd';
+
+const AuthLayout = (props) => {
 	return (
-		<section className="main-page-wrapper otp-page-wrapper">
-			<div className="main-page-left">
-				<img src="/assets/images/wave.png" alt="" />
+		<Row>
+		<Col span={12}>
+		{/* <Col span={24}> */}
+			{props.children}
+		</Col>
+		<Col span={12} className="auth-right-layout">
+			<div className="">
+				<img src="/assets/images/login-page.jpg" alt="login-page" style={{ height: '100vh'}} />
 			</div>
-			<div className="main-page-right">
-				<div className="better-logo">
-					<img src="/assets/images/better-logo.svg" alt="" />
-				</div>
-				{props.children}
-			</div>
-		</section>
+			{/* <h1>WELCOME TO THE DGSOFT</h1> */}
+		</Col>
+	  </Row>
 	)
 
 }

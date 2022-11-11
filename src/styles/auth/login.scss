@@ -97,6 +97,78 @@
 
 @media (min-width: 1200px) {}
 
-.login-with-sso {
-    font-family: 'Avenir-Heavy';
+.loginContainer {
+    width: 45%;
+    height: 45vh;
+    background-color: #ffffff;
+    margin-left: 25%;
+    margin-top: -10%;
+    border-radius: 10px;
+    .loginInput {
+        margin-top: 35%;
+        margin-left: 5%;
+        width: 90%;
+        font-size: 20px;
+        padding-left: 5px;
+    }
+    .loginInput input {
+        border-top-style: hidden;
+        border-right-style: hidden;
+        border-left-style: hidden;
+    }
+    .loginBtn {
+        margin-left: 16%;
+        margin-top: 5%;
+        height: 45px;
+        font-weight: bold;
+        font-size: 25px;
+        cursor: pointer;
+        background: #2d75d3;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        width: 65%;
+    }
+    .loginBtn:hover {
+        background: #1890ff;
+        box-shadow: 5px 10px 15px #82a0e6;
+    }
+    .loginPassword {
+        margin-top: 5% !important;
+    }
+    .back-to-home {
+        float: right;
+        font-family: "Avenir-Heavy";
+        font-size: 15px;
+        margin: 5%;
+    }
+}
+
+.loginMobileIcon {
+    color: #6c6cef;
+}
+
+.loginHeader {
+    width: 40%;
+    height: 20vh;
+    background-color: #2d75d3;
+    margin-top: 200px;
+    left: 27.5%;
+    border-radius: 10px;
+    position: relative;
+    background-image: linear-gradient(#2d75d3, #4980d1);
+    .loginGoogle {
+        color: #ffffff;
+        font-size: 30px;
+        margin-left: 43%;
+        padding: 1%;
+        cursor: pointer;
+    }
+}
+
+.loginHeader h1 {
+    color: white;
+    font-size: 40px;
+    padding-left: 35%;
+    padding-top: 10%;
 }
