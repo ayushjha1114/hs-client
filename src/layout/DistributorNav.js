@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { DistributorLink, AdminLink } from '../config/sideNav';
 
@@ -41,12 +40,26 @@ let Navigation = props => {
                 <ul>
                     {
                         isAdminLogin === 'admin' ?
-                            <li>
-                                <Link to={'/admin/dashboard'}>
-                                    <img src="/assets/images/so-icon.svg" alt="" />
-                                    Dashboard
-                                </Link>
-                            </li>
+                            <>
+                                <li>
+                                    <Link to={'/admin/dashboard'}>
+                                        {/* <i class="fa-solid fa-house"></i> */}
+                                        Dashboard
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to={'/admin/dashboard'}>
+                                        {/* <i class="fa-solid fa-user"></i> */}
+                                        New User Registration
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to={'/admin/dashboard'}>
+                                        {/* <i class="fa-solid fa-user"></i> */}
+                                        User Management
+                                    </Link>
+                                </li>
+                            </>
                             :
                             <>
                                 <li>
@@ -63,23 +76,4 @@ let Navigation = props => {
     )
 }
 
-const mapStateToProps = state => {
-    return {
-        // createOrderData: state.distributor.get('create_order'),
-        // app_level_configuration: state.auth.get('app_level_configuration'),
-    }
-}
-const mapDispatchToProps = dispatch => {
-    return {
-        // distributorResetCreateOrderCompleteFormFields: () =>
-        //     dispatch(Action.distributorResetCreateOrderCompleteFormFields()),
-        // fetchAppLevelConfiguration: () => dispatch(AuthAction.fetchAppLevelSettings())
-    }
-}
-
-const ConnectNavigation = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Navigation)
-
-export default ConnectNavigation;
+export default Navigation;

@@ -48,6 +48,7 @@ const LoginPage = props => {
           />
           <button className="loginBtn">Login</button>
           <a className="back-to-home" onClick={onClickBackToLogin}>Back to home <i class="fa-solid fa-arrow-right"></i></a>
+          <a className="back-to-home" onClick={onClickBackToLogin}>Register</a>
         </div>
       </AuthLayout>
     </>

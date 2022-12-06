@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import NavigationNavigation from "./DistributorNav";
 import DistributorHeader from "./DistributorHeader";
 import jwt from 'jsonwebtoken';
-import { connect } from 'react-redux';
 import Auth from '../util/middleware/auth';
-import config from '../config/server';
-// import * as Action from '../services/admin/actions/adminAction';
+import { useLocation } from 'react-router-dom';
 
 let UserLayout = (props) => {
-    const { loaderShowHide } = props;
+    let location = useLocation();
+    console.log("🚀 ~ file: User.js:10 ~ UserLayout ~ location", location)
+
     let access_token = Auth.getAccessToken();
     // const [isPathAdmin] = useState(props.route.path);
-    const isPathAdmin = 'aa'
+    const isPathAdmin = location.pathname.split("/")[1];
+    console.log("🚀 ~ file: User.js:15 ~ UserLayout ~ isPathAdmin", isPathAdmin)
 
     let login_id = '';
     if (isPathAdmin !== 'admin') {
@@ -21,20 +22,17 @@ let UserLayout = (props) => {
             login_id = jwt.decode(access_token).login_id;
         }
     } else if (isPathAdmin === 'admin') {
-        loaderShowHide(true);
-        setTimeout(() => {
-            const isAdminLoggedIn = Auth.adminLoggedIn();
-            if (!isAdminLoggedIn) {
-                // browserHistory.push("/no-access");
-            }
-            const ssoAuthTime = window.localStorage.getItem("TCPL_SSO_at");
-            const anHourAgo = Date.now() - (1000 * 60 * 60);
-            if (new Date(Number(ssoAuthTime)) < new Date(anHourAgo)) {
-                Auth.removeSSOCreds();
-                window.localStorage.clear();
-            }
-            loaderShowHide(false);
-        }, 1000);
+            console.log("🚀 ~ file: User.js:20 ~ UserLayout ~ isPathAdmin", isPathAdmin)
+            // const isAdminLoggedIn = Auth.adminLoggedIn();
+            // if (!isAdminLoggedIn) {
+            //     // browserHistory.push("/no-access");
+            // }
+            // const ssoAuthTime = window.localStorage.getItem("TCPL_SSO_at");
+            // const anHourAgo = Date.now() - (1000 * 60 * 60);
+            // if (new Date(Number(ssoAuthTime)) < new Date(anHourAgo)) {
+            //     Auth.removeSSOCreds();
+            //     window.localStorage.clear();
+            // }
     }
     return (
         <div id="dashboard-wrapper">
@@ -45,19 +43,4 @@ let UserLayout = (props) => {
     )
 
 }
-
-const mapStateToProps = () => {
-    return {}
-}
-const mapDispatchToProps = (dispatch) => {
-    return {
-        // loaderShowHide: (show) =>
-        //     dispatch(Action.loaderShowHide(show))
-    }
-}
-
-const ConnectUserLayout = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(UserLayout)
-export default ConnectUserLayout;
+export default UserLayout;
