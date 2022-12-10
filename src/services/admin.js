@@ -15,4 +15,4 @@ export const adminApi = createApi({
   }),
 });
 
-export const { useGetAllUsersQuery } = adminApi;
+export const { useGetAllUserQuery } = adminApi;

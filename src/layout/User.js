@@ -27,10 +27,8 @@ let UserLayout = (props) => {
             // if (!isAdminLoggedIn) {
             //     // browserHistory.push("/no-access");
             // }
-            // const ssoAuthTime = window.localStorage.getItem("TCPL_SSO_at");
             // const anHourAgo = Date.now() - (1000 * 60 * 60);
             // if (new Date(Number(ssoAuthTime)) < new Date(anHourAgo)) {
-            //     Auth.removeSSOCreds();
             //     window.localStorage.clear();
             // }
     }
