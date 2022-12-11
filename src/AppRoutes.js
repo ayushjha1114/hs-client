@@ -7,6 +7,7 @@ import LoginPage from "./modules/auth/Login";
 import AMCPlanDetails from "./modules/auth/AMCPlanDetails";
 import Dashboard from "./modules/user/Dashboard";
 import AdminDashboard from "./modules/admin/Dashboard";
+import NoAccess from "./modules/admin/NoAccess";
 import Services from "./modules/auth/Services";
 import PublicPage from "./layout/PublicLayout";
 
@@ -26,6 +27,7 @@ const AppRoutes = (props) => {
       <Route path="admin" /* element={<UserLayout />} */ >
           <Route path="dashboard" element={<AdminDashboard />} />
       </Route>
+      <Route path="no-access" element={<NoAccess />} />
     </Routes>
   );
 };

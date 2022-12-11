@@ -63,7 +63,7 @@ let Navigation = props => {
                             :
                             <>
                                 <li>
-                                    <Link to={'/distributor/dashboard'}>
+                                    <Link to={'/dashboard'}>
                                         <img src="/assets/images/so-icon.svg" alt="" />
                                         Text
                                     </Link>

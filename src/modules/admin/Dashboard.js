@@ -1,19 +1,13 @@
 import React from "react";
 import "./Dashboard.css";
 import UserLayout from "../../layout/User";
-import { useGetAllPostsQuery } from "../../services/auth";
 import { useGetAllUserQuery } from "../../services/admin";
 
 
 let AdminDashboard = (props) => {
-  const totalCount = 100;
 
-  // const { data, error, isLoading } = useGetAllPostsQuery();
   const { data, error, isLoading } = useGetAllUserQuery();
   console.log("🚀 ~ file: Dashboard.js:13 ~ AdminDashboard ~ data, error, isLoading", data, error)
-
-  // const { data: aaa } = useGetAllUsersQuery();
-  // console.log("🚀 ~ file: Dashboard.js:13 ~ AdminDashboard ~ aaa", useGetAllUsersQuery())
 
 
   return (

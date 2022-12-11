@@ -8,10 +8,8 @@ const recaptchaKey = process.env.REACT_APP_RECAPTCHA_KEY;
 const envBased = {
 	serviceServerName: {
 		auth: "auth_api_server",
-		order: "order_api_server",
-		sap: "sap_api_server"
-	}
-	, auth_api_server: {
+	}, 
+	auth_api_server: {
 		path: '/auth',
 		version: '/api/v1/',
 		url: baseUrl,
@@ -22,6 +20,7 @@ const envBased = {
 		refresh_token: 'refresh-token',
 		generate_otp: 'generate-otp',
 		verify_otp: 'verify-otp',
+		encryptionKey: 'qwerty987secret',
 	},
 	google_analytics_id: ga_id,
 	cache_version,

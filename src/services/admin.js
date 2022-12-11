@@ -12,7 +12,16 @@ export const adminApi = createApi({
         method: 'GET'
       }),
     }),
+    login: builder.mutation({
+      query(body) {
+        return {
+          url: `login`,
+          method: 'POST',
+          body,
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetAllUserQuery } = adminApi;
+export const { useGetAllUserQuery, useLoginMutation } = adminApi;
