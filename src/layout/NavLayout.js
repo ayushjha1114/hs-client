@@ -48,13 +48,7 @@ let Navigation = props => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to={'/admin/dashboard'}>
-                                        {/* <i class="fa-solid fa-user"></i> */}
-                                        New User Registration
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to={'/admin/dashboard'}>
+                                    <Link to={'/admin/user-management'}>
                                         {/* <i class="fa-solid fa-user"></i> */}
                                         User Management
                                     </Link>

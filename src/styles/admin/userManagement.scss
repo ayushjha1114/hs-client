@@ -1,0 +1,60 @@
+.user-management-card {
+    margin: 80px 20px 0 120px;
+    padding: 20px 10px;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.user-management-card h3 {
+  margin: 0px;
+  font-size: 30px;
+}
+
+.user-management-table {
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.user-management-table table {
+  width: 100%;
+}
+
+.user-management-table table thead tr {
+  background: #1268b3;
+}
+
+.user-management-table table thead tr th {
+  color: #fff;
+  padding: 11px 15px;
+  font-weight: normal;
+  font-family: MyriadPro-Semibold;
+  font-size: 18px;
+}
+
+.user-management-table table tr td {
+  padding: 11px 15px;
+  font-weight: normal;
+  font-family: MyriadPro-Regular;
+  font-size: 18px;
+  color: #333333;
+}
+
+.user-management-table table tbody tr:nth-of-type(odd) {
+  background: #f3f3f3;
+}
+
+.user-management-table table tbody tr td button {
+  border: none;
+  font-size: 16px;
+  background: #00aeef;
+  color: #fff;
+  border-radius: 5px;
+  width: 83px;
+  cursor: pointer;
+  height: 28px;
+}
+
+.user-management-table table tbody tr td button[disabled] {
+  color: #c6c6c6;
+  background: #d4d8da;
+}

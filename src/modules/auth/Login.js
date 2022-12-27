@@ -66,19 +66,27 @@ const LoginPage = props => {
         mobile,
         password: encryptedPassword
       });
-      const decodedToken = jwt.decode(response.data.token);
-      console.log("🚀 ~ file: Login.js:73 ~ handleLogin ~ decodedToken", decodedToken)
-      Auth.setUserName(decodedToken.name);
-      if (decodedToken.role === 'ADMIN') {
-        Auth.setAdminAccessToken(response.data.token);
-        Auth.setRole(decodedToken.role);
-        window.localStorage.setItem('login_at', Date.now());
-        navigate('/admin/dashboard');
-      } else if (decodedToken.role === 'USER') {
-        Auth.setAccessToken(response.data.token);
-        Auth.setRole(decodedToken.role);
-        window.localStorage.setItem('login_at', Date.now());
-        navigate('/dashboard');
+      if (response?.error?.data?.success === false) {
+        errorHandler(
+          'Error occurred',
+          response.error.data.message
+        )
+      } else if (response?.data?.success === true) {
+        const decodedToken = jwt.decode(response.data.token);
+        console.log("🚀 ~ file: Login.js:73 ~ handleLogin ~ decodedToken", decodedToken)
+        Auth.setUserName(decodedToken.name);
+        
+        if (decodedToken.role === 'ADMIN') {
+          Auth.setAdminAccessToken(response.data.token);
+          Auth.setRole(decodedToken.role);
+          window.localStorage.setItem('login_at', Date.now());
+          navigate('/admin/dashboard');
+        } else if (decodedToken.role === 'USER') {
+          Auth.setAccessToken(response.data.token);
+          Auth.setRole(decodedToken.role);
+          window.localStorage.setItem('login_at', Date.now());
+          navigate('/dashboard');
+        }
       }
     }
   };

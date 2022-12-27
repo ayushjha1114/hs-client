@@ -1,0 +1,24 @@
+.registerModalTitle {
+    color: #1268b3;
+    font-size: 1.65rem !important;
+    font-weight: bold !important;
+}
+
+.registerModalContentText {
+    color: #443c3c !important;
+    font-size: 1.25rem !important;
+    margin-bottom: 10px !important;
+}
+
+.registerModalBody {
+    margin-left: 20px;
+    margin-right: 20px;
+    .registerModalBodyField {
+        display: flex;
+        gap: 20px;
+    }
+}
+
+.registerModalBtn {
+    font-size: 1.25rem !important;
+}

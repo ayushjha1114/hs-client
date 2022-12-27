@@ -10,6 +10,7 @@ import AdminDashboard from "./modules/admin/Dashboard";
 import NoAccess from "./modules/admin/NoAccess";
 import Services from "./modules/auth/Services";
 import PublicPage from "./layout/PublicLayout";
+import UserManagement from "./modules/admin/UserManagement";
 
 // import httpService from './axios-interceptors';
 
@@ -26,6 +27,7 @@ const AppRoutes = (props) => {
       <Route path="welcome" element={<WelcomePage />}></Route>
       <Route path="admin" /* element={<UserLayout />} */ >
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="user-management" element={<UserManagement />} />
       </Route>
       <Route path="no-access" element={<NoAccess />} />
     </Routes>
