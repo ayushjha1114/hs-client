@@ -4,7 +4,6 @@ import { useGetAllUserQuery } from "../../services/admin";
 
 const UserManagement = () => {
     const { data, error, isLoading } = useGetAllUserQuery();
-    // console.log("🚀 ~ file: UserManagement.js:7 ~ UserManagement ~ data", data)
 
 	return (
         <>
@@ -19,24 +18,6 @@ const UserManagement = () => {
                         ) : data ? (
                             <>
                             <h5>{data.data.totalCount} records found</h5>
-                            {/* <table>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Mobile</th>
-                                <th>Action</th>
-                            </tr>
-                            {
-                                data.data.rows.map(item => (
-                                <tr>
-                                    <td>{item.first_name} {item.last_name}</td>
-                                    <td>{item.email}</td>
-                                    <td>{item.mobile}</td>
-                                    <td><a>edit</a></td>
-                                </tr>
-                                ))
-                            }
-                            </table> */}
                             <div className="user-management-table">
                                 <table>
                                     <thead>
@@ -52,7 +33,7 @@ const UserManagement = () => {
                                         {data.data.rows && data.data.rows.length > 0 && data.data.rows.map((item, i) => {
                                             return (
                                                 <tr key={i}>
-                                                    <td>{item.first_name} {item.last_name}</td>
+                                                    <td>{item.first_name} {(item.last_name === null) ? item.last_name : '' }</td>
                                                     <td>{item.email}</td>
                                                     <td>{item.mobile}</td>
                                                     <td>{item.role}</td>

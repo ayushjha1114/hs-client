@@ -21,7 +21,16 @@ export const adminApi = createApi({
         }
       },
     }),
+    registerUser: builder.mutation({
+      query(body) {
+        return {
+          url: `register_user`,
+          method: 'POST',
+          body,
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetAllUserQuery, useLoginMutation } = adminApi;
+export const { useGetAllUserQuery, useLoginMutation, useRegisterUserMutation } = adminApi;
