@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -16,22 +16,28 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { AES } from 'crypto-js';
 import { ADD_USER } from './adminSlice';
-import { useRegisterUserMutation } from '../../services/admin';
+import { useGetAllUserQuery, useRegisterUserMutation, useUpdateUserDetailMutation } from '../../services/admin';
 import config from '../../config/server';
 
 const baseConfig = config[config.serviceServerName['auth']];
 
 export default function RegisterUserModal(props) {
-  const dispatch = useDispatch();
-  const [registerUser] = useRegisterUserMutation();
+  const { show, onHide, forEdit, forView, mobile, closeEdit, closeView  } = props;
 
-  const { show, onHide } = props;
+  const dispatch = useDispatch();
+  const userList = useSelector((state) => state.admin.userList);
+
+  const [registerUser] = useRegisterUserMutation();
+  const [updateUserDetail] = useUpdateUserDetailMutation();
+  const { refetch } = useGetAllUserQuery();
+
   const [isChecked, setIsChecked] = useState(false);
   const [data, setData] = useState({});
   const [permanentAddress, setPermanentAddress] = useState('');
   const [permanentCity, setPermanentCity] = useState('');
   const [permanentState, setPermanentState] = useState('');
   const [permanentPincode, setPermanentPincode] = useState('');
+  const [defaultData, setDefaultData] = useState({});
   
   const handleChange = (event, field) => {
     switch (field) {
@@ -54,13 +60,13 @@ export default function RegisterUserModal(props) {
         setData({ ...data, mobile: event.target.value});
         break;
       case 'dob':
-        setData({ ...data, dob: event.target.value});
+        setData({ ...data, date_of_birth: event.target.value});
         break;
       case 'gender':
         setData({ ...data, gender: event.target.value});
         break;
       case 'aadhaar':
-        setData({ ...data, aadhaar: event.target.value});
+        setData({ ...data, aadhaar_number: event.target.value});
         break;
       case 'current_address':
         setData({ ...data, current_address: event.target.value});
@@ -79,18 +85,6 @@ export default function RegisterUserModal(props) {
       }
   };
   
-  const handleSubmit = async () => {
-    data.permanent_address = permanentAddress;
-    data.permanent_city = permanentCity;
-    data.permanent_state = permanentState;
-    data.permanent_pincode = permanentPincode;
-    const encryptedPassword = AES.encrypt(data.password, baseConfig.encryptionKey).toString();
-    data.password = encryptedPassword;
-    dispatch(ADD_USER({ data }));
-    const response = await registerUser(data);
-    onHide();
-  };
-
   const handleCheckBoxClicked = (event) => {
     if (event.target.checked) {
       setPermanentAddress(data?.current_address);
@@ -99,6 +93,44 @@ export default function RegisterUserModal(props) {
       setPermanentPincode(data?.current_pincode);
     }
     setIsChecked(current => !current);
+  };
+  
+  const handleSubmit = async () => {
+    if (forEdit) {
+      let modifiedData = data;
+      modifiedData.mobile = mobile;
+      const response = await updateUserDetail(modifiedData);
+      refetch();
+    } else {
+      data.permanent_address = permanentAddress;
+      data.permanent_city = permanentCity;
+      data.permanent_state = permanentState;
+      data.permanent_pincode = permanentPincode;
+      const encryptedPassword = AES.encrypt(data.password, baseConfig.encryptionKey).toString();
+      data.password = encryptedPassword;
+      dispatch(ADD_USER({ data }));
+      const response = await registerUser(data);
+    }
+    onHide();
+  };
+
+  useEffect(() => {
+    if (userList.length > 0) {
+      userList.map(item => {
+        if(item.mobile === mobile) {
+          setDefaultData(item);
+        }
+      });
+    }
+  }, [forEdit, forView, show]);
+
+  const handleCancel = () => {
+    onHide();
+    if(forEdit) {
+      closeEdit();
+    } else {
+      closeView();
+    }
   };
 
   return (
@@ -119,6 +151,7 @@ export default function RegisterUserModal(props) {
             <div className="registerModalBodyField">
               <TextField
                 required
+                disabled={forView}
                 autoFocus
                 margin="dense"
                 id="name"
@@ -126,29 +159,35 @@ export default function RegisterUserModal(props) {
                 type="text"
                 fullWidth
                 variant="standard"
+                defaultValue={(forEdit || forView) ? defaultData?.first_name : ''}
                 onChange={(e) => handleChange(e, 'first_name')}
               />
               <TextField
                 margin="dense"
+                disabled={forView}
                 id="name"
                 label="Middle Name"
                 type="text"
                 fullWidth
                 variant="standard"
+                defaultValue={(forEdit || forView) ? ((defaultData?.middle_name === 'null') ? '': defaultData?.middle_name) : ''}
                 onChange={(e) => handleChange(e, 'middle_name')}
               />
               <TextField
                 margin="dense"
+                disabled={forView}
                 id="name"
                 label="Last Name"
                 type="text"
                 fullWidth
                 variant="standard"
+                defaultValue={(forEdit || forView) ? ((defaultData?.last_name === 'null') ? '': defaultData?.last_name): ''}
                 onChange={(e) => handleChange(e, 'last_name')}
               />
             </div>
             <div className="registerModalBodyField">
               <TextField
+                disabled={forEdit || forView}
                 required
                 margin="dense"
                 id="name"
@@ -156,10 +195,12 @@ export default function RegisterUserModal(props) {
                 type="email"
                 fullWidth
                 variant="standard"
+                defaultValue={(forEdit || forView) ? defaultData?.email : ''}
                 onChange={(e) => handleChange(e, 'email')}
               />
               <TextField
                 required
+                disabled={forEdit || forView}
                 margin="dense"
                 id="name"
                 label="Password"
@@ -172,24 +213,28 @@ export default function RegisterUserModal(props) {
             <div className="registerModalBodyField" style={{ marginTop: '15px' }}>
               <TextField
                 required
+                disabled={forEdit || forView}
                 margin="dense"
                 id="name"
                 label="Mobile Number"
                 type="text"
                 fullWidth
                 variant="standard"
+                defaultValue={(forEdit || forView) ? defaultData?.mobile : ''}
                 onChange={(e) => handleChange(e, 'mobile_number')}
               />
               <TextField
                 id="date"
+                disabled={forView}
                 label="Date Of Birth"
                 type="date"
                 defaultValue="1997-05-24"
                 sx={{ width: 220 }}
                 InputLabelProps={{
-                shrink: true,
+                  shrink: true,
                 }}
                 onChange={(e) => handleChange(e, 'dob')}
+                defaultValue={(forEdit || forView) ? ((defaultData?.date_of_birth === 'null') ? '': defaultData?.date_of_birth) : ''}
               />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
               <InputLabel id="demo-simple-select-standard-label">Gender</InputLabel>
@@ -198,6 +243,8 @@ export default function RegisterUserModal(props) {
                 id="demo-simple-select-standard"
                 onChange={(e) => handleChange(e, 'gender')}
                 label="Gender"
+                defaultValue={(forEdit || forView) ? defaultData?.gender : ''}
+                disabled={forView}
               >
                 <MenuItem value='male'>Male</MenuItem>
                 <MenuItem value='female'>Female</MenuItem>
@@ -207,6 +254,7 @@ export default function RegisterUserModal(props) {
             </div>
             <TextField
               required
+              disabled={forView}
               margin="dense"
               id="name"
               label="Aadhaar Number"
@@ -214,6 +262,7 @@ export default function RegisterUserModal(props) {
               fullWidth
               variant="standard"
               onChange={(e) => handleChange(e, 'aadhaar')}
+              defaultValue={(forEdit || forView) ? defaultData?.aadhaar_number : ''}
             />
           </div>
           <DialogContentText className="registerModalContentText" style={{ marginTop: '20px' }}>
@@ -222,6 +271,7 @@ export default function RegisterUserModal(props) {
           <Divider />
           <div className='registerModalBody'>
             <TextField
+              disabled={forView}
               id="standard-textarea"
               label="Current Address"
               placeholder="Placeholder"
@@ -229,10 +279,11 @@ export default function RegisterUserModal(props) {
               variant="standard"
               fullWidth
               onChange={(e) => handleChange(e, 'current_address')}
+              defaultValue={(forEdit || forView) ? defaultData?.current_address : ''}
             />
             <div className="registerModalBodyField">
               <TextField
-                required
+                disabled={forView}
                 autoFocus
                 margin="dense"
                 id="name"
@@ -241,9 +292,10 @@ export default function RegisterUserModal(props) {
                 fullWidth
                 variant="standard"
                 onChange={(e) => handleChange(e, 'current_city')}
+                defaultValue={(forEdit || forView) ? defaultData?.current_city : ''}
               />
               <TextField
-                required
+                disabled={forView}
                 margin="dense"
                 id="name"
                 label="Current State"
@@ -251,9 +303,10 @@ export default function RegisterUserModal(props) {
                 fullWidth
                 variant="standard"
                 onChange={(e) => handleChange(e, 'current_state')}
+                defaultValue={(forEdit || forView) ? defaultData?.current_state : ''}
               />
               <TextField
-                required
+                disabled={forView}
                 margin="dense"
                 id="name"
                 label="Current Pincode"
@@ -261,6 +314,7 @@ export default function RegisterUserModal(props) {
                 fullWidth
                 variant="standard"
                 onChange={(e) => handleChange(e, 'current_pincode')}
+                defaultValue={(forEdit || forView) ? defaultData?.current_pincode : ''}
               />
             </div>
             <FormControlLabel 
@@ -268,6 +322,7 @@ export default function RegisterUserModal(props) {
               label="Permanent address same as Current address" 
             />
             <TextField
+              disabled={forView}
               id="standard-textarea"
               label="Permanent Address"
               placeholder="Placeholder"
@@ -276,10 +331,11 @@ export default function RegisterUserModal(props) {
               fullWidth
               defaultValue={permanentAddress}
               onChange={(e) => handleChange(e, 'permanent_address')}
+              defaultValue={(forEdit || forView) ? defaultData?.permanent_address : ''}
             />
             <div className="registerModalBodyField">
               <TextField
-                required
+                disabled={forView}
                 autoFocus
                 margin="dense"
                 id="name"
@@ -289,9 +345,10 @@ export default function RegisterUserModal(props) {
                 variant="standard"
                 defaultValue={permanentCity}
                 onChange={(e) => handleChange(e, 'permanent_city')}
+                defaultValue={(forEdit || forView) ? defaultData?.permanent_city : ''}
               />
               <TextField
-                required
+                disabled={forView}
                 margin="dense"
                 id="name"
                 label="Permanent State"
@@ -300,9 +357,10 @@ export default function RegisterUserModal(props) {
                 variant="standard"
                 defaultValue={permanentState}
                 onChange={(e) => handleChange(e, 'permanent_state')}
+                defaultValue={(forEdit || forView) ? defaultData?.permanent_state : ''}
               />
               <TextField
-                required
+                disabled={forView}
                 margin="dense"
                 id="name"
                 label="Permanent Pincode"
@@ -311,13 +369,17 @@ export default function RegisterUserModal(props) {
                 variant="standard"
                 defaultValue={permanentPincode}
                 onChange={(e) => handleChange(e, 'permanent_pincode')}
+                defaultValue={(forEdit || forView) ? defaultData?.permanent_pincode : ''}
               />
             </div>
           </div>
         </DialogContent>
         <DialogActions>
-          <Button className="registerModalBtn" onClick={onHide}>Cancel</Button>
-          <Button className="registerModalBtn" onClick={() => handleSubmit()}>Submit</Button>
+          <Button className="registerModalBtn" onClick={() => handleCancel()}>Cancel</Button>
+          {
+            !forView && 
+            <Button className="registerModalBtn" onClick={() => handleSubmit()}>{forEdit ? 'Edit': 'Submit'}</Button>
+          }
         </DialogActions>
       </Dialog>
     </div>

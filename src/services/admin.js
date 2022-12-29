@@ -30,7 +30,16 @@ export const adminApi = createApi({
         }
       },
     }),
+    updateUserDetail: builder.mutation({
+      query(body) {
+        return {
+          url: `user`,
+          method: 'PATCH',
+          body,
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetAllUserQuery, useLoginMutation, useRegisterUserMutation } = adminApi;
+export const { useGetAllUserQuery, useLoginMutation, useRegisterUserMutation, useUpdateUserDetailMutation } = adminApi;

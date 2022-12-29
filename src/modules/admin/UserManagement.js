@@ -1,9 +1,34 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
+import RegisterUserModal from "./RegisterUserModal";
+import { SET_USER_LIST } from './adminSlice';
 
 const UserManagement = () => {
+    const dispatch = useDispatch();
     const { data, error, isLoading } = useGetAllUserQuery();
+    const [registerModalShow, setRegisterModalShow] = useState(false);
+    const [forEdit, setForEdit] = useState(false);
+    const [forView, setForView] = useState(false);
+    const [mobile, setMobile] = useState('');
+
+
+    const handleEditBtn = (mobile) => {
+        setForEdit(true);
+        setMobile(mobile);
+        setRegisterModalShow(true);
+    };
+
+    const handleViewBtn = (mobile) => {
+        setForView(true);
+        setMobile(mobile);
+        setRegisterModalShow(true);
+    };
+
+    useEffect(() => {
+        dispatch(SET_USER_LIST({ data: data?.data?.rows }));
+    }, [data, forEdit, forView]);
 
 	return (
         <>
@@ -33,12 +58,19 @@ const UserManagement = () => {
                                         {data.data.rows && data.data.rows.length > 0 && data.data.rows.map((item, i) => {
                                             return (
                                                 <tr key={i}>
-                                                    <td>{item.first_name} {(item.last_name === null) ? item.last_name : '' }</td>
+                                                    <td>{item.first_name} {(item.last_name !== 'null') ? item.last_name : '' }</td>
                                                     <td>{item.email}</td>
                                                     <td>{item.mobile}</td>
                                                     <td>{item.role}</td>
                                                     <td className='admin-actions'>
-                                                        <button type="button">Edit</button>
+                                                        <button 
+                                                            className="user-mngt-edit-btn" 
+                                                            type="button"
+                                                            onClick={() => handleEditBtn(item.mobile)}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button onClick={() => handleViewBtn(item.mobile)} type="button">View</button>
                                                     </td>
                                                 </tr>
                                             )
@@ -47,9 +79,18 @@ const UserManagement = () => {
                                 </table>
                             </div>
                         </>
-                    ) : null}
+                    ) : <></>}
                 </div>
             </div>
+            <RegisterUserModal
+                forEdit={forEdit}
+                forView={forView}
+                mobile={mobile}
+                show={registerModalShow}
+                onHide={() => setRegisterModalShow(false)}
+                closeEdit={() => setForEdit(false)}
+                closeView={() => setForView(false)}
+            />
             </UserLayout>
         </>
 	)
