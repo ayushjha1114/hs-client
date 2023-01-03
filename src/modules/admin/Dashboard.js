@@ -6,15 +6,12 @@ import RegisterUserModal from "./RegisterUserModal";
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-
 const AdminDashboard = (props) => {
   const [registerModalShow, setRegisterModalShow] = useState(false);
   const { data, error, isLoading } = useGetAllUserQuery();
   
   const handlePlusBtn = () => {
     setRegisterModalShow(true);
-    console.log("🚀 ~ file: Dashboard.js:13 ~ AdminDashboard ~ data, error, isLoading", data, error)
-
   }
 
 
@@ -27,14 +24,14 @@ const AdminDashboard = (props) => {
             <div className="card">
               <div className="card-row">
                 <div className="card-row-col">
-                  <h3>User Management</h3>
+                  <h3>ADMIN DASHBOARD</h3>
                   {error ? (
                     <>Oh no, there was an error</>
                     ) : isLoading ? (
                       <>Loading...</>
                       ) : data ? (
                         <>
-                        <h5>{data.data.totalCount} records found</h5>
+                        <h5>{data?.data?.totalCount ? data?.data?.totalCount : 0} records found</h5>
                         <table>
                           <tr>
                             <th>Name</th>
@@ -42,7 +39,7 @@ const AdminDashboard = (props) => {
                             <th>Mobile</th>
                           </tr>
                           {
-                            data.data.rows.map(item => (
+                            data?.data && data?.data?.rows?.length > 0 && data?.data?.rows.map(item => (
                               <tr>
                                 <td>{item.first_name} {item.last_name}</td>
                                 <td>{item.email}</td>

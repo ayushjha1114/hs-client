@@ -42,7 +42,7 @@ const UserManagement = () => {
                         <>Loading...</>
                         ) : data ? (
                             <>
-                            <h5>{data.data.totalCount} records found</h5>
+                            <h5>{data?.data?.totalCount ? data?.data?.totalCount : 0} records found</h5>
                             <div className="user-management-table">
                                 <table>
                                     <thead>
@@ -55,7 +55,7 @@ const UserManagement = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.data.rows && data.data.rows.length > 0 && data.data.rows.map((item, i) => {
+                                        {data?.data && data?.data?.rows?.length > 0 && data.data.rows.map((item, i) => {
                                             return (
                                                 <tr key={i}>
                                                     <td>{item.first_name} {(item.last_name !== 'null') ? item.last_name : '' }</td>
