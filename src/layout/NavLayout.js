@@ -53,6 +53,12 @@ let Navigation = props => {
                                         User Management
                                     </Link>
                                 </li>
+                                <li>
+                                    <Link to={'/admin/complain-list'}>
+                                        {/* <i class="fa-solid fa-user"></i> */}
+                                        Complain List
+                                    </Link>
+                                </li>
                             </>
                             :
                             <>

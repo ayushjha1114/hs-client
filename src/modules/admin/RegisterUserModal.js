@@ -221,7 +221,7 @@ export default function RegisterUserModal(props) {
         maxWidth="lg"
         fullWidth={true}
       >
-        <DialogTitle className="registerModalTitle">Register New User</DialogTitle>
+        <DialogTitle className="registerModalTitle">{forEdit ? 'Edit User': forView ? 'View User': 'Register New User' }</DialogTitle>
         <DialogContent>
           <DialogContentText className="registerModalContentText">
             Personal Information
