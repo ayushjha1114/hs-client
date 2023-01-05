@@ -4,6 +4,8 @@ import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
 import RegisterUserModal from "./RegisterUserModal";
 import { SET_USER_LIST } from './adminSlice';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 const UserManagement = () => {
     const dispatch = useDispatch();
@@ -25,6 +27,10 @@ const UserManagement = () => {
         setMobile(mobile);
         setRegisterModalShow(true);
     };
+
+    const handlePlusBtn = () => {
+        setRegisterModalShow(true);
+    }
 
     useEffect(() => {
         dispatch(SET_USER_LIST({ data: data?.data?.rows }));
@@ -80,6 +86,11 @@ const UserManagement = () => {
                             </div>
                         </>
                     ) : <></>}
+                </div>
+                <div class="plus-btn-block">
+                    <Fab color="primary" aria-label="add" onClick={() => handlePlusBtn()}>
+                        <AddIcon />
+                    </Fab>
                 </div>
             </div>
             <RegisterUserModal

@@ -2,18 +2,9 @@ import React, { useState } from "react";
 import "./Dashboard.css";
 import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
-import RegisterUserModal from "./RegisterUserModal";
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
 
 const AdminDashboard = (props) => {
-  const [registerModalShow, setRegisterModalShow] = useState(false);
   const { data, error, isLoading } = useGetAllUserQuery();
-  
-  const handlePlusBtn = () => {
-    setRegisterModalShow(true);
-  }
-
 
   return (
     <>
@@ -53,22 +44,7 @@ const AdminDashboard = (props) => {
                 </div>
               </div>
             </div>
-            <div class="plus-btn-block">
-              <Fab color="primary" aria-label="add" onClick={() => handlePlusBtn()}>
-                <AddIcon />
-              </Fab>
-              {/* <button 
-                className="plus-btn"
-                onClick={() => handlePlusBtn()}
-              >
-                <img src="/assets/images/plus-btn.svg" alt="" />
-              </button> */}
-            </div>
           </div>
-          <RegisterUserModal
-            show={registerModalShow}
-            onHide={() => setRegisterModalShow(false)}
-          />
         </UserLayout>
     </>
   );

@@ -123,6 +123,8 @@ export default function RegisterUserModal(props) {
             duration: 4,
             className: 'notification-green',
           });
+          onHide();
+          refetch();
         } else {
           errorHandler(
             'Technical Error',
@@ -130,6 +132,7 @@ export default function RegisterUserModal(props) {
           )
         }
       } else {
+        console.log("🚀 ~ file: RegisterUserModal.js:135 ~ handleSubmit ~ data", data)
         if (!data.first_name) {
           errorHandler(
             'Error occurred',
@@ -174,6 +177,7 @@ export default function RegisterUserModal(props) {
         const encryptedPassword = AES.encrypt(data.password, baseConfig.encryptionKey).toString();
         data.password = encryptedPassword;
         const response = await registerUser(data);
+        console.log("🚀 ~ file: RegisterUserModal.js:180 ~ handleSubmit ~ response", response)
         if (response?.data?.success) {
           dispatch(ADD_USER({ data }));
           notification.success({
@@ -182,6 +186,8 @@ export default function RegisterUserModal(props) {
             duration: 4,
             className: 'notification-green',
           });
+          onHide();
+          refetch();
         } else {
           errorHandler(
             'Technical Error',
@@ -190,8 +196,6 @@ export default function RegisterUserModal(props) {
         }
       }
       }
-      refetch();
-      onHide();
   };
 
   useEffect(() => {

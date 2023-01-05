@@ -54,9 +54,15 @@ let Navigation = props => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to={'/admin/complain-list'}>
+                                    <Link to={'/admin/tickets'}>
                                         {/* <i class="fa-solid fa-user"></i> */}
-                                        Complain List
+                                        Tickets
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to={'/admin/brand'}>
+                                        {/* <i class="fa-solid fa-user"></i> */}
+                                        Brand
                                     </Link>
                                 </li>
                             </>

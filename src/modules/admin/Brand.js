@@ -2,45 +2,60 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import UserLayout from "../../layout/User";
 
-const ComplainList = () => {
-    const error = '';
-    const isLoading  = false;
-    const data = {
-        data: {
-            totalCount: 5,
-            rows: [{
-                    name: 'ayush', 
-                    subject: 'shipped',
-                    agent: 'ddd',
-                    status: 'active',
-                    last_message: '2 min ago',
-                }
-            ]
-        }
-    }
+const Brand = () => {
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [status, setStatus] = useState('');
+  const [statusColor, setStatusColor] = useState('');
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const error = '';
+  const isLoading  = false;
+  const data = {
+      data: {
+          totalCount: 5,
+          rows: [{
+                  name: 'Dell', 
+                  description: 'something...',
+              }
+          ]
+      }
+  }
+
+  const handlePriority = (priority) => {
+    handleClose();
+  };
+
+  const handleStatus = (status, color) => {
+    setStatus(status);
+    setStatusColor(color);
+    handleClose();
+  };
 
 	return (
         <>
             <UserLayout>
             <div className="">
                 <div className="user-management-card">
-                    <h3>Complain List</h3>
+                    <h3>Brand</h3>
                     {error ? (
                         <>Oh no, there was an error</>
                         ) : isLoading ? (
                         <>Loading...</>
                         ) : data ? (
                             <>
-                            <h5>{data?.data?.totalCount ? data?.data?.totalCount : 0} records found</h5>
                             <div className="user-management-table">
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Requester</th>
-                                            <th>Subject</th>
-                                            <th>Agent</th>
-                                            <th>Status</th>
-                                            <th>Last message</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -49,12 +64,15 @@ const ComplainList = () => {
                                             return (
                                                 <tr key={i}>
                                                     <td>{item.name}</td>
-                                                    <td>{item.subject}</td>
-                                                    <td>{item.agent}</td>
-                                                    <td>{item.status}</td>
-                                                    <td>{item.last_message}</td>
-                                                    <td className='admin-actions'>
-                                                        <button onClick={() => handleViewBtn(item.mobile)} type="button">actions</button>
+                                                    <td>{item.description}</td>
+                                                    <td  className='admin-actions'>
+                                                        <button 
+                                                            className="user-mngt-edit-btn" 
+                                                            type="button"
+                                                            // onClick={() => handleEditBtn(item.mobile)}
+                                                        >
+                                                            Edit
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             )
@@ -71,4 +89,4 @@ const ComplainList = () => {
 	)
 }
 
-export default ComplainList;
+export default Brand;
