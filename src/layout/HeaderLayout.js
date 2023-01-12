@@ -8,7 +8,6 @@ const appConfig = appLevelConfig.app_level_configuration;
 let HeaderLayout = props => {
     const navigate = useNavigate();
     const [isAdmin] = useState(props.isAdminLogin);
-    console.log("🚀 ~ file: HeaderLayout.js:11 ~ HeaderLayout ~ isAdmin", isAdmin, isAdmin === 'admin')
     const [activeCount, setActiveCount] = useState(0)
     const [profileFeatureFlag, setProfileFeatureFlag] = useState(true);
     const [changePasswordFeatureFlag, setChangePasswordFeatureFlag] = useState(true);

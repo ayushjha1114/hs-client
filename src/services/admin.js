@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Auth from '../util/middleware/auth';
+import Auth from "../util/middleware/auth";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
@@ -10,43 +10,202 @@ export const adminApi = createApi({
     getAllUser: builder.query({
       query: () => ({
         headers: {
-          'Content-type': 'application/json',
-          'Authorization': Auth.getAdminAccessToken()
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
         },
-        url: 'user-list',
-        method: 'GET'
+        url: "user-list",
+        method: "GET",
+      }),
+    }),
+    getUserById: builder.query({
+      query: (id) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `user/${id}`,
+        method: "GET",
+      }),
+    }),
+    getAllBrand: builder.query({
+      query: () => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `brand-list`,
+        method: "GET",
+      }),
+    }),
+    getAllService: builder.query({
+      query: () => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `service-list`,
+        method: "GET",
+      }),
+    }),
+    getAllTicket: builder.query({
+      query: () => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `ticket-list`,
+        method: "GET",
+      }),
+    }),
+    getAllPaymentDetail: builder.query({
+      query: () => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `payment-detail-list`,
+        method: "GET",
       }),
     }),
     login: builder.mutation({
       query: (body) => ({
-        url: 'login',
-        method: 'POST',
+        url: "login",
+        method: "POST",
         body,
       }),
     }),
     registerUser: builder.mutation({
       query: (body) => ({
         headers: {
-          'Content-type': 'application/json',
-          'Authorization': Auth.getAdminAccessToken()
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
         },
-        url: 'register-user',
-        method: 'POST',
+        url: "register-user",
+        method: "POST",
         body,
       }),
     }),
     updateUserDetail: builder.mutation({
       query: (body) => ({
         headers: {
-          'Content-type': 'application/json',
-          'Authorization': Auth.getAdminAccessToken()
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
         },
-        url: 'user',
-        method: 'PATCH',
+        url: "user",
+        method: "PATCH",
         body,
+      }),
+    }),
+    createBrand: builder.mutation({
+      query: (body) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: "brand",
+        method: "POST",
+        body,
+      }),
+    }),
+    updateBrandDetail: builder.mutation({
+      query: (data) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `brand/${data.id}`,
+        method: "PATCH",
+        body: {
+          name: data.name,
+          description: data.description
+        }
+      }),
+    }),
+    createService: builder.mutation({
+      query: (body) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: "service",
+        method: "POST",
+        body,
+      }),
+    }),
+    updateServiceDetail: builder.mutation({
+      query: (data) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `service/${data.id}`,
+        method: "PATCH",
+        body: data
+      }),
+    }),
+    createTicket: builder.mutation({
+      query: (body) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: "ticket",
+        method: "POST",
+        body,
+      }),
+    }),
+    savePaymentDetail: builder.mutation({
+      query: (body) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: "payment-detail",
+        method: "POST",
+        body,
+      }),
+    }),
+    updatePaymentDetail: builder.mutation({
+      query: (data) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `payment-detail/${data.id}`,
+        method: "PATCH",
+        body: data
+      }),
+    }),
+    updateTicket: builder.mutation({
+      query: (data) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `ticket/${data.id}`,
+        method: "PATCH",
+        body: data
       }),
     }),
   }),
 });
 
-export const { useGetAllUserQuery, useLoginMutation, useRegisterUserMutation, useUpdateUserDetailMutation } = adminApi;
+export const {
+  useGetAllUserQuery,
+  useLoginMutation,
+  useRegisterUserMutation,
+  useUpdateUserDetailMutation,
+  useGetUserByIdQuery,
+  useGetAllBrandQuery,
+  useCreateBrandMutation, 
+  useUpdateBrandDetailMutation,
+  useGetAllServiceQuery,
+  useCreateServiceMutation,
+  useUpdateServiceDetailMutation,
+  useCreateTicketMutation,
+  useGetAllTicketQuery,
+  useSavePaymentDetailMutation,
+  useGetAllPaymentDetailQuery,
+  useUpdatePaymentDetailMutation,
+  useUpdateTicketMutation
+} = adminApi;

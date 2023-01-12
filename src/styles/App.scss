@@ -4,7 +4,6 @@
 // Auth
 @import "./auth/welcome.scss";
 @import "./auth/login.scss";
-@import "./auth/otp.scss";
 @import "./auth/services.scss";
 @import "./auth/publicLayout.scss";
 @import "./auth/amcPlanDetail.scss";
@@ -14,4 +13,6 @@
 @import "./admin/noAccess.scss";
 @import "./admin/userManagement.scss";
 @import "./admin/registerUserModal.scss";
+@import "./admin/brand.scss";
+@import "./admin/service.scss";
 @import "./admin/tickets.scss";

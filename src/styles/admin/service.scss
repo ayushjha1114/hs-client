@@ -1,0 +1,30 @@
+.service-heading {
+    display: flex;
+    .new-service-btn {
+        left: 87%;
+        margin-top: 7px;
+        font-size: 1.25rem;
+        padding-top: 1px;
+    }
+}
+
+.serviceEditBtn {
+    margin-right: 10px;
+}
+
+
+/* Service modal css */
+
+.serviceModalAddBtn {
+    font-size: 1.75rem;
+    margin-top: 20px;
+}
+
+.serviceModalServiceProvidedText {
+    margin-top: 30px !important;
+    white-space: nowrap;
+}
+
+.serviceModalServiceTypeText {
+    margin-top: 10px !important;
+}

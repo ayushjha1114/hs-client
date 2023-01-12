@@ -1,14 +1,8 @@
-.top-box-spinner span {
-  top: 70% !important;
-}
 
 .box {
   display: flex;
 }
 
-.icon-sync {
-  padding-left: 19%;
-}
 
 .box-content1 {
   display: flex;

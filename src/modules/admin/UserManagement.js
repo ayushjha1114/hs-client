@@ -1,40 +1,56 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
 import RegisterUserModal from "./RegisterUserModal";
 import { SET_USER_LIST } from './adminSlice';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import { EditTwoTone, EyeTwoTone } from '@ant-design/icons';
 
 const UserManagement = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const userList = useSelector((state) => state.admin.userList);
     const { data, error, isLoading } = useGetAllUserQuery();
+
     const [registerModalShow, setRegisterModalShow] = useState(false);
-    const [forEdit, setForEdit] = useState(false);
     const [forView, setForView] = useState(false);
     const [mobile, setMobile] = useState('');
+    const [userId, setUserId] = useState('');
 
 
     const handleEditBtn = (mobile) => {
-        setForEdit(true);
-        setMobile(mobile);
-        setRegisterModalShow(true);
+        navigate('/admin/register-user', {
+            state: {
+                mobile,
+                forEdit: true,
+            }
+        });
     };
 
     const handleViewBtn = (mobile) => {
+        if (userList.length > 0) {
+            userList.map(item => {
+              if(item.mobile === mobile) {
+                  console.log("🚀 ~ file: UserManagement.js:35 ~ handleViewBtn ~ item.mobile", item.mobile, item.id)
+                setUserId(item.id);
+              }
+            });
+        }
         setForView(true);
         setMobile(mobile);
         setRegisterModalShow(true);
     };
 
     const handlePlusBtn = () => {
-        setRegisterModalShow(true);
+        navigate('/admin/register-user');
     }
 
     useEffect(() => {
         dispatch(SET_USER_LIST({ data: data?.data?.rows }));
-    }, [data, forEdit, forView]);
+    }, [data, forView]);
 
 	return (
         <>
@@ -69,14 +85,13 @@ const UserManagement = () => {
                                                     <td>{item.mobile}</td>
                                                     <td>{item.role}</td>
                                                     <td className='admin-actions'>
-                                                        <button 
+                                                        <a 
                                                             className="user-mngt-edit-btn" 
-                                                            type="button"
                                                             onClick={() => handleEditBtn(item.mobile)}
                                                         >
-                                                            Edit
-                                                        </button>
-                                                        <button onClick={() => handleViewBtn(item.mobile)} type="button">View</button>
+                                                            <EditTwoTone />
+                                                        </a>
+                                                        <a onClick={() => handleViewBtn(item.mobile)} ><EyeTwoTone /></a>
                                                     </td>
                                                 </tr>
                                             )
@@ -94,10 +109,10 @@ const UserManagement = () => {
                 </div>
             </div>
             <RegisterUserModal
-                forEdit={forEdit}
                 forView={forView}
                 mobile={mobile}
                 show={registerModalShow}
+                userId={userId}
                 onHide={() => setRegisterModalShow(false)}
                 closeEdit={() => setForEdit(false)}
                 closeView={() => setForView(false)}

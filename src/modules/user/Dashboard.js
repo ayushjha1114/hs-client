@@ -1,11 +1,9 @@
 import React from "react";
 import "./Dashboard.css";
-import useWindowDimensions from "../../hooks/useWindowDimensions";
 import UserLayout from "../../layout/User";
 import { useGetAllPostsQuery } from "../../services/auth";
 
 let Dashboard = (props) => {
-  const { width } = useWindowDimensions();
 
   const totalCount = 100;
 
@@ -13,7 +11,6 @@ let Dashboard = (props) => {
 
   return (
     <>
-      {width > 767 ? (
         <UserLayout>
           <div className="distributor-main-page">
             <div className="distributor-info-block">Hi there</div>
@@ -37,9 +34,6 @@ let Dashboard = (props) => {
             </div>
           </div>
         </UserLayout>
-      ) : (
-        <></>
-      )}
     </>
   );
 };

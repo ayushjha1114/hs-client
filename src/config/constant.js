@@ -1,22 +1,4 @@
-//import images
-export const HOME_PATH_SVG = "../assets/images/home-path.svg";
-
-// constant
-export const INITIALMINUTES = 2;
-export const INITIALSECONDS = 45;
-export const SYNC_PROGRESS_TEXT = `Sync is in progress, it may take some time. Please don't click back or refresh button`;
-
 export const DEFAULT_MESSAGES = {
-    LOGIN: {
-        ERROR: 'Technical issue' 
-    },
-    VERIFY_OTP: {
-        ERROR: 'Technical issue'
-    },
-    SEND_OTP: {
-        SUCCESS: 'OTP successfully sent',
-        ERROR: 'Technical issue' //todo  
-    },
     RESET_PASSWORD: {
         SUCCESS: 'Password changed successfully',
         MATCH_ERROR: 'Set password and confirm password do not match',
@@ -33,6 +15,3 @@ export const DEFAULT_MESSAGES = {
         ENTER_NEW_PASSWORD: 'Please enter new password.'
     }
 };
-
-
-export default WAVE_IMAGE;

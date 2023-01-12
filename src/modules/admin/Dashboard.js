@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Dashboard.css";
+// import "./Dashboard.css";
 import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
 
@@ -10,8 +10,7 @@ const AdminDashboard = (props) => {
     <>
         <UserLayout>
           <div className="">
-            <div className="distributor-info-block">Hi there yo man!!!</div>
-
+            {/* <div className="distributor-info-block">Hi there yo man!!!</div> */}
             <div className="card">
               <div className="card-row">
                 <div className="card-row-col">

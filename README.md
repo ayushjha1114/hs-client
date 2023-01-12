@@ -1,6 +1,6 @@
-## AAAA distributor order management application
+## DG SOFT application
 
-The platform should be able to serve as a single, unified portal for XXX.
+The platform should be able to serve as a single, unified portal for DG SOFT.
 
 #### Contribution Guidelines
 

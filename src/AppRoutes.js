@@ -13,6 +13,8 @@ import PublicPage from "./layout/PublicLayout";
 import UserManagement from "./modules/admin/UserManagement";
 import Tickets from "./modules/admin/Tickets";
 import Brand from "./modules/admin/Brand";
+import RegisterUser from "./modules/admin/RegisterUser";
+import Service from "./modules/admin/Service";
 
 // import httpService from './axios-interceptors';
 
@@ -30,8 +32,10 @@ const AppRoutes = (props) => {
       <Route path="admin" /* element={<UserLayout />} */ >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="user-management" element={<UserManagement />} />
+          <Route path="register-user" element={<RegisterUser />} />
           <Route path="tickets" element={<Tickets />} />
           <Route path="brand" element={<Brand />} />
+          <Route path="service" element={<Service />} />
       </Route>
       <Route path="no-access" element={<NoAccess />} />
     </Routes>
