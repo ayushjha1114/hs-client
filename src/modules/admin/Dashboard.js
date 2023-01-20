@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-// import "./Dashboard.css";
 import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
 
 const AdminDashboard = (props) => {
-  const { data, error, isLoading } = useGetAllUserQuery();
+  const { data, error, isLoading } = useGetAllUserQuery({ limit: 10, offset: 0});
 
   return (
     <>

@@ -11,7 +11,6 @@ let UserLayout = (props) => {
 
     let access_token = Auth.getAccessToken();
     const isPathAdmin = location.pathname.split("/")[1];
-    console.log("🚀 ~ file: User.js:15 ~ UserLayout ~ isPathAdmin", isPathAdmin)
 
     let login_id = '';
     if (isPathAdmin !== 'admin') {

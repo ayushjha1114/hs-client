@@ -6,14 +6,20 @@ import {
   useCreateBrandMutation,
   useUpdateBrandDetailMutation,
 } from "../../services/admin";
-import { Input, notification } from "antd";
-import { EditTwoTone, DeleteTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+import { Button, Input, notification } from "antd";
+import {
+  EditTwoTone,
+  DeleteTwoTone,
+  CheckCircleTwoTone,
+  PlusOutlined,
+  CheckOutlined
+} from "@ant-design/icons";
+import TablePagination from '@mui/material/TablePagination';
 
 const Brand = () => {
-  const { data, error, isLoading, refetch } = useGetAllBrandQuery();
   const [createBrand] = useCreateBrandMutation();
   const [updateBrandDetail] = useUpdateBrandDetailMutation();
-
+  
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [brandName, setBrandName] = useState("");
   const [brandDescription, setBrandDescription] = useState("");
@@ -21,7 +27,20 @@ const Brand = () => {
   const [isEditableIndex, setIsEditableIndex] = useState(null);
   const [defaultName, setDefaultName] = useState("");
   const [defaultDescription, setDefaultDescription] = useState("");
-  console.log("🚀 ~ file: Brand.js:8 ~ Brand ~ data", data);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  
+  
+  const { data, error, isLoading, refetch } = useGetAllBrandQuery({ limit: rowsPerPage, offset: page * rowsPerPage});
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   let errorHandler = (message, description) => {
     setTimeout(() => {
@@ -45,10 +64,6 @@ const Brand = () => {
           name: brandName,
           description: brandDescription,
         });
-        console.log(
-          "🚀 ~ file: Brand.js:31 ~ handleAddBtn ~ response",
-          response
-        );
         if (response?.data?.success) {
           notification.success({
             message: "Success",
@@ -91,42 +106,43 @@ const Brand = () => {
     setIsEditableIndex(i);
   };
 
-  const handleUpdateBtn = async (id) => {
-    console.log("🚀 ~ file: Brand.js:92 ~ handleUpdateBtn ~ id", id);
-    if (!brandName) {
-      errorHandler("Error occurred", "Please enter brand name.");
-    } else if (!brandDescription) {
-      errorHandler("Error occurred", "Please enter the brand description.");
-    } else {
-      const response = await updateBrandDetail({
-        id,
-        name: brandName,
-        description: brandDescription,
-      });
-      console.log(
-        "🚀 ~ file: Brand.js:104 ~ handleUpdateBtn ~ response",
-        response
-      );
+  const undoEditAction = (i) => {
+    setDefaultName("");
+    setDefaultDescription("");
+    setIsEditable(false);
+    setIsEditableIndex(i);
+  };
 
-      if (response?.data?.success) {
-        notification.success({
-          message: "Success",
-          description: "Brand Update Successfully !!",
-          duration: 4,
-          className: "notification-green",
-        });
-        refetch();
-        setBrandName("");
-        setBrandDescription("");
-        setDefaultName("");
-        setDefaultDescription("");
-        setIsEditable(false);
-      } else {
-        errorHandler(
-          "Technical Error",
-          "There may be some error occurred while processing the request. Please try after some time."
-        );
-      }
+  const handleUpdateBtn = async (id) => {
+    let updateBrand = {};
+    if (brandName) {
+      updateBrand.name = brandName;
+    } else if (brandDescription) {
+      updateBrand.description = brandDescription;
+    }
+    const response = await updateBrandDetail({
+      id,
+      ...updateBrand,
+    });
+
+    if (response?.data?.success) {
+      notification.success({
+        message: "Success",
+        description: "Brand Update Successfully !!",
+        duration: 4,
+        className: "notification-green",
+      });
+      refetch();
+      setBrandName("");
+      setBrandDescription("");
+      setDefaultName("");
+      setDefaultDescription("");
+      setIsEditable(false);
+    } else {
+      errorHandler(
+        "Technical Error",
+        "There may be some error occurred while processing the request. Please try after some time."
+      );
     }
   };
 
@@ -135,7 +151,22 @@ const Brand = () => {
       <UserLayout>
         <div className="">
           <div className="user-management-card">
-            <h3>Brand</h3>
+            <div className="brandHeading">
+              <h3>Brand</h3>
+              <Button
+                type="primary"
+                ghost
+                className="brandAddIcon"
+                onClick={() => handleAddBtn()}
+              >
+                {!isAddOpen ? (
+                  <PlusOutlined style={{ paddingTop: '2px' }}/>
+                ) : (
+                  <CheckOutlined style={{ paddingTop: '2px' }}/>
+                )}
+                {!isAddOpen ? "ADD BRAND" : "SAVE BRAND"}
+              </Button>
+            </div>
             {error ? (
               <>Oh no, there was an error</>
             ) : isLoading ? (
@@ -176,10 +207,13 @@ const Brand = () => {
                                     />
                                   </td>
                                   <td className="admin-actions">
-                                    <a
-                                      onClick={() => handleUpdateBtn(item.id)}
-                                    >
-                                      <CheckCircleTwoTone />
+                                    <a onClick={() => handleUpdateBtn(item.id)}>
+                                      <CheckCircleTwoTone
+                                        style={{ marginRight: "10px" }}
+                                      />
+                                    </a>
+                                    <a onClick={() => undoEditAction(i)}>
+                                      <DeleteTwoTone className="brandDelete" />
                                     </a>
                                   </td>
                                 </>
@@ -209,6 +243,7 @@ const Brand = () => {
                         <tr key="brand">
                           <td>
                             <Input
+                              autoFocus
                               placeholder="Enter the brand name"
                               onChange={(e) => handleInputChange(e, "name")}
                             />
@@ -222,24 +257,22 @@ const Brand = () => {
                             />
                           </td>
                           <td onClick={() => handleDeleteIcon()}>
-                            <DeleteTwoTone className="brandDelete"/>
+                            <DeleteTwoTone className="brandDelete" />
                           </td>
                         </tr>
                       )}
                     </tbody>
                   </table>
-                  <a
-                    href="#"
-                    className="brandAddIcon"
-                    onClick={() => handleAddBtn()}
-                  >
-                    {!isAddOpen ? (
-                      <i class="fa-solid fa-square-plus fa-3x"></i>
-                    ) : (
-                      <i class="fa-solid fa-square-check fa-3x"></i>
-                    )}
-                  </a>
                 </div>
+                <TablePagination
+                  className="userManagementPagination"
+                  component="div"
+                  count={data?.data?.totalCount ? data?.data?.totalCount : 0}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
               </>
             ) : (
               <></>

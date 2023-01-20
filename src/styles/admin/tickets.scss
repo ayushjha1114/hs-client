@@ -1,7 +1,7 @@
 .ticket-heading {
     display: flex;
+    justify-content:space-between;
     .new-ticket-btn {
-        left: 88%;
         margin-top: 7px;
         font-size: 1.25rem;
         padding-top: 1px;
@@ -23,6 +23,26 @@
     font-size: 1rem;
 }
 
-.priority-color {
+.priority-medium {
     color: #1268B3;
+}
+
+.priority-low {
+    color: green;
+}
+
+.priority-high {
+    color: #dcdc03;
+}
+
+.priority-urgent {
+    color: red;
+}
+
+.ticket-ellipsis-btn {
+    margin-right: 10px;
+}
+
+.ticketNumber {
+    display: flex;
 }

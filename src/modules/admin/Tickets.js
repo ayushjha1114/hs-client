@@ -15,6 +15,7 @@ import {
   SET_SERVICE_LIST,
   SET_BRAND_LIST,
   SET_PAYMENT_DETAIL_LIST,
+  SET_AMC_LIST
 } from "./adminSlice";
 import {
   useGetAllUserQuery,
@@ -22,7 +23,7 @@ import {
   useGetAllBrandQuery,
   useGetAllTicketQuery,
   useGetAllPaymentDetailQuery,
-  useUpdateTicketMutation
+  useUpdateTicketMutation,
 } from "../../services/admin";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import NorthIcon from "@mui/icons-material/North";
@@ -30,19 +31,19 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import SouthIcon from "@mui/icons-material/South";
 import { notification } from "antd";
 import Helper from "../../util/helper";
+import { EyeTwoTone } from "@ant-design/icons";
+import TicketViewModal from "./TicketViewModal";
+import TablePagination from '@mui/material/TablePagination';
 
 const Tickets = () => {
   const dispatch = useDispatch();
 
-  const { data: userData } = useGetAllUserQuery();
+  const { data: userData } = useGetAllUserQuery({ limit: 10, offset: 0});
   const { data: serviceData } = useGetAllServiceQuery();
-  const { data: brandData } = useGetAllBrandQuery();
-  const { data: paymentData } = useGetAllPaymentDetailQuery();
-  const { data, error, isLoading, refetch } = useGetAllTicketQuery();
-  console.log("🚀 ~ file: Tickets.js:42 ~ Tickets ~ data", data)
-
+  const { data: brandData } = useGetAllBrandQuery({ limit: 10, offset: 0});
+  
   const [updateTicket] = useUpdateTicketMutation();
-
+  
   const [anchorEl, setAnchorEl] = useState(null);
   const [status, setStatus] = useState("");
   const [statusColor, setStatusColor] = useState("");
@@ -53,13 +54,34 @@ const Tickets = () => {
   const [forPaymentModalEdit, setForPaymentModalEdit] = useState(false);
   const [paymentUpdatedAtList, setPaymentUpdatedAtList] = useState([]);
   const [paymentStatusList, setPaymentStatusList] = useState([]);
+  const [ticketViewModalShow, setTicketViewModalShow] = useState(false);
+  const [ticketDetailForView, setTicketDetailForView] = useState({});
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const {
+    data: paymentData,
+    isLoading: isPaymentLoading,
+    refetch: paymentRefetch,
+  } = useGetAllPaymentDetailQuery({ limit: rowsPerPage, offset: page * rowsPerPage});
+  
+  const { data, error, isLoading, refetch } = useGetAllTicketQuery({ limit: rowsPerPage, offset: page * rowsPerPage});
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const open = Boolean(anchorEl);
-  const handleClick = ({event, id, status, priority, statusColor}) => {
+
+  const handleClick = ({ event, id, status, priority, statusColor }) => {
     setTicketId(id);
     setStatus(status);
     setPriority(priority);
-    setStatusColor(statusColor)
+    setStatusColor(statusColor);
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -71,7 +93,6 @@ const Tickets = () => {
       priority: prior,
       id: ticketId,
     });
-    console.log("🚀 ~ file: Tickets.js:76 ~ handleStatus ~ response", response, ticketId)
     if (response?.data?.success) {
       notification.success({
         message: "Success",
@@ -80,6 +101,7 @@ const Tickets = () => {
         className: "notification-green",
       });
       refetch();
+      paymentRefetch();
     } else {
       Helper.errorHandler(
         "Technical Error",
@@ -91,7 +113,6 @@ const Tickets = () => {
   };
 
   const handleStatus = async (status, color) => {
-    console.log("🚀 ~ file: Tickets.js:93 ~ handleStatus ~ color", color)
     if (status === "Closed") {
       setPaymentModalShow(true);
     } else {
@@ -121,16 +142,19 @@ const Tickets = () => {
 
   const handleNewTicketBtn = () => {
     dispatch(SET_USER_LIST({ data: userData?.data?.rows }));
+    dispatch(SET_AMC_LIST({ data: userData?.data?.amcList }));
     dispatch(SET_BRAND_LIST({ data: brandData?.data?.rows }));
     dispatch(SET_SERVICE_LIST({ data: serviceData?.data?.rows }));
     setTicketModalShow(true);
   };
 
-  const handlePaymentStatus = (ticketId) => {
+  const handlePaymentStatus = (ticketId, status) => {
     dispatch(SET_PAYMENT_DETAIL_LIST({ data: paymentData?.data?.rows }));
     setPaymentModalShow(true);
-    setTicketId(ticketId);
-    setForPaymentModalEdit(true);
+    if (status === 'Closed') {
+      setTicketId(ticketId);
+      setForPaymentModalEdit(true);
+    }
   };
 
   useEffect(() => {
@@ -163,7 +187,53 @@ const Tickets = () => {
       });
       setPaymentStatusList(refinedPaymentStatusList);
     }
-  }, [isLoading]);
+  }, [isLoading, isPaymentLoading]);
+
+  const handleViewBtn = (ticketData) => {
+    dispatch(SET_USER_LIST({ data: userData?.data?.rows }));
+    let final = { ...ticketData };
+    data.data.paymentDetailList.map((payment) => {
+      if (ticketData.id === payment.ticket_id) {
+        final = { ...payment, ...ticketData };
+      }
+    });
+    setTicketDetailForView(final);
+    setTicketViewModalShow(true);
+  };
+
+  const changePriorityIcon = (priority) => {
+    let priorityIcon = "";
+    switch (priority) {
+      case "URGENT":
+        priorityIcon = (
+          <div>
+            <KeyboardDoubleArrowUpIcon className="priority-urgent" />
+          </div>
+        );
+        break;
+      case "HIGH":
+        priorityIcon = (
+          <div>
+            <NorthIcon className="priority-high" />
+          </div>
+        );
+        break;
+      case "MEDIUM":
+        priorityIcon = (
+          <div>
+            <FiberManualRecordIcon className="priority-medium" />
+          </div>
+        );
+        break;
+      default:
+        priorityIcon = (
+          <div>
+            <SouthIcon className="priority-low" />
+          </div>
+        );
+    }
+    return priorityIcon;
+  };
 
   return (
     <>
@@ -196,10 +266,12 @@ const Tickets = () => {
                       <tr>
                         <th>Ticket Number</th>
                         <th>Customer</th>
+                        <th>User Plan</th>
                         <th>Service</th>
                         <th>Engineer</th>
                         <th>Status</th>
                         <th>Payment Status</th>
+                        <th>Date</th>
                         <th>Last Modified</th>
                         <th>Actions</th>
                       </tr>
@@ -210,14 +282,20 @@ const Tickets = () => {
                         data.data.rows.map((item, i) => {
                           return (
                             <tr key={i}>
-                              <td>{item.ticket_number}</td>
+                              <td className="ticketNumber">
+                                {item.ticket_number}{" "}
+                                {changePriorityIcon(item.priority)}
+                              </td>
                               <td>{item.customer}</td>
-                              <td>{item.parent_service}</td>
+                              <td>
+                                {item.customer_plan
+                                  ? item.customer_plan
+                                  : '-'}
+                              </td>
+                              <td>{item.service_provided}</td>
                               <td>{item.engineer}</td>
                               <td>
-                                <Tag
-                                  color={item.status_color || 'green'}
-                                >
+                                <Tag color={item.status_color || "green"}>
                                   {item.status}
                                 </Tag>
                               </td>
@@ -226,15 +304,26 @@ const Tickets = () => {
                                   ? paymentStatusList[i]
                                   : "-"}
                               </td>
-                              <td>
-                                {paymentUpdatedAtList[i]
-                                  ? moment(paymentUpdatedAtList[i]).fromNow()
-                                  : "-"}
-                              </td>
+                              <td>{moment(item.createdAt).format('DD/MM/YYYY')}</td>
+                              <td>{moment(item.updatedAt).fromNow()}</td>
 
                               <td>
-                                <a onClick={(e) => handleClick({event: e, id: item.id, status: item.status, priority: item.priority, statusColor: item.status_color})}>
+                                <a
+                                  className="ticket-ellipsis-btn"
+                                  onClick={(e) =>
+                                    handleClick({
+                                      event: e,
+                                      id: item.id,
+                                      status: item.status,
+                                      priority: item.priority,
+                                      statusColor: item.status_color,
+                                    })
+                                  }
+                                >
                                   <i class="fa-solid fa-ellipsis"></i>
+                                </a>
+                                <a onClick={() => handleViewBtn(item)}>
+                                  <EyeTwoTone />
                                 </a>
                                 <Menu
                                   id="basic-menu"
@@ -246,8 +335,10 @@ const Tickets = () => {
                                   }}
                                 >
                                   <MenuItem
-                                    disabled={status === 'Closed'}
-                                    onClick={() => handlePriority("URGENT", item.status)}
+                                    disabled={status === "Closed"}
+                                    onClick={() =>
+                                      handlePriority("URGENT", item.status)
+                                    }
                                   >
                                     {priority === "URGENT" && (
                                       <ListItemIcon>
@@ -255,10 +346,10 @@ const Tickets = () => {
                                       </ListItemIcon>
                                     )}
                                     Set priority to Urgent
-                                    <KeyboardDoubleArrowUpIcon className="priority-color" />
+                                    <KeyboardDoubleArrowUpIcon className="priority-urgent" />
                                   </MenuItem>
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() => handlePriority("HIGH")}
                                   >
                                     {priority === "HIGH" && (
@@ -267,10 +358,10 @@ const Tickets = () => {
                                       </ListItemIcon>
                                     )}
                                     Set priority to High{" "}
-                                    <NorthIcon className="priority-color" />
+                                    <NorthIcon className="priority-high" />
                                   </MenuItem>
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() => handlePriority("MEDIUM")}
                                   >
                                     {priority === "MEDIUM" && (
@@ -279,10 +370,10 @@ const Tickets = () => {
                                       </ListItemIcon>
                                     )}
                                     Set priority to Medium
-                                    <FiberManualRecordIcon className="priority-color" />
+                                    <FiberManualRecordIcon className="priority-medium" />
                                   </MenuItem>
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() => handlePriority("LOW")}
                                   >
                                     {priority === "LOW" && (
@@ -291,11 +382,11 @@ const Tickets = () => {
                                       </ListItemIcon>
                                     )}
                                     Set priority to Low{" "}
-                                    <SouthIcon className="priority-color" />
+                                    <SouthIcon className="priority-low" />
                                   </MenuItem>
                                   <Divider />
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() =>
                                       handleStatus("Open", "green")
                                     }
@@ -308,7 +399,7 @@ const Tickets = () => {
                                     Set as Open
                                   </MenuItem>
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() =>
                                       handleStatus("Pending", "blue")
                                     }
@@ -321,7 +412,7 @@ const Tickets = () => {
                                     Set as Pending
                                   </MenuItem>
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() =>
                                       handleStatus("On Hold", "orange")
                                     }
@@ -334,7 +425,7 @@ const Tickets = () => {
                                     Set as On hold
                                   </MenuItem>
                                   <MenuItem
-                                  disabled={status === 'Closed'}
+                                    disabled={status === "Closed"}
                                     onClick={() =>
                                       handleStatus("Closed", "red")
                                     }
@@ -348,7 +439,8 @@ const Tickets = () => {
                                   </MenuItem>
                                   <Divider />
                                   <MenuItem
-                                    onClick={() => handlePaymentStatus(item.id)}
+                                    disabled={status !== "Closed"}
+                                    onClick={() => handlePaymentStatus(item.id, status)}
                                   >
                                     Payment Status
                                   </MenuItem>
@@ -360,6 +452,15 @@ const Tickets = () => {
                     </tbody>
                   </table>
                 </div>
+                <TablePagination
+                  className="userManagementPagination"
+                  component="div"
+                  count={data?.data?.totalCount ? data?.data?.totalCount : 0}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
               </>
             ) : (
               <>
@@ -371,6 +472,11 @@ const Tickets = () => {
         <TicketModal
           show={ticketModalShow}
           onHide={() => setTicketModalShow(false)}
+        />
+        <TicketViewModal
+          show={ticketViewModalShow}
+          data={ticketDetailForView}
+          onHide={() => setTicketViewModalShow(false)}
         />
         <PaymentConfirmationModal
           show={paymentModalShow}

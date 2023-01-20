@@ -91,3 +91,10 @@
 .ant-layout-header {
   background: unset;
 }
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (max-width: 1200px) {
+  .user-img {
+    width: 35px;
+  }
+}

@@ -4,16 +4,17 @@ import Auth from "../util/middleware/auth";
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({
+    // baseUrl: "https://dgsoft.org/auth/admin",
     baseUrl: "http://localhost:3001/auth/admin",
   }),
   endpoints: (builder) => ({
     getAllUser: builder.query({
-      query: () => ({
+      query: (data) => ({
         headers: {
           "Content-type": "application/json",
           Authorization: Auth.getAdminAccessToken(),
         },
-        url: "user-list",
+        url: `user-list?limit=${data.limit}&offset=${data.offset}`,
         method: "GET",
       }),
     }),
@@ -28,12 +29,12 @@ export const adminApi = createApi({
       }),
     }),
     getAllBrand: builder.query({
-      query: () => ({
+      query: (data) => ({
         headers: {
           "Content-type": "application/json",
           Authorization: Auth.getAdminAccessToken(),
         },
-        url: `brand-list`,
+        url: `brand-list?limit=${data.limit}&offset=${data.offset}`,
         method: "GET",
       }),
     }),
@@ -48,22 +49,22 @@ export const adminApi = createApi({
       }),
     }),
     getAllTicket: builder.query({
-      query: () => ({
+      query: (data) => ({
         headers: {
           "Content-type": "application/json",
           Authorization: Auth.getAdminAccessToken(),
         },
-        url: `ticket-list`,
+        url: `ticket-list?limit=${data.limit}&offset=${data.offset}`,
         method: "GET",
       }),
     }),
     getAllPaymentDetail: builder.query({
-      query: () => ({
+      query: (data) => ({
         headers: {
           "Content-type": "application/json",
           Authorization: Auth.getAdminAccessToken(),
         },
-        url: `payment-detail-list`,
+        url: `payment-detail-list?limit=${data.limit}&offset=${data.offset}`,
         method: "GET",
       }),
     }),

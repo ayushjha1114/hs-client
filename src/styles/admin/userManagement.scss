@@ -37,6 +37,7 @@
   font-family: MyriadPro-Regular;
   font-size: 18px;
   color: #333333;
+  white-space: nowrap;
 }
 
 .user-management-table table tbody tr:nth-of-type(odd) {
@@ -61,4 +62,24 @@
 
 .admin-actions .user-mngt-edit-btn{
   margin-right: 10px;
+}
+
+.userManagementPagination p {
+  margin: 0;
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (max-width: 1200px) {
+  .user-management-table {
+    height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Extra large devices (large desktops, 1500px and up) */
+@media (max-width: 1500px) {
+  .user-management-table {
+    height: 63vh;
+    overflow-y: auto;
+  }
 }

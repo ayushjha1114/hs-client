@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
-  DialogContentText,
   DialogTitle,
   InputLabel,
   Select,
@@ -16,15 +15,13 @@ import {
   FormControlLabel,
   Checkbox,
   Autocomplete,
-  Radio,
-  RadioGroup,
 } from "@mui/material";
 import {
   useGetAllTicketQuery,
   useCreateTicketMutation,
 } from "../../services/admin";
 import { notification } from "antd";
-
+import Helper from "../../util/helper";
 
 export default function TicketModal(props) {
   const { show, onHide, forEdit, forView, mobile, closeEdit, closeView } =
@@ -32,11 +29,12 @@ export default function TicketModal(props) {
 
   const dispatch = useDispatch();
   const userList = useSelector((state) => state.admin.userList);
+  const amcList = useSelector((state) => state.admin.amcList);
   const serviceList = useSelector((state) => state.admin.serviceList);
   const brandList = useSelector((state) => state.admin.brandList);
 
   const [createTicket] = useCreateTicketMutation();
-  const { refetch } = useGetAllTicketQuery();
+  const { refetch } = useGetAllTicketQuery({ limit: 10, offset: 0});
 
   const [isChecked, setIsChecked] = useState(false);
   const [data, setData] = useState({});
@@ -47,8 +45,13 @@ export default function TicketModal(props) {
   const [brandData, setBrandData] = useState([]);
   const [serviceProvidedList, setServiceProvidedList] = useState([]);
   const [engineerList, setEngineerList] = useState([]);
+  const [serviceType, setServiceType] = useState([]);
   // const [file, setFile] = useState("");
   // const [fileName, setFileName] = useState("");
+  const [visitAddress, setVisitAddress] = useState("");
+  const [visitCity, setVisitCity] = useState("");
+  const [visitState, setVisitState] = useState("");
+  const [visitPincode, setVisitPincode] = useState("");
 
   let errorHandler = (message, description) => {
     setTimeout(() => {
@@ -66,10 +69,17 @@ export default function TicketModal(props) {
       case "customer":
         setData({ ...data, customer: event.target.value });
         userList.map((item) => {
-          if (`${item.first_name} ${item.last_name}` === event.target.value) {
-            console.log("🚀 ~ file: TicketModal.js:71 ~ userList.map ~ `${item.first_name} ${item.last_name}`", `${item.first_name} ${item.last_name}`)
-            console.log("🚀 ~ file: TicketModal.js:71 ~ userList.map ~ event.target.value", event.target.value)
-            setDefaultUserDetail(item);
+          let combineList = {}; 
+          if (Helper.transformUserName(item) === event.target.value) {
+          let amcIndex = amcList.findIndex((amc) => amc.user_profile_id === item.id)
+            if (amcIndex !== -1) {
+                combineList = {...item, ...amcList[amcIndex]}
+                setDefaultUserDetail(combineList);
+              }
+              else {
+                combineList = {...item}
+                setDefaultUserDetail(combineList);
+              }
           }
         });
         break;
@@ -80,9 +90,6 @@ export default function TicketModal(props) {
           }
         });
         setData({ ...data, parent_service: event.target.value });
-        break;
-      case "service_type":
-        setData({ ...data, service_type: event.target.value });
         break;
       case "brand":
         setData({ ...data, brand: event.target.value });
@@ -108,8 +115,17 @@ export default function TicketModal(props) {
       case "engineer":
         setData({ ...data, engineer: event.target.value });
         break;
-      case "current_address":
-        setData({ ...data, current_address: event.target.value });
+      case "visit_address":
+        setVisitAddress(event.target.value);
+        break;
+      case "visit_city":
+        setData({ ...data, visit_city: event.target.value });
+        break;
+      case "visit_state":
+        setData({ ...data, visit_state: event.target.value });
+        break;
+      case "visit_pincode":
+        setData({ ...data, visit_pincode: event.target.value });
         break;
       default:
         console.log("nothing");
@@ -118,66 +134,83 @@ export default function TicketModal(props) {
 
   const handleCheckBoxClicked = (event) => {
     if (event.target.checked) {
-      setCurrentAddress(
-        `${
-          defaultUserDetail?.permanent_address
-            ? defaultUserDetail?.permanent_address
-            : ""
-        } ${
-          defaultUserDetail?.permanent_city
-            ? defaultUserDetail?.permanent_city
-            : ""
-        } ${
-          defaultUserDetail?.permanent_state
-            ? defaultUserDetail?.permanent_state
-            : ""
-        } ${
-          defaultUserDetail?.permanent_pincode
-            ? defaultUserDetail?.permanent_pincode
-            : ""
-        }`
-      );
+      setCurrentAddress(`${
+        defaultUserDetail?.current_address
+          ? defaultUserDetail?.current_address
+          : ""
+      } ${
+        defaultUserDetail?.current_city
+          ? defaultUserDetail?.current_city
+          : ""
+      } ${
+        defaultUserDetail?.current_state
+          ? defaultUserDetail?.current_state
+          : ""
+      } ${
+        defaultUserDetail?.current_pincode
+          ? defaultUserDetail?.current_pincode
+          : ""
+      }`);
+      setVisitAddress(defaultUserDetail?.current_address);
+      setVisitCity(defaultUserDetail?.current_city);
+      setVisitState(defaultUserDetail?.current_state);
+      setVisitPincode(defaultUserDetail?.current_pincode);
     } else {
-      setCurrentAddress("");
+      setVisitAddress('');
+      setVisitCity('');
+      setVisitState('');
+      setVisitPincode('');
     }
     setIsChecked((current) => !current);
   };
 
   const handleSubmit = async () => {
-        let address = ''
-          if (data.current_address) {
-            address = data.current_address
-          } else {
-            address = currentAddress;
-          }
-          let ticketData = {
-            ...data,
-            address, 
-            mobile: defaultUserDetail.mobile,
-            email: defaultUserDetail.email
-            
-          }
-          console.log("🚀 ~ file: TicketModal.js:219 ~ handleSubmit ~ ticketData", ticketData)
-          console.log("🚀 ~ file:>>>>>>>>>>>>>>>>>>>>>>>>>", defaultUserDetail, currentAddress)
-
-        const response = await createTicket(ticketData);
-        console.log("🚀 ~ file: TicketModal.js:200 ~ handleSubmit ~ response", response)
-        if (response?.data?.success) {
-          notification.success({
-            message: "Success",
-            description: "Ticket Created Successfully !!",
-            duration: 4,
-            className: "notification-green",
-          });
-        } else {
-          errorHandler(
-            "Technical Error",
-            "There may be some error occurred while processing the request. Please try after some time."
-          );
-        }
-      // }
-    refetch();
-    onHide();
+    if (!data.customer) {
+      Helper.errorHandler("Error occurred", "Please select the customer name.");
+    } else if (!data.parent_service) {
+      errorHandler("Error occurred", "Please select the parent service.");
+    } else if (!data.brand) {
+      errorHandler("Error occurred", "Please select the brand.");
+    } else if (!data.model_number) {
+      errorHandler("Error occurred", "Please enter the model number.");
+    } else {
+      let address = "";
+      if (
+        visitAddress ||
+        visitCity ||
+        visitState ||
+        visitPincode
+      ) {
+        address = `${visitAddress} ${visitCity} ${visitState} ${visitPincode}`;
+      } else {
+        address = currentAddress;
+      }
+      data.service_type = JSON.stringify(serviceType);
+      data.customer_plan = defaultUserDetail.user_plan;
+      let ticketData = {
+        ...data,
+        address,
+        mobile: defaultUserDetail.mobile,
+        email: defaultUserDetail.email,
+      };
+      const response = await createTicket(ticketData);
+      if (response?.data?.success) {
+        notification.success({
+          message: "Success",
+          description: "Ticket Created Successfully !!",
+          duration: 4,
+          className: "notification-green",
+        });
+      } else {
+        errorHandler(
+          "Technical Error",
+          "There may be some error occurred while processing the request. Please try after some time."
+        );
+      }
+      setDefaultUserDetail({});
+      refetch();
+      onHide();
+    }
   };
 
   useEffect(() => {
@@ -186,7 +219,7 @@ export default function TicketModal(props) {
         .map((item) => {
           if (item.role === "USER" || item.role === "AMC") {
             return {
-              label: `${item.first_name} ${item.last_name ? item.last_name : ''}`,
+              label: Helper.transformUserName(item),
               email: item.email,
             };
           }
@@ -217,6 +250,8 @@ export default function TicketModal(props) {
   }, [forEdit, forView, show]);
 
   const handleCancel = () => {
+    setData({});
+    setDefaultUserDetail({});
     onHide();
     if (forEdit) {
       closeEdit();
@@ -225,14 +260,29 @@ export default function TicketModal(props) {
     }
   };
 
-  const handleUploadFile = (e)=>{
-    setFile(e.target.files[0])
-    setFileName(e.target.files[0].name)
-}
+  // const handleUploadFile = (e) => {
+  //   setFile(e.target.files[0]);
+  //   setFileName(e.target.files[0].name);
+  // };
+
+  const handleServiceType = (event, value) => {
+    if (event.target.checked) {
+      setServiceType([...serviceType, value]);
+    } else {
+      const modifiedType = serviceType
+        .map((item) => {
+          if (item !== value) {
+            return item;
+          }
+        })
+        .filter((item) => item);
+      setServiceType(modifiedType);
+    }
+  };
 
   return (
     <div>
-      <Dialog open={show} onClose={onHide} maxWidth="lg" fullWidth={true}>
+      <Dialog open={show} onClose={handleCancel} maxWidth="lg" fullWidth={true}>
         <DialogTitle className="registerModalTitle">New Ticket</DialogTitle>
         <DialogContent>
           <Divider />
@@ -267,7 +317,29 @@ export default function TicketModal(props) {
                 </Select>
               </FormControl>
             </div>
-            <FormControl>
+            <div className="registerModalBodyField">
+              <FormControlLabel
+                control={
+                  <Checkbox onChange={(e) => handleServiceType(e, "ON-SITE")} />
+                }
+                label="ON-SITE"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox onChange={(e) => handleServiceType(e, "ONLINE")} />
+                }
+                label="ONLINE"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={(e) => handleServiceType(e, "PICK AND DROP")}
+                  />
+                }
+                label="PICK AND DROP"
+              />
+            </div>
+            {/* <FormControl style={{ marginTop: "10px" }}>
               <RadioGroup
                 row
                 aria-labelledby="demo-row-radio-buttons-group-label"
@@ -291,7 +363,7 @@ export default function TicketModal(props) {
                   label="Pickup drop service"
                 />
               </RadioGroup>
-            </FormControl>
+            </FormControl> */}
             <div className="registerModalBodyField">
               <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
                 <InputLabel id="demo-simple-select-standard-label">
@@ -332,13 +404,13 @@ export default function TicketModal(props) {
               />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
                 <InputLabel id="demo-simple-select-standard-label">
-                  Service Provided
+                  Service Provide
                 </InputLabel>
                 <Select
                   labelId="demo-simple-select-standard-label"
                   id="demo-simple-select-standard"
                   onChange={(e) => handleChange(e, "service_provided")}
-                  label="Service Provided"
+                  label="Service Provide"
                 >
                   {serviceProvidedList.map((item) => (
                     <MenuItem key={item.label} value={item.label}>
@@ -361,7 +433,7 @@ export default function TicketModal(props) {
                 fullWidth
                 onChange={(e) => handleChange(e, "description")}
                 defaultValue={
-                  forEdit || forView ? defaultData?.current_address : ""
+                  forEdit || forView ? defaultData?.curreccnt_address : ""
                 }
               />
               <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
@@ -384,7 +456,7 @@ export default function TicketModal(props) {
               </FormControl>
             </div>
           </div>
-          <div className="registerModalBody" style={{ marginTop: '10px'}}>
+          <div className="registerModalBody" style={{ marginTop: "10px" }}>
             <TextField
               disabled={forView}
               id="standard-textarea"
@@ -396,7 +468,7 @@ export default function TicketModal(props) {
               fullWidth
               onChange={(e) => handleChange(e, "remark")}
               defaultValue={
-                forEdit || forView ? defaultData?.current_address : ""
+                forEdit || forView ? defaultData?.curxxrent_address : ""
               }
             />
             {forView && (
@@ -453,50 +525,53 @@ export default function TicketModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="name"
+                id="mobile"
                 label="Mobile"
                 type="text"
                 fullWidth
                 variant="standard"
-                onChange={(e) => handleChange(e, "mobile")}
-                defaultValue={defaultUserDetail?.mobile}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={defaultUserDetail?.mobile}
               />
               <TextField
                 disabled
                 margin="dense"
-                id="name"
+                id="email"
                 label="Email"
                 type="text"
                 fullWidth
                 variant="standard"
-                onChange={(e) => handleChange(e, "email")}
-                defaultValue={defaultUserDetail?.email}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={defaultUserDetail?.email}
               />
             </div>
             <TextField
               disabled
               margin="dense"
               id="name"
-              label="Permanent Address"
+              label="Current Address"
               type="text"
               fullWidth
               variant="standard"
-              onChange={(e) => handleChange(e, "permanent_address")}
-              defaultValue={`${
-                defaultUserDetail?.permanent_address
-                  ? defaultUserDetail?.permanent_address
+              value={`${
+                defaultUserDetail?.current_address
+                  ? defaultUserDetail?.current_address
                   : ""
               } ${
-                defaultUserDetail?.permanent_city
-                  ? defaultUserDetail?.permanent_city
+                defaultUserDetail?.current_city
+                  ? defaultUserDetail?.current_city
                   : ""
               } ${
-                defaultUserDetail?.permanent_state
-                  ? defaultUserDetail?.permanent_state
+                defaultUserDetail?.current_state
+                  ? defaultUserDetail?.current_state
                   : ""
               } ${
-                defaultUserDetail?.permanent_pincode
-                  ? defaultUserDetail?.permanent_pincode
+                defaultUserDetail?.current_pincode
+                  ? defaultUserDetail?.current_pincode
                   : ""
               }`}
             />
@@ -507,18 +582,51 @@ export default function TicketModal(props) {
                   onChange={(e) => handleCheckBoxClicked(e)}
                 />
               }
-              label="Current address same as Permanent address"
+              label="Visit address same as Current address"
             />
             <TextField
               margin="dense"
               id="name"
-              label="Current Address"
+              label="Visit Address"
               type="text"
               fullWidth
+              className="ticketVisitAddress"
               variant="standard"
-              onChange={(e) => handleChange(e, "current_address")}
-              defaultValue={currentAddress}
+              onChange={(e) => handleChange(e, "visit_address")}
+              value={visitAddress}
             />
+            <div className="registerModalBodyField">
+              <TextField
+                margin="dense"
+                id="name"
+                label="Visit City"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => handleChange(e, "visit_city")}
+                value={visitCity}
+              />
+              <TextField
+                margin="dense"
+                id="name"
+                label="Visit State"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => handleChange(e, "visit_state")}
+                value={visitState}
+              />
+              <TextField
+                margin="dense"
+                id="name"
+                label="Visit Pincode"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => handleChange(e, "visit_pincode")}
+                value={visitPincode}
+              />
+            </div>
             {/* <div className="registerModalBodyField">
               <DialogContentText className="ticketModalAttachmentText">
                 Attachment:

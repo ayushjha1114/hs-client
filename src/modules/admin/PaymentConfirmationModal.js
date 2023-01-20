@@ -18,7 +18,7 @@ import {
   useGetAllPaymentDetailQuery,
   useSavePaymentDetailMutation,
   useUpdatePaymentDetailMutation,
-  useGetAllTicketQuery
+  useGetAllTicketQuery,
 } from "../../services/admin";
 import { notification } from "antd";
 import Helper from "../../util/helper";
@@ -26,11 +26,13 @@ import Helper from "../../util/helper";
 export default function PaymentConfirmationModal(props) {
   const { show, onHide, ticketId, isEdit, closeEdit } = props;
 
-  const paymentDetailList = useSelector((state) => state.admin.paymentDetailList);
+  const paymentDetailList = useSelector(
+    (state) => state.admin.paymentDetailList
+  );
   const [savePaymentDetail] = useSavePaymentDetailMutation();
   const [updatePaymentDetail] = useUpdatePaymentDetailMutation();
-  const { refetch } = useGetAllPaymentDetailQuery();
-  const { refetch: refetchAllTicket } = useGetAllTicketQuery();
+  const { refetch } = useGetAllPaymentDetailQuery({ limit: 10, offset: 0});
+  const { refetch: refetchAllTicket } = useGetAllTicketQuery({ limit: 10, offset: 0});
 
   const [data, setData] = useState({});
   const [defaultData, setDefaultData] = useState({});
@@ -64,7 +66,6 @@ export default function PaymentConfirmationModal(props) {
         ...data,
         id: ticketId,
       });
-      console.log("🚀 ~ file: PaymentConfirmationModal.js:75 ~ handleSubmit ~ response", response)
       if (response?.data?.success) {
         notification.success({
           message: "Success",
@@ -81,36 +82,36 @@ export default function PaymentConfirmationModal(props) {
       refetch();
       refetchAllTicket();
       onHide();
-
     } else {
-
       if (!data.invoice_number) {
-        Helper.errorHandler("Error occurred", "Please enter the invoice number.");
+        Helper.errorHandler(
+          "Error occurred",
+          "Please enter the invoice number."
+        );
       } else if (!data.invoice_amount) {
-        Helper.errorHandler("Error occurred", "Please enter the invoice amount.");
+        Helper.errorHandler(
+          "Error occurred",
+          "Please enter the invoice amount."
+        );
       } else if (!/^\d+$/.test(data.invoice_amount)) {
-        Helper.errorHandler("Error occurred", "Please enter the valid invoice amount.");
+        Helper.errorHandler(
+          "Error occurred",
+          "Please enter the valid invoice amount."
+        );
       } else if (!data.invoice_date) {
         Helper.errorHandler("Error occurred", "Please enter the invoice date.");
       } else if (!data.remark) {
         Helper.errorHandler("Error occurred", "Please enter the remark.");
       } else if (!data.payment_status) {
-        Helper.errorHandler("Error occurred", "Please enter the payment status.");
-      } else {
-        console.log(
-          "🚀 ~ file: PaymentConfirmationModal.js:69 ~ handleSubmit ~ data",
-          data,
-          ticketId
+        Helper.errorHandler(
+          "Error occurred",
+          "Please enter the payment status."
         );
-  
+      } else {
         const response = await savePaymentDetail({
           ...data,
           ticket_id: ticketId,
         });
-        console.log(
-          "🚀 ~ file: TicketModal.js:200 ~ handleSubmit ~ response",
-          response
-        );
         if (response?.data?.success) {
           notification.success({
             message: "Success",
@@ -132,7 +133,7 @@ export default function PaymentConfirmationModal(props) {
   };
 
   const handleCancel = () => {
-    if(isEdit) {
+    if (isEdit) {
       closeEdit();
     }
     onHide();
@@ -140,7 +141,6 @@ export default function PaymentConfirmationModal(props) {
 
   useEffect(() => {
     if (paymentDetailList.length > 0) {
-      console.log("🚀 ~ file: PaymentConfirmationModal.js:122 ~ data ~ ticketId", ticketId)
       paymentDetailList.map((item) => {
         if (item.ticket_id === ticketId) {
           setDefaultData(item);
@@ -153,7 +153,7 @@ export default function PaymentConfirmationModal(props) {
     <div>
       <Dialog open={show} onClose={onHide} maxWidth="lg" fullWidth={true}>
         <DialogTitle className="registerModalTitle">
-          {isEdit ? 'Edit ' : ''}Payment Details
+          {isEdit ? "Edit " : ""}Payment Details
         </DialogTitle>
         <DialogContent>
           <Divider />
@@ -168,9 +168,7 @@ export default function PaymentConfirmationModal(props) {
                 fullWidth
                 variant="standard"
                 onChange={(e) => handleChange(e, "invoice_number")}
-                defaultValue={
-                  isEdit ? defaultData?.invoice_number : ""
-                }
+                defaultValue={isEdit ? defaultData?.invoice_number : ""}
               />
             </div>
             <div
@@ -186,9 +184,7 @@ export default function PaymentConfirmationModal(props) {
                 fullWidth
                 variant="standard"
                 onChange={(e) => handleChange(e, "invoice_amount")}
-                defaultValue={
-                  isEdit ? defaultData?.invoice_amount : ""
-                }
+                defaultValue={isEdit ? defaultData?.invoice_amount : ""}
               />
               <TextField
                 id="date"
@@ -199,9 +195,7 @@ export default function PaymentConfirmationModal(props) {
                   shrink: true,
                 }}
                 onChange={(e) => handleChange(e, "invoice_date")}
-                defaultValue={
-                  isEdit ? defaultData?.invoice_date : ""
-                }
+                defaultValue={isEdit ? defaultData?.invoice_date : ""}
               />
             </div>
             <div
@@ -217,9 +211,7 @@ export default function PaymentConfirmationModal(props) {
                 variant="standard"
                 fullWidth
                 onChange={(e) => handleChange(e, "remark")}
-                defaultValue={
-                  isEdit ? defaultData?.remark : ""
-                }
+                defaultValue={isEdit ? defaultData?.remark : ""}
               />
               <FormControl variant="standard" sx={{ width: 200 }}>
                 <InputLabel id="demo-simple-select-standard-label">
@@ -230,9 +222,7 @@ export default function PaymentConfirmationModal(props) {
                   id="demo-simple-select-standard"
                   onChange={(e) => handleChange(e, "payment_status")}
                   label="Payment Status"
-                  defaultValue={
-                    isEdit ? defaultData?.payment_status : ""
-                  }
+                  defaultValue={isEdit ? defaultData?.payment_status : ""}
                 >
                   <MenuItem value="Paid">Paid</MenuItem>
                   <MenuItem value="Unpaid">Unpaid</MenuItem>
@@ -247,7 +237,7 @@ export default function PaymentConfirmationModal(props) {
             Cancel
           </Button>
           <Button className="registerModalBtn" onClick={() => handleSubmit()}>
-            {isEdit ? 'Edit': 'Save'}
+            {isEdit ? "Edit" : "Save"}
           </Button>
         </DialogActions>
       </Dialog>

@@ -18,6 +18,30 @@ const Helper = {
         className: "notification-error",
       });
     }, 50);
-  }
+  },
+  transformUserName(data) {
+    let userName = data.first_name;
+    if (data.middle_name !== null) {
+      userName = userName + ' ' + data.middle_name;
+    }
+    if (data.last_name !== null) {
+      userName = userName + ' ' + data.last_name;
+    }
+    return userName;
+  },
+  removeCommaFromServiceProvide(data) {
+    let label = '';
+    data.map(type => {
+      label += `${type.label}, `;
+    })
+    return label.substring(0, label.length - 2);
+  },
+  removeCommaFromServiceType(data) {
+    let label = '';
+    data.map(type => {
+      label += `${type}, `;
+    })
+    return label.substring(0, label.length - 2);
+  },
 };
 export default Helper;

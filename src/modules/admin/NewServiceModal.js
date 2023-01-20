@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -25,17 +25,18 @@ export default function NewServiceModal(props) {
   const [createService] = useCreateServiceMutation();
   const [updateServiceDetail] = useUpdateServiceDetailMutation();
 
-
-  // const [rowCount, setRowCount] = useState(1);
-  // const [serviceProvidedRow, setServiceProvidedRow] = useState([rowCount]);
-   let [serviceProvided, setServiceProvided] = useState({totalRows: 1, rows: [1], serviceProvidedData: []});
+  let [serviceProvided, setServiceProvided] = useState({
+    totalRows: 1,
+    rows: [1],
+    serviceProvidedData: [],
+  });
   const [data, setData] = useState({});
   const [serviceType, setServiceType] = useState([]);
-  console.log("🚀 ~ file: NewServiceModal.js:34 ~ NewServiceModal ~ serviceType", serviceType)
   let [defaultServiceProvided, setDefaultServiceProvided] = useState([]);
 
   const [serviceProvidedLabel, setServiceProvidedLabel] = useState("");
-  const [serviceProvidedDescription, setServiceProvidedDescription] = useState("");
+  const [serviceProvidedDescription, setServiceProvidedDescription] =
+    useState("");
   const [defaultData, setDefaultData] = useState({});
 
   const [defaultOnSite, setDefaultOnSite] = useState(false);
@@ -44,7 +45,6 @@ export default function NewServiceModal(props) {
   const [defaultOnSiteChecked, setDefaultOnSiteChecked] = useState(false);
   const [defaultOnlineChecked, setDefaultOnlineChecked] = useState(false);
   const [defaultPickDropChecked, setDefaultPickDropChecked] = useState(false);
-  
 
   let errorHandler = (message, description) => {
     setTimeout(() => {
@@ -61,48 +61,49 @@ export default function NewServiceModal(props) {
     setDefaultOnline(false);
     setDefaultOnSite(false);
     setDefaultPickDrop(false);
+    setServiceProvided({ totalRows: 1, rows: [1], serviceProvidedData: [] });
+    setServiceProvidedLabel("");
+    setServiceProvidedDescription("");
     onHide();
     closeEdit();
   };
 
-
   useEffect(() => {
-
     if (serviceList.length > 0 && isEdit) {
-      serviceList.map(item => {
-        if(item.id === serviceId) {
-            let serviceProvidedLength = item?.service_provided?.length;
-            let newArr = [];
-            let i  = 0
-            while (i !== serviceProvidedLength) {
-              newArr.push(i + 1)
-              i++;
+      serviceList.map((item) => {
+        if (item.id === serviceId) {
+          let serviceProvidedLength = item?.service_provided?.length;
+          let newArr = [];
+          let i = 0;
+          while (i !== serviceProvidedLength) {
+            newArr.push(i + 1);
+            i++;
+          }
+          item.service_type.map((element) => {
+            if (element === "ONLINE") {
+              setDefaultOnline(true);
+            } else if (element === "ON-SITE") {
+              setDefaultOnSite(true);
+            } else if (element === "PICK AND DROP") {
+              setDefaultPickDrop(true);
             }
-            item.service_type.map(element => {
-              if (element === 'ONLINE') {
-                setDefaultOnline(true);
-              } else if (element === 'ON-SITE') {
-                setDefaultOnSite(true);
-              } else if (element === 'PICK AND DROP') {
-                setDefaultPickDrop(true);
-              }
-            })
-            
-          //   setServiceProvidedRow(newArr);
-          // setRowCount(serviceProvidedLength);
+          });
+
           setDefaultServiceProvided(item.service_provided);
           setServiceProvided({
-            totalRows: serviceProvidedLength, 
+            totalRows: serviceProvidedLength,
             rows: newArr,
-            serviceProvidedData: []
+            serviceProvidedData: item.service_provided,
           });
-          setServiceProvidedLabel(item.service_provided[serviceProvidedLength-1].label);
-          setServiceProvidedDescription(item.service_provided[serviceProvidedLength-1].description);
-          console.log("🚀 ~ file: NewServiceModal.js:102 ~ useEffect ~ item", item)
-          setServiceType(item.service_type)
+          setServiceProvidedLabel(
+            item.service_provided[serviceProvidedLength - 1].label
+          );
+          setServiceProvidedDescription(
+            item.service_provided[serviceProvidedLength - 1].description
+          );
+          setServiceType(item.service_type);
           setDefaultData(item);
         }
-        
       });
     }
   }, [isEdit, show]);
@@ -127,8 +128,6 @@ export default function NewServiceModal(props) {
   };
 
   const handleAddBtn = (count) => {
-    console.log("🚀 ~ file: NewServiceModal.js:128 ~ handleAddBtn ~ serviceProvidedLabel", serviceProvidedLabel)
-    console.log("🚀 ~ file: NewServiceModal.js:134 ~ handleAddBtn ~ serviceProvidedDescription", serviceProvidedDescription)
     if (!serviceProvidedLabel) {
       errorHandler(
         "Error occurred",
@@ -142,102 +141,89 @@ export default function NewServiceModal(props) {
     } else {
       const totalCount = serviceProvided.totalRows;
       if (isEdit) {
-        let modifiedData = defaultServiceProvided.map(item => {
-          console.log("🚀 ~ file: NewServiceModal.js:145 ~ modifiedData ~ serviceProvidedLabel", serviceProvidedLabel, item.label)
-          if( item.label !== serviceProvidedLabel) {
-            return item
-          }
-        }).filter(ele => ele);
-        console.log("🚀 ~ file: NewServiceModal.js:149 ~ modifiedData ~ modifiedData", modifiedData)
+        let modifiedData = defaultServiceProvided
+          .map((item) => {
+            if (item.label !== serviceProvidedLabel) {
+              return item;
+            }
+          })
+          .filter((ele) => ele);
         setServiceProvided({
           totalRows: totalCount + 1,
-          rows: [...serviceProvided.rows, totalCount+1],
+          rows: [...serviceProvided.rows, totalCount + 1],
           serviceProvidedData: [
-            ...modifiedData, {
+            ...modifiedData,
+            {
               label: serviceProvidedLabel,
               description: serviceProvidedDescription,
-            }
-          ]
-        })
+            },
+          ],
+        });
         setDefaultServiceProvided([
-          ...modifiedData, {
+          ...modifiedData,
+          {
             label: serviceProvidedLabel,
             description: serviceProvidedDescription,
-          }
-        ])
+          },
+        ]);
       } else {
         setServiceProvided({
           totalRows: totalCount + 1,
-          rows: [...serviceProvided.rows, totalCount+1],
+          rows: [...serviceProvided.rows, totalCount + 1],
           serviceProvidedData: [
-            ...serviceProvided.serviceProvidedData, {
+            ...serviceProvided.serviceProvidedData,
+            {
               label: serviceProvidedLabel,
               description: serviceProvidedDescription,
-            }
-          ]
-        })
-
+            },
+          ],
+        });
       }
-      //   setServiceProvided([
-      //     ...serviceProvided,
-      //     {
-      //       label: serviceProvidedLabel,
-      //       description: serviceProvidedDescription,
-      //     },
-      //   ]);
-      // setRowCount(rowCount + 1);
-      // setServiceProvidedRow([...serviceProvidedRow, rowCount + 1]);
       setServiceProvidedLabel("");
       setServiceProvidedDescription("");
     }
   };
 
   const handleServiceType = (event, value) => {
-    console.log("🚀 ~ defaultOnSite,   (isEdit && serviceType.includes('ON-SITE'))", defaultOnSite)
-    if (value === 'ONLINE') {
+    if (value === "ONLINE") {
       setDefaultOnlineChecked(!defaultOnlineChecked);
       setDefaultOnline(!defaultOnline);
-    } else if (value === 'ON-SITE') {
+    } else if (value === "ON-SITE") {
       setDefaultOnSiteChecked(!defaultOnSiteChecked);
       setDefaultOnSite(!defaultOnSite);
-    } else if (value === 'PICK AND DROP') {
+    } else if (value === "PICK AND DROP") {
       setDefaultPickDropChecked(!defaultPickDropChecked);
       setDefaultPickDrop(!defaultPickDrop);
     }
     if (event.target.checked) {
-      console.log("🚀 ~ file: NewServiceModal.js:121 ~ handleServiceType ~ event.target.checked", event.target.checked)
       setServiceType([...serviceType, value]);
     } else {
-      console.log("🚀 ~ file: NewServiceModal.js:121 ~ handleServiceType ~ event.target.checked", event.target.checked)
-      const modifiedType = serviceType.map(item => {
-        if (item !==  value) {
-          return item;
-        }
-      }).filter(item => item);
-      console.log("🚀 ~ file: NewServiceModal.js:218 ~ modifiedType ~ modifiedType", modifiedType)
-      // serviceType.splice(serviceTypeIndex, 1);
+      const modifiedType = serviceType
+        .map((item) => {
+          if (item !== value) {
+            return item;
+          }
+        })
+        .filter((item) => item);
       setServiceType(modifiedType);
     }
   };
 
   const handleSubmit = async () => {
-    console.log("🚀 ~ file: NewServiceModal.js:154 ~ handleSubmit ~ serviceData", serviceProvidedLabel)
-    if(isEdit) {
+    if (isEdit) {
       let serviceData = {};
       serviceData.name = data.name;
       serviceData.description = data.description;
-      console.log("🚀 ~ file: NewServiceModal.js:196 ~ handleSubmit ~ serviceType", serviceType)
       if (serviceType.length > 0) {
         serviceData.service_type = JSON.stringify(serviceType);
-
       }
-      console.log("🚀 ~ file: NewServiceModal.js:198 ~ handleSubmit ~ serviceProvided", serviceProvided)
       if (serviceProvided.serviceProvidedData.length > 0) {
         serviceData.service_provided = serviceProvided.serviceProvidedData;
       }
-      console.log("🚀 ~ file: NewServiceModal.js:154 ~ handleSubmit ~ serviceData", serviceData)
-      const response = await updateServiceDetail({ ...serviceData, id: serviceId });
-      console.log("🚀 ~ file: NewServiceModal.js:147 ~ handleSubmit ~ response", response)
+      const response = await updateServiceDetail({
+        ...serviceData,
+        id: serviceId,
+      });
       if (response?.data?.success) {
         notification.success({
           message: "Success",
@@ -245,7 +231,7 @@ export default function NewServiceModal(props) {
           duration: 4,
           className: "notification-green",
         });
-        setServiceType([])
+        setServiceType([]);
         refetch();
         onHide();
       } else {
@@ -254,30 +240,22 @@ export default function NewServiceModal(props) {
           "There may be some error occurred while processing the request. Please try after some time."
         );
       }
-
-    } else  {
-    if (!data.name) {
-      errorHandler("Error occurred", "Please enter the service name.");
-    } else if (!data.description) {
-      errorHandler("Error occurred", "Please enter the service description.");
-    } else if (serviceType.length === 0) {
-      errorHandler("Error occurred", "Please select the service type.");
     } else {
+      if (!data.name) {
+        errorHandler("Error occurred", "Please enter the service name.");
+      } else if (!data.description) {
+        errorHandler("Error occurred", "Please enter the service description.");
+      } else if (serviceType.length === 0) {
+        errorHandler("Error occurred", "Please select the service type.");
+      } else {
         let serviceData = {};
         serviceData.name = data.name;
         serviceData.description = data.description;
         serviceData.service_type = JSON.stringify(serviceType);
         serviceData.service_provided = serviceProvided.serviceProvidedData;
-  
-        console.log(
-          "🚀 ~ file: NewServiceModal.js:132 ~ handleSubmit ~ serviceData",
-          serviceData
-        );
+
         const response = await createService(serviceData);
-        console.log(
-          "🚀 ~ file: NewServiceModal.js:133 ~ handleSubmit ~ response",
-          response
-        );
+
         if (response?.data?.success) {
           notification.success({
             message: "Success",
@@ -293,41 +271,35 @@ export default function NewServiceModal(props) {
             "There may be some error occurred while processing the request. Please try after some time."
           );
         }
-
       }
     }
   };
 
   const handleRemoveServiceProvided = (index) => {
-    const indexedValue = serviceProvided.serviceProvidedData[index -1];
-    console.log("🚀 ~ file: NewServiceModal.js:246 ~ handleRemoveServiceProvided ~ indexedValue", indexedValue)
-    const newArr = serviceProvided.serviceProvidedData.map(item => {
-      if (item.label !== indexedValue.label) {
-        return item;
-      }
-    }).filter(item => item)
-    console.log("🚀 ~ file: NewServiceModal.js:246 ~ handleRemoveServiceProvided ~ newArr", newArr)
+    const indexedValue = serviceProvided.serviceProvidedData[index - 1];
+    const newArr = serviceProvided.serviceProvidedData
+      .map((item) => {
+        if (item.label !== indexedValue.label) {
+          // document.getElementById(`label ${item.label}`).value = 'dsdfsdf lund';
+          // console.log("🚀 ~ file: NewServiceModal.js:286 ~ .map ~ document.getElementById(`label ${item.label}`)", document.getElementById(`label ${item.label}`))
+          return item;
+        }
+      })
+      .filter((item) => item);
     serviceProvided.rows.pop();
     setServiceProvided({
-      totalRows: serviceProvided.totalRows -1,
+      totalRows: serviceProvided.totalRows - 1,
       rows: serviceProvided.rows,
-      serviceProvidedData: newArr
-    })
-    
-    // setServiceProvided(newArr);
-    // setRowCount(rowCount-1);
-    // serviceProvidedRow.pop();
-    // setServiceProvidedRow(serviceProvidedRow)
-    
+      serviceProvidedData: newArr,
+    });
   };
-  console.log("🚀 ~ f>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", defaultPickDrop ,defaultPickDropChecked)
-
-
 
   return (
     <div>
-      <Dialog open={show} onClose={() => handleCancel()} maxWidth="lg" fullWidth={true}>
-        <DialogTitle className="registerModalTitle">{isEdit ? 'Edit Service' : 'Create Service'}</DialogTitle>
+      <Dialog open={show} onClose={handleCancel} maxWidth="lg" fullWidth={true}>
+        <DialogTitle className="registerModalTitle">
+          {isEdit ? "Edit Service" : "Create Service"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText className="registerModalContentText">
             Service Information
@@ -344,9 +316,7 @@ export default function NewServiceModal(props) {
                 type="text"
                 fullWidth
                 variant="standard"
-                defaultValue={
-                  isEdit ? defaultData?.name : ""
-                }
+                defaultValue={isEdit ? defaultData?.name : ""}
                 onChange={(e) => handleChange(e, "name")}
               />
             </div>
@@ -356,56 +326,52 @@ export default function NewServiceModal(props) {
               </DialogContentText>
               <FormControlLabel
                 control={
-                  (isEdit ? 
+                  isEdit ? (
                     <Checkbox
                       // checked={defaultOnSite || defaultOnSiteChecked}
                       checked={defaultOnSite}
-
                       onChange={(e) => handleServiceType(e, "ON-SITE")}
                     />
-                    :
+                  ) : (
                     <Checkbox
-                    // checked={defaultOnSite}
-                    onChange={(e) => handleServiceType(e, "ON-SITE")}
-                  />
-                    )
+                      // checked={defaultOnSite}
+                      onChange={(e) => handleServiceType(e, "ON-SITE")}
+                    />
+                  )
                 }
                 label="ON-SITE"
               />
               <FormControlLabel
                 control={
-                  (isEdit ? 
+                  isEdit ? (
                     <Checkbox
-                    // checked={defaultOnline || defaultOnlineChecked}
-                    checked={defaultOnline }
-
-                    onChange={(e) => handleServiceType(e, "ONLINE")}
-                  />
-                    :
+                      // checked={defaultOnline || defaultOnlineChecked}
+                      checked={defaultOnline}
+                      onChange={(e) => handleServiceType(e, "ONLINE")}
+                    />
+                  ) : (
                     <Checkbox
-                    // checked={(!isEdit && defaultOnline) || (isEdit && defaultOnlineChecked)}
-                    onChange={(e) => handleServiceType(e, "ONLINE")}
-                  />
-                    )
+                      // checked={(!isEdit && defaultOnline) || (isEdit && defaultOnlineChecked)}
+                      onChange={(e) => handleServiceType(e, "ONLINE")}
+                    />
+                  )
                 }
                 label="ONLINE"
               />
               <FormControlLabel
                 control={
-                  (isEdit ? 
+                  isEdit ? (
                     <Checkbox
-                    // checked={defaultPickDrop || defaultPickDropChecked}
-                    checked={defaultPickDrop}
-
-                    onChange={(e) => handleServiceType(e, "PICK AND DROP")}
-                  />
-                    :
+                      // checked={defaultPickDrop || defaultPickDropChecked}
+                      checked={defaultPickDrop}
+                      onChange={(e) => handleServiceType(e, "PICK AND DROP")}
+                    />
+                  ) : (
                     <Checkbox
-                    // checked={defaultPickDrop || (isEdit && defaultPickDropChecked)}
-                    onChange={(e) => handleServiceType(e, "PICK AND DROP")}
-                  />
-                    )
-               
+                      // checked={defaultPickDrop || (isEdit && defaultPickDropChecked)}
+                      onChange={(e) => handleServiceType(e, "PICK AND DROP")}
+                    />
+                  )
                 }
                 label="PICK AND DROP"
               />
@@ -420,25 +386,33 @@ export default function NewServiceModal(props) {
                 variant="standard"
                 fullWidth
                 onChange={(e) => handleChange(e, "description")}
-                defaultValue={
-                  isEdit ? defaultData?.description : ""
-                }
+                defaultValue={isEdit ? defaultData?.description : ""}
               />
             </div>
             {serviceProvided.rows.map((item, key) => (
               <div className="registerModalBodyField">
                 <DialogContentText className="serviceModalServiceProvidedText">
-                  Service Provided:
+                  Service Provide:
                 </DialogContentText>
                 <TextField
                   required
                   margin="dense"
-                  id="name"
+                  id='label'
+                  // id={`label ${defaultData?.service_provided[key]?.label}`}
                   label="Label"
                   type="text"
                   fullWidth
                   variant="standard"
-                  defaultValue={isEdit ? defaultData?.service_provided ? defaultData?.service_provided[key]?.label : "": ""}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  defaultValue={
+                    isEdit
+                      ? defaultData?.service_provided
+                        ? defaultData?.service_provided[key]?.label
+                        : ""
+                      : ""
+                  }
                   onChange={(e) => handleChange(e, "label")}
                 />
                 <TextField
@@ -448,21 +422,29 @@ export default function NewServiceModal(props) {
                   type="text"
                   fullWidth
                   variant="standard"
-                  defaultValue={isEdit ? defaultData?.service_provided ? defaultData?.service_provided[key]?.description : "" : ""}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  defaultValue={
+                    isEdit
+                      ? defaultData?.service_provided
+                        ? defaultData?.service_provided[key]?.description
+                        : ""
+                      : ""
+                  }
                   onChange={(e) =>
                     handleChange(e, "service_provided_description")
                   }
                 />
-                {
-                  (serviceProvided.totalRows !== item) && (
-                    <a
+
+                {serviceProvided.totalRows !== item && (
+                  <a
                     className="serviceModalAddBtn"
                     onClick={() => handleRemoveServiceProvided(item)}
-                    >
-                      <CloseCircleTwoTone />
-                    </a>
-                  )
-                }
+                  >
+                    <CloseCircleTwoTone />
+                  </a>
+                )}
                 {serviceProvided.totalRows === item && (
                   <a
                     className="serviceModalAddBtn"
@@ -480,7 +462,7 @@ export default function NewServiceModal(props) {
             Cancel
           </Button>
           <Button className="registerModalBtn" onClick={() => handleSubmit()}>
-            {isEdit ? 'Edit': 'Create'}
+            {isEdit ? "Save" : "Create"}
           </Button>
         </DialogActions>
       </Dialog>

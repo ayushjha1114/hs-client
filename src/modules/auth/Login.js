@@ -7,6 +7,7 @@ import config from '../../config/server';
 import { useLoginMutation } from "../../services/admin";
 import Auth from '../../util/middleware/auth';
 import { useNavigate } from 'react-router-dom';
+import { MobileOutlined, LockOutlined } from '@ant-design/icons';
 
 const baseConfig = config[config.serviceServerName['auth']];
 
@@ -73,7 +74,6 @@ const LoginPage = props => {
         )
       } else if (response?.data?.success === true) {
         const decodedToken = jwt.decode(response.data.token);
-        console.log("🚀 ~ file: Login.js:73 ~ handleLogin ~ decodedToken", decodedToken)
         Auth.setUserName(decodedToken.name);
         
         if (decodedToken.role === 'ADMIN') {
@@ -107,7 +107,7 @@ const LoginPage = props => {
             className="loginInput" 
             size="large" 
             placeholder="Mobile Number" 
-            prefix={<i class="fa-solid fa-mobile-screen loginMobileIcon"></i>} 
+            prefix={<MobileOutlined className='loginMobileIcon' />} 
             maxLength={10}
             onChange={(e) => handleMobileChange(e)}
           />
@@ -115,7 +115,7 @@ const LoginPage = props => {
             className="loginInput loginPassword" 
             size="large" 
             placeholder="Password"
-            prefix={<i class="fa-solid fa-lock loginMobileIcon"></i>} 
+            prefix={<LockOutlined className='loginMobileIcon' />} 
             maxLength={10}
             onChange={handlePasswordChange}
           />

@@ -10,8 +10,8 @@ import FormControl from "@mui/material/FormControl";
 import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import { AES } from "crypto-js";
-import { ADD_USER } from "./adminSlice";
 import {
   useGetAllUserQuery,
   useRegisterUserMutation,
@@ -21,6 +21,8 @@ import config from "../../config/server";
 import { notification } from "antd";
 import UserLayout from "../../layout/User";
 import Stack from "@mui/material/Stack";
+import moment from "moment";
+import { devices } from "../../config/constant";
 
 const baseConfig = config[config.serviceServerName["auth"]];
 
@@ -28,11 +30,11 @@ const RegisterUser = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const userList = useSelector((state) => state.admin.userList);
+  const defaultUserData = useSelector((state) => state.admin.defaultUserData);
 
   const [registerUser] = useRegisterUserMutation();
   const [updateUserDetail] = useUpdateUserDetailMutation();
-  const { refetch } = useGetAllUserQuery();
+  const { refetch } = useGetAllUserQuery({ limit: 10, offset: 0});
 
   const [isChecked, setIsChecked] = useState(false);
   const [data, setData] = useState({});
@@ -40,11 +42,12 @@ const RegisterUser = (props) => {
   const [permanentCity, setPermanentCity] = useState("");
   const [permanentState, setPermanentState] = useState("");
   const [permanentPincode, setPermanentPincode] = useState("");
-  const [defaultData, setDefaultData] = useState({});
   const [userTypeAMC, setUserTypeAMC] = useState(false);
   const [forEdit, setForEdit] = useState(false);
+  const [device, setDevice] = React.useState([]);
   const [mobile, setMobile] = useState("");
   const [AMCData, setAMCData] = useState({});
+  const currentDate = moment().format("YYYY-MM-DD");
 
   let errorHandler = (message, description) => {
     setTimeout(() => {
@@ -106,6 +109,18 @@ const RegisterUser = (props) => {
       case "current_pincode":
         setData({ ...data, current_pincode: event.target.value });
         break;
+      case "permanent_address":
+        setPermanentAddress(event.target.value);
+        break;
+      case "permanent_city":
+        setPermanentCity(event.target.value);
+        break;
+      case "permanent_state":
+        setPermanentState(event.target.value);
+        break;
+      case "permanent_pincode":
+        setPermanentPincode(event.target.value);
+        break;
       case "company_name":
         setAMCData({ ...AMCData, company_name: event.target.value });
         break;
@@ -128,7 +143,16 @@ const RegisterUser = (props) => {
         setAMCData({ ...AMCData, pan_number: event.target.value });
         break;
       case "device":
-        setAMCData({ ...AMCData, device: event.target.value });
+        const {
+          target: { value },
+        } = event;
+        setDevice(typeof value === "string" ? value.split(",") : value);
+        break;
+      case "director_email":
+        setAMCData({ ...AMCData, director_email: event.target.value });
+        break;
+      case "admin_email":
+        setAMCData({ ...AMCData, admin_email: event.target.value });
         break;
       default:
         console.log("nothing");
@@ -141,6 +165,11 @@ const RegisterUser = (props) => {
       setPermanentCity(data?.current_city);
       setPermanentState(data?.current_state);
       setPermanentPincode(data?.current_pincode);
+    } else {
+      setPermanentAddress('');
+      setPermanentCity('');
+      setPermanentState('');
+      setPermanentPincode('');
     }
     setIsChecked((current) => !current);
   };
@@ -167,10 +196,6 @@ const RegisterUser = (props) => {
         );
       }
     } else {
-      console.log(
-        "🚀 ~ file: RegisterUserModal.js:135 ~ handleSubmit ~ data",
-        data
-      );
       if (!data.first_name) {
         errorHandler("Error occurred", "Please enter your first name.");
       } else if (!data.email) {
@@ -188,72 +213,62 @@ const RegisterUser = (props) => {
         errorHandler("Error occurred", "Please enter the mobile.");
       } else if (data.mobile.length !== 10) {
         errorHandler("Error occurred", "Please enter valid mobile number.");
-      } else if (data.aadhaar_number.length !== 12) {
+      } else if (data.aadhaar_number && data.aadhaar_number?.length !== 12) {
         errorHandler("Error occurred", "Please enter valid aadhaar number.");
-      } else if (data.role === "AMC") {
-        if (!AMCData.date_of_registration) {
-          errorHandler(
-            "Error occurred",
-            "Please enter the date of registration."
-          );
-        } else if (!AMCData.plan_activation_date) {
-          errorHandler(
-            "Error occurred",
-            "Please enter the plan activation date."
-          );
-        } else if (!AMCData.user_plan) {
-          errorHandler("Error occurred", "Please enter the user plan.");
-        } else if (!AMCData.plan_expired_date) {
-          errorHandler("Error occurred", "Please enter the plan expired date.");
-        } else if (!AMCData.gst_number) {
-          errorHandler("Error occurred", "Please enter the gst number.");
-        } else if (!AMCData.pan_number) {
-          errorHandler("Error occurred", "Please enter the pan number.");
-        } else if (!AMCData.device) {
-          errorHandler("Error occurred", "Please enter the device.");
-        } else if (AMCData.pan_number.length !== 10) {
-          errorHandler("Error occurred", "Please enter valid pan number.");
-        } else if (AMCData.gst_number.length !== 15) {
-          errorHandler("Error occurred", "Please enter valid gst number.");
-        }
       } else {
-        data.permanent_address = permanentAddress;
-        data.permanent_city = permanentCity;
-        data.permanent_state = permanentState;
-        data.permanent_pincode = permanentPincode;
-        const encryptedPassword = AES.encrypt(
-          data.password,
-          baseConfig.encryptionKey
-        ).toString();
-        data.password = encryptedPassword;
-        let userData = {};
-        userData.userDetail = data;
-        userData.amcDetail = AMCData;
-        console.log(
-          "🚀 ~ file: RegisterUser.js:207 ~ handleSubmit ~ userData",
-          userData
-        );
-        const response = await registerUser(userData);
-        console.log(
-          "🚀 ~ file: RegisterUserModal.js:180 ~ handleSubmit ~ response",
-          response
-        );
-        if (response?.data?.success) {
-          dispatch(ADD_USER({ data }));
-          notification.success({
-            message: "Success",
-            description: "User Registration Successfully !!",
-            duration: 4,
-            className: "notification-green",
-          });
-          refetch();
-          navigate("/admin/user-management");
-        } else {
-          errorHandler(
-            "Technical Error",
-            "There may be some error occurred while processing the request. Please try after some time."
-          );
-        }
+          if (data.role === "AMC" && !AMCData.company_name) {
+            errorHandler("Error occurred", "Please enter the company name.");
+          } else if (data.role === "AMC" && !AMCData.plan_activation_date) {
+            errorHandler(
+              "Error occurred",
+              "Please enter the plan activation date."
+            );
+          } else if (data.role === "AMC" && !AMCData.plan_expired_date) {
+            errorHandler(
+              "Error occurred",
+              "Please enter the plan expired date."
+            );
+          } else if (data.role === "AMC" && device.length === 0) {
+            errorHandler("Error occurred", "Please enter the device.");
+          } else if (data.role === "AMC" && AMCData.pan_number && AMCData.pan_number?.length !== 10) {
+            errorHandler("Error occurred", "Please enter valid pan number.");
+          } else if (data.role === "AMC" && AMCData.gst_number && AMCData.gst_number?.length !== 15) {
+            errorHandler("Error occurred", "Please enter valid gst number.");
+          } else {
+
+            data.permanent_address = permanentAddress;
+            data.permanent_city = permanentCity;
+            data.permanent_state = permanentState;
+            data.permanent_pincode = permanentPincode;
+            const encryptedPassword = AES.encrypt(
+              data.password,
+              baseConfig.encryptionKey
+            ).toString();
+            data.password = encryptedPassword;
+            let userData = {};
+            userData.userDetail = data;
+            AMCData.device = JSON.stringify(device);
+            if (!AMCData.date_of_registration) {
+              AMCData.date_of_registration = currentDate;
+            }
+            userData.amcDetail = AMCData;
+            const response = await registerUser(userData);
+            if (response?.data?.success) {
+              notification.success({
+                message: "Success",
+                description: "User Registration Successfully !!",
+                duration: 4,
+                className: "notification-green",
+              });
+              refetch();
+              navigate("/admin/user-management");
+            } else {
+              errorHandler(
+                "Technical Error",
+                "There may be some error occurred while processing the request. Please try after some time."
+              );
+            }
+          }
       }
     }
   };
@@ -263,17 +278,7 @@ const RegisterUser = (props) => {
       setForEdit(location.state.forEdit);
       setMobile(location.state.mobile);
     }
-  }, [location.state]);
-
-  useEffect(() => {
-    if (userList.length > 0) {
-      userList.map((item) => {
-        if (item.mobile === mobile) {
-          setDefaultData(item);
-        }
-      });
-    }
-  }, [forEdit]);
+  }, [location?.state?.forEdit]);
 
   return (
     <>
@@ -294,7 +299,9 @@ const RegisterUser = (props) => {
                   type="text"
                   fullWidth
                   variant="standard"
-                  defaultValue={forEdit ? defaultData?.first_name : ""}
+                  defaultValue={
+                    location?.state?.forEdit ? defaultUserData?.first_name : ""
+                  }
                   onChange={(e) => handleChange(e, "first_name")}
                 />
                 <TextField
@@ -306,9 +313,9 @@ const RegisterUser = (props) => {
                   variant="standard"
                   defaultValue={
                     forEdit
-                      ? defaultData?.middle_name === "null"
+                      ? defaultUserData?.middle_name === "null"
                         ? ""
-                        : defaultData?.middle_name
+                        : defaultUserData?.middle_name
                       : ""
                   }
                   onChange={(e) => handleChange(e, "middle_name")}
@@ -321,10 +328,10 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   defaultValue={
-                    forEdit
-                      ? defaultData?.last_name === "null"
+                    location?.state?.forEdit
+                      ? defaultUserData?.last_name === "null"
                         ? ""
-                        : defaultData?.last_name
+                        : defaultUserData?.last_name
                       : ""
                   }
                   onChange={(e) => handleChange(e, "last_name")}
@@ -340,7 +347,9 @@ const RegisterUser = (props) => {
                   type="email"
                   fullWidth
                   variant="standard"
-                  defaultValue={forEdit ? defaultData?.email : ""}
+                  defaultValue={
+                    location?.state?.forEdit ? defaultUserData?.email : ""
+                  }
                   onChange={(e) => handleChange(e, "email")}
                 />
                 <TextField
@@ -368,7 +377,9 @@ const RegisterUser = (props) => {
                   type="text"
                   fullWidth
                   variant="standard"
-                  defaultValue={forEdit ? defaultData?.mobile : ""}
+                  defaultValue={
+                    location?.state?.forEdit ? defaultUserData?.mobile : ""
+                  }
                   onChange={(e) => handleChange(e, "mobile_number")}
                 />
                 <TextField
@@ -381,10 +392,12 @@ const RegisterUser = (props) => {
                   }}
                   onChange={(e) => handleChange(e, "dob")}
                   defaultValue={
-                    forEdit
-                      ? defaultData?.date_of_birth === "null"
+                    location?.state?.forEdit
+                      ? defaultUserData?.date_of_birth === "null"
                         ? "1997-05-24"
-                        : defaultData?.date_of_birth
+                        : moment(defaultUserData?.date_of_birth).format(
+                            "YYYY-MM-DD"
+                          )
                       : "1997-05-24"
                   }
                 />
@@ -397,7 +410,9 @@ const RegisterUser = (props) => {
                     id="demo-simple-select-standard"
                     onChange={(e) => handleChange(e, "gender")}
                     label="Gender"
-                    defaultValue={forEdit ? defaultData?.gender : ""}
+                    defaultValue={
+                      location?.state?.forEdit ? defaultUserData?.gender : ""
+                    }
                   >
                     <MenuItem value="male">Male</MenuItem>
                     <MenuItem value="female">Female</MenuItem>
@@ -417,28 +432,36 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "aadhaar")}
-                  defaultValue={forEdit ? defaultData?.aadhaar_number : ""}
+                  defaultValue={
+                    location?.state?.forEdit
+                      ? defaultUserData?.aadhaar_number
+                      : ""
+                  }
                 />
-                <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <FormControl variant="standard" sx={{ m: 1, minWidth: 150 }}>
                   <InputLabel id="demo-simple-select-standard-label">
-                    User Type
+                    Customer Type
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
                     onChange={(e) => handleChange(e, "role")}
-                    label="User Type"
-                    defaultValue={forEdit ? defaultData?.type : ""}
+                    label="Customer Type"
+                    defaultValue={
+                      location?.state?.forEdit ? defaultUserData?.role : ""
+                    }
                   >
                     <MenuItem value="ADMIN">ADMIN</MenuItem>
                     <MenuItem value="USER">USER</MenuItem>
-                    <MenuItem value="AMC">AMC</MenuItem>
+                    <MenuItem value="AMC">AMC Customer</MenuItem>
                     <MenuItem value="ENGINEER">ENGINEER</MenuItem>
                   </Select>
                 </FormControl>
               </div>
             </div>
-            {userTypeAMC && (
+            {(userTypeAMC ||
+              (location?.state?.forEdit &&
+                defaultUserData?.role === "AMC")) && (
               <>
                 <p style={{ marginTop: "10px" }}>Company Information</p>
                 <Divider />
@@ -448,13 +471,18 @@ const RegisterUser = (props) => {
                     style={{ marginTop: "15px" }}
                   >
                     <TextField
+                      required
                       margin="dense"
                       id="name"
                       label="Company Name"
                       type="text"
                       fullWidth
                       variant="standard"
-                      defaultValue={forEdit ? defaultData?.company_name : ""}
+                      defaultValue={
+                        location?.state?.forEdit
+                          ? defaultUserData?.company_name
+                          : ""
+                      }
                       onChange={(e) => handleChange(e, "company_name")}
                     />
                     <TextField
@@ -467,11 +495,11 @@ const RegisterUser = (props) => {
                       }}
                       onChange={(e) => handleChange(e, "date_of_registration")}
                       defaultValue={
-                        forEdit
-                          ? defaultData?.date_of_registration === "null"
-                            ? "1997-05-24"
-                            : defaultData?.date_of_registration
-                          : "1997-05-24"
+                        location?.state?.forEdit
+                          ? moment(
+                              defaultUserData?.date_of_registration
+                            ).format("YYYY-MM-DD")
+                          : currentDate
                       }
                     />
                     <TextField
@@ -484,10 +512,10 @@ const RegisterUser = (props) => {
                       }}
                       onChange={(e) => handleChange(e, "plan_activation_date")}
                       defaultValue={
-                        forEdit
-                          ? defaultData?.plan_activation_date === "null"
-                            ? "1997-05-24"
-                            : defaultData?.plan_activation_date
+                        location?.state?.forEdit
+                          ? moment(
+                              defaultUserData?.plan_activation_date
+                            ).format("YYYY-MM-DD")
                           : "1997-05-24"
                       }
                     />
@@ -497,33 +525,40 @@ const RegisterUser = (props) => {
                     style={{ marginTop: "15px" }}
                   >
                     <TextField
-                      required
                       margin="dense"
                       id="name"
                       label="User Plan"
                       type="text"
                       fullWidth
                       variant="standard"
-                      defaultValue={forEdit ? defaultData?.user_plan : ""}
+                      defaultValue={
+                        location?.state?.forEdit
+                          ? defaultUserData?.user_plan
+                          : ""
+                      }
                       onChange={(e) => handleChange(e, "user_plan")}
                     />
-                    <FormControl
-                      variant="standard"
-                      sx={{ m: 1, minWidth: 120 }}
-                    >
-                      <InputLabel id="demo-simple-select-standard-label">
+                    <FormControl sx={{ m: 1, width: 300 }}>
+                      <InputLabel id="demo-multiple-name-label">
                         Device
                       </InputLabel>
                       <Select
-                        labelId="demo-simple-select-standard-label"
-                        id="demo-simple-select-standard"
+                        labelId="demo-multiple-name-label"
+                        id="demo-multiple-name"
+                        multiple
+                        value={
+                          location?.state?.forEdit
+                            ? JSON.parse(defaultUserData?.device)
+                            : device
+                        }
                         onChange={(e) => handleChange(e, "device")}
-                        label="Gender"
-                        defaultValue={forEdit ? defaultData?.device : ""}
+                        input={<OutlinedInput label="Device" />}
                       >
-                        <MenuItem value="desktop">Desktop</MenuItem>
-                        <MenuItem value="laptop">Laptop</MenuItem>
-                        <MenuItem value="other">Other</MenuItem>
+                        {devices.map((device) => (
+                          <MenuItem key={device} value={device}>
+                            {device}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                     <TextField
@@ -536,10 +571,10 @@ const RegisterUser = (props) => {
                       }}
                       onChange={(e) => handleChange(e, "plan_expired_date")}
                       defaultValue={
-                        forEdit
-                          ? defaultData?.plan_expired_date === "null"
-                            ? "1997-05-24"
-                            : defaultData?.plan_expired_date
+                        location?.state?.forEdit
+                          ? moment(defaultUserData?.plan_expired_date).format(
+                              "YYYY-MM-DD"
+                            )
                           : "1997-05-24"
                       }
                     />
@@ -549,26 +584,65 @@ const RegisterUser = (props) => {
                     style={{ marginTop: "15px" }}
                   >
                     <TextField
-                      required
                       margin="dense"
                       id="name"
                       label="GST Number"
                       type="text"
                       fullWidth
                       variant="standard"
-                      defaultValue={forEdit ? defaultData?.gst_number : ""}
+                      defaultValue={
+                        location?.state?.forEdit
+                          ? defaultUserData?.gst_number
+                          : ""
+                      }
                       onChange={(e) => handleChange(e, "gst_number")}
                     />
                     <TextField
-                      required
                       margin="dense"
                       id="name"
                       label="PAN Number"
                       type="text"
                       fullWidth
                       variant="standard"
-                      defaultValue={forEdit ? defaultData?.pan_number : ""}
+                      defaultValue={
+                        location?.state?.forEdit
+                          ? defaultUserData?.pan_number
+                          : ""
+                      }
                       onChange={(e) => handleChange(e, "pan_number")}
+                    />
+                  </div>
+                  <div
+                    className="registerModalBodyField"
+                    style={{ marginTop: "15px" }}
+                  >
+                    <TextField
+                      margin="dense"
+                      id="name"
+                      label="Director Email"
+                      type="email"
+                      fullWidth
+                      variant="standard"
+                      defaultValue={
+                        location?.state?.forEdit
+                          ? defaultUserData?.director_email
+                          : ""
+                      }
+                      onChange={(e) => handleChange(e, "director_email")}
+                    />
+                    <TextField
+                      margin="dense"
+                      id="name"
+                      label="Admin Email"
+                      type="email"
+                      fullWidth
+                      variant="standard"
+                      defaultValue={
+                        location?.state?.forEdit
+                          ? defaultUserData?.admin_email
+                          : ""
+                      }
+                      onChange={(e) => handleChange(e, "admin_email")}
                     />
                   </div>
                 </div>
@@ -580,13 +654,17 @@ const RegisterUser = (props) => {
               <TextField
                 id="standard-textarea"
                 label="Current Address"
-                placeholder="Placeholder"
+                placeholder="Enter the current address"
                 multiline
                 maxRows={4}
                 variant="standard"
                 fullWidth
                 onChange={(e) => handleChange(e, "current_address")}
-                defaultValue={forEdit ? defaultData?.current_address : ""}
+                defaultValue={
+                  location?.state?.forEdit
+                    ? defaultUserData?.current_address
+                    : ""
+                }
               />
               <div className="registerModalBodyField">
                 <TextField
@@ -597,7 +675,11 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "current_city")}
-                  defaultValue={forEdit ? defaultData?.current_city : ""}
+                  defaultValue={
+                    location?.state?.forEdit
+                      ? defaultUserData?.current_city
+                      : ""
+                  }
                 />
                 <TextField
                   margin="dense"
@@ -607,7 +689,11 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "current_state")}
-                  defaultValue={forEdit ? defaultData?.current_state : ""}
+                  defaultValue={
+                    location?.state?.forEdit
+                      ? defaultUserData?.current_state
+                      : ""
+                  }
                 />
                 <TextField
                   margin="dense"
@@ -617,7 +703,11 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "current_pincode")}
-                  defaultValue={forEdit ? defaultData?.current_pincode : ""}
+                  defaultValue={
+                    location?.state?.forEdit
+                      ? defaultUserData?.current_pincode
+                      : ""
+                  }
                 />
               </div>
               <FormControlLabel
@@ -632,27 +722,34 @@ const RegisterUser = (props) => {
               <TextField
                 id="standard-textarea"
                 label="Permanent Address"
-                placeholder="Placeholder"
+                placeholder="Enter the Permanent address"
                 multiline
                 maxRows={4}
                 variant="standard"
                 fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                }}
                 onChange={(e) => handleChange(e, "permanent_address")}
                 defaultValue={
-                  forEdit ? defaultData?.permanent_address : permanentAddress
+                  location?.state?.forEdit
+                    ? defaultUserData?.permanent_address
+                    : permanentAddress
                 }
               />
               <div className="registerModalBodyField">
                 <TextField
                   margin="dense"
-                  id="name"
+                  id="Permanent City"
                   label="Permanent City"
                   type="text"
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "permanent_city")}
-                  defaultValue={
-                    forEdit ? defaultData?.permanent_city : permanentCity
+                  value={
+                    location?.state?.forEdit
+                      ? defaultUserData?.permanent_city
+                      : permanentCity
                   }
                 />
                 <TextField
@@ -663,8 +760,10 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "permanent_state")}
-                  defaultValue={
-                    forEdit ? defaultData?.permanent_state : permanentState
+                  value={
+                    location?.state?.forEdit
+                      ? defaultUserData?.permanent_state
+                      : permanentState
                   }
                 />
                 <TextField
@@ -675,15 +774,17 @@ const RegisterUser = (props) => {
                   fullWidth
                   variant="standard"
                   onChange={(e) => handleChange(e, "permanent_pincode")}
-                  defaultValue={
-                    forEdit ? defaultData?.permanent_pincode : permanentPincode
+                  value={
+                    location?.state?.forEdit
+                      ? defaultUserData?.permanent_pincode
+                      : permanentPincode
                   }
                 />
               </div>
             </div>
             <Stack spacing={2} direction="row" className="register-btn-block">
               <Button variant="outlined" onClick={() => handleSubmit()}>
-                {forEdit ? "EDIT" : "SUBMIT"}
+                SAVE
               </Button>
             </Stack>
           </div>

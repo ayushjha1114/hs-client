@@ -58,7 +58,7 @@ let HeaderLayout = props => {
                 <img src="/assets/images/DGSoft-logo.png" alt="" style={{ width: "18%"}} />
             </div>
             <div className="header-right">
-                <span>{window.localStorage.getItem('user_name')}</span> 
+                <span>{window.localStorage.getItem('user_name') && window.localStorage.getItem('user_name').toUpperCase()}</span> 
                 <div ref={myRef} className="user-img">
                     <img
                         onClick={e => handleMenuClick(e)}

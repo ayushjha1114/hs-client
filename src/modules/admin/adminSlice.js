@@ -1,23 +1,27 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  userData: [],
-  userList: {}, 
+  defaultUserData: {},
+  userList: [],
+  amcList: [],
   serviceList: [],
   brandList: [],
   ticketList: [],
-  paymentDetailList: []
-}
+  paymentDetailList: [],
+};
 
 export const AdminSlice = createSlice({
-  name: 'ADMIN',
+  name: "ADMIN",
   initialState,
   reducers: {
-    ADD_USER: (state, action) => {
-      state.userData = action.payload.data;
+    SET_DEFAULT_USER_DATA: (state, action) => {
+      state.defaultUserData = action.payload.data;
     },
     SET_USER_LIST: (state, action) => {
       state.userList = action.payload.data;
+    },
+    SET_AMC_LIST: (state, action) => {
+      state.amcList = action.payload.data;
     },
     SET_SERVICE_LIST: (state, action) => {
       state.serviceList = action.payload.data;
@@ -27,10 +31,17 @@ export const AdminSlice = createSlice({
     },
     SET_PAYMENT_DETAIL_LIST: (state, action) => {
       state.paymentDetailList = action.payload.data;
-    },
+    }
   },
-})
+});
 
-export const { ADD_USER, SET_USER_LIST, SET_SERVICE_LIST, SET_BRAND_LIST, SET_PAYMENT_DETAIL_LIST } = AdminSlice.actions
+export const {
+  SET_DEFAULT_USER_DATA,
+  SET_USER_LIST,
+  SET_SERVICE_LIST,
+  SET_BRAND_LIST,
+  SET_PAYMENT_DETAIL_LIST,
+  SET_AMC_LIST,
+} = AdminSlice.actions;
 
 export default AdminSlice.reducer;
