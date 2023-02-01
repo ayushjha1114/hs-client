@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import UserLayout from "../../layout/User";
 import { useGetAllServiceQuery } from "../../services/admin";
-import { Button } from "antd";
 import { EditTwoTone, DeleteTwoTone } from "@ant-design/icons";
 import { SET_SERVICE_LIST } from "./adminSlice";
 import NewServiceModal from "./NewServiceModal";
 import Helper from "../../util/helper";
-import { Tooltip } from "antd";
+import { Tooltip, Modal } from "antd";
+import {
+  PlusOutlined
+  } from '@ant-design/icons';
+import {Card, CardHeader ,Button} from '@mui/material';
+import AddIcon from "@mui/icons-material/Add";
+
 
 const Service = () => {
   const dispatch = useDispatch();
@@ -17,6 +22,24 @@ const Service = () => {
   const [serviceModalShow, setServiceModalShow] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [serviceId, setServiceId] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+ 
+  const handleOk = (event) => {
+    console.log(event);
+    event.stopPropagation();
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const isOpen = () => {
+    console.log("ttt" + isModalOpen);
+    return isModalOpen;
+  }
 
   const handleEditBtn = (id) => {
     if (serviceList.length > 0) {
@@ -29,6 +52,14 @@ const Service = () => {
     setIsEdit(true);
     setServiceModalShow(true);
   };
+
+  const handleclose =() =>{
+    console.log(serviceModalShow);
+    setServiceModalShow(!serviceModalShow);
+    console.log(serviceModalShow);
+
+  }
+  console.log(isModalOpen);
 
   const handleNewServiceBtn = () => {
     setServiceModalShow(true);
@@ -49,19 +80,18 @@ const Service = () => {
   return (
     <>
       <UserLayout>
-        <div className="">
-          <div className="user-management-card">
-            <div className="service-heading">
-              <h3>Service</h3>
-              <Button
-                className="new-service-btn"
-                type="primary"
-                ghost
-                onClick={() => handleNewServiceBtn()}
-              >
-                New Service
-              </Button>
-            </div>
+      <Card
+    sx={{
+      margin: '4% 0%',
+      padding: '20px 10px',
+      borderRadius: '8px',
+      height : 'calc(100vh - 90px)'
+    }}
+    >
+      <CardHeader title="Services" action={<Button variant="contained"  startIcon={<AddIcon />} onClick={() => handleNewServiceBtn()}>
+      New Service
+     </Button>}></CardHeader>
+            
             {error ? (
               <>Oh no, there was an error</>
             ) : isLoading ? (
@@ -137,15 +167,16 @@ const Service = () => {
             ) : (
               <></>
             )}
-          </div>
-        </div>
+            
         <NewServiceModal
-          show={serviceModalShow}
+          show={serviceModalShow}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
           isEdit={isEdit}
           serviceId={serviceId}
-          onHide={() => setServiceModalShow(false)}
+          onHide={handleclose}
           closeEdit={() => setIsEdit(false)}
         />
+        </Card>
+       
       </UserLayout>
     </>
   );

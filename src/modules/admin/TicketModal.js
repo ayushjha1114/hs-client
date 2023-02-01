@@ -214,7 +214,7 @@ export default function TicketModal(props) {
   };
 
   useEffect(() => {
-    if (userList.length > 0) {
+    if (userList && userList.length > 0) {
       const data = userList
         .map((item) => {
           if (item.role === "USER" || item.role === "AMC") {

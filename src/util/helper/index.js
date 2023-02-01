@@ -20,6 +20,7 @@ const Helper = {
     }, 50);
   },
   transformUserName(data) {
+    console.log(data);
     let userName = data.first_name;
     if (data.middle_name !== null) {
       userName = userName + ' ' + data.middle_name;

@@ -124,7 +124,7 @@ li {
 }
 
 .dashboard-header {
-    padding: 0 34px;
+    padding: 0 15px 0 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -133,7 +133,7 @@ li {
     background: #fff;
     position: fixed;
     top: 0;
-    left: 100px;
+    left: 0px;
     right: 0;
     z-index: 9;
     transition: 0.3s;
@@ -371,13 +371,13 @@ ul.sub-menu.admin-sub-menu li a img {
     background: #1268b3;
 }
 
-
+/* 
 @media only screen and (max-width: 1500px) {
 
 }
 
 @media only screen and (min-width: 1501px) {
-}
+} */
 
 
 /* new css */
@@ -475,207 +475,19 @@ body.show-sidebar .left-sidebar {
     left: 0;
 }
 
-/* Extra small devices (portrait phones, less than 360px) */
-@media (max-width: 360px) {
 
-    .dashboard-header {
-        padding: 0 10px !important;
+    svg { 
+        vertical-align: baseline; 
     }
 
-    .header-right span {
-        font-size: 10px !important;
-        padding-right: 5px !important;
-        padding-top: 0 !important;
-        width: 115px !important;
-    }
-
-    .header-logo img {
-        width: 90% !important;
-    }
+/* Material- ui css */
+.MuiDataGrid-columnHeaders{
+    background-color: #1268B3;
+    color: #F5F6F6;
 }
-
-/* Extra small devices (portrait phones, less than 576px) */
-@media (max-width: 575.98px) {
-
-    .left-sidebar {
-        left: -100px;
-    }
-
-    .left-sidebar.show-mob-leftbar {
-        left: 0;
-    }
-
-    .dashboard-header {
-        left: 0;
-        padding: 0 10px;
-    }
-
-    #nav-icon2 {
-        display: block !important;
-        margin: 0 5px 0 0;
-        width: 20px;
-        height: 14px;
-    }
-
-    .nav-icon span:nth-child(2) {
-        top: 6px;
-    }
-
-    .nav-icon span:nth-child(3) {
-        top: 12px;
-    }
-
-    #nav-icon span:nth-child(1) {
-        top: 8px;
-        -webkit-transform: rotate(135deg);
-        -moz-transform: rotate(135deg);
-        -o-transform: rotate(135deg);
-        transform: rotate(135deg);
-    }
-
-    #nav-icon span:nth-child(2) {
-        opacity: 0;
-        left: -60px;
-    }
-
-    #nav-icon span:nth-child(3) {
-        top: 8px;
-        -webkit-transform: rotate(-135deg);
-        -moz-transform: rotate(-135deg);
-        -o-transform: rotate(-135deg);
-        transform: rotate(-135deg);
-    }
-
-    .header-right span {
-        white-space: nowrap;
-        font-size: 11px;
-        padding-right: 5px;
-        width: 130px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    .header-logo img {
-        width: 85%;
-    }
-
-    .order-value small {
-        font-size: 12px;
-    }
+.MuiDataGrid-menuIcon {
+    color: #F5F6F6;
 }
-
-/* Small devices (landscape phones, 576px and up) */
-@media (min-width: 576px) and (max-width: 767.98px) {
-
-    .left-sidebar {
-        left: -100px;
-    }
-
-    .left-sidebar.show-mob-leftbar {
-        left: 0;
-    }
-
-    #nav-icon2 {
-        display: block !important;
-        margin: 0 5px 0 0;
-        width: 20px;
-        height: 14px;
-    }
-
-    .nav-icon span:nth-child(2) {
-        top: 6px;
-    }
-
-    .nav-icon span:nth-child(3) {
-        top: 12px;
-    }
-
-    #nav-icon span:nth-child(1) {
-        top: 8px;
-        -webkit-transform: rotate(135deg);
-        -moz-transform: rotate(135deg);
-        -o-transform: rotate(135deg);
-        transform: rotate(135deg);
-    }
-
-    #nav-icon span:nth-child(2) {
-        opacity: 0;
-        left: -60px;
-    }
-
-    #nav-icon span:nth-child(3) {
-        top: 8px;
-        -webkit-transform: rotate(-135deg);
-        -moz-transform: rotate(-135deg);
-        -o-transform: rotate(-135deg);
-        transform: rotate(-135deg);
-    }
-
-    .dashboard-header {
-        left: 0;
-        padding: 0 22px;
-    }
-
-    .header-right span {
-        white-space: nowrap;
-        font-size: 14px;
-    }
-
-    .header-logo img {
-        width: 80%;
-    }
-
-}
-
-/* Medium devices (tablets, 768px and up) */
-@media (min-width: 768px) and (max-width: 991.98px) {
-
-    .left-sidebar {
-        width: 80px;
-    }
-
-    .dashboard-header {
-        left: 80px;
-        padding: 0 22px;
-    }
-
-    .header-right span {
-        white-space: nowrap;
-    }
-
-    .header-logo img {
-        width: 62%;
-    }
-
-    .menu ul li a {
-        padding: 10px 15px 15px 5px;
-        font-size: 9px !important;
-    }
-
-}
-
-/* Large devices (desktops, 992px and up) */
-@media (min-width: 992px) and (max-width: 1199.98px) {
-    .left-sidebar {
-        width: 80px;
-    }
-
-    .dashboard-header {
-        left: 80px;
-        padding: 0 22px;
-    }
-
-    .header-right span {
-        white-space: nowrap;
-    }
-
-    .header-logo img {
-        width: 62%;
-    }
-
-    .menu ul li a {
-        padding: 10px 15px 15px 5px;
-        font-size: 9px !important;
-    }
-
+.MuiDataGrid-iconButtonContainer{
+    color: #F5F6F6;
 }

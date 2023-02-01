@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Divider from "@mui/material/Divider";
-import { FormControlLabel, Checkbox } from "@mui/material";
+// import Button from "@mui/material/Button";
+// import TextField from "@mui/material/TextField";
+// import Dialog from "@mui/material/Dialog";
+// import DialogActions from "@mui/material/DialogActions";
+// import DialogContent from "@mui/material/DialogContent";
+// import DialogContentText from "@mui/material/DialogContentText";
+// import DialogTitle from "@mui/material/DialogTitle";
+// import Divider from "@mui/material/Divider";
+// import { FormControlLabel, Checkbox } from "@mui/material";
 import {
   useCreateServiceMutation,
   useGetAllServiceQuery,
@@ -16,10 +16,40 @@ import {
 } from "../../services/admin";
 import { PlusCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
 import { notification } from "antd";
+import { Button, Modal } from 'antd';
+import {
+  Cascader,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Switch,
+  TreeSelect,
+  Checkbox,
+} from 'antd';
+import { Col, Divider, Row } from 'antd';
 
+
+const { TextArea } = Input;
+const options = [
+  {
+    label: 'Online',
+    value: 'Online',
+  },
+  {
+    label: 'On-Site',
+    value: 'On-Site',
+  },
+  {
+    label: 'Pick & Drop',
+    value: 'Pick & Drop',
+  },
+];
 export default function NewServiceModal(props) {
   const { show, onHide, isEdit, closeEdit, serviceId } = props;
-
+  console.log('-----' + show);
   const serviceList = useSelector((state) => state.admin.serviceList);
   const { refetch } = useGetAllServiceQuery();
   const [createService] = useCreateServiceMutation();
@@ -58,54 +88,57 @@ export default function NewServiceModal(props) {
   };
 
   const handleCancel = () => {
-    setDefaultOnline(false);
-    setDefaultOnSite(false);
-    setDefaultPickDrop(false);
-    setServiceProvided({ totalRows: 1, rows: [1], serviceProvidedData: [] });
-    setServiceProvidedLabel("");
-    setServiceProvidedDescription("");
+    // setDefaultOnline(false);
+    // setDefaultOnSite(false);
+    // setDefaultPickDrop(false);
+    // setServiceProvided({ totalRows: 1, rows: [1], serviceProvidedData: [] });
+    // setServiceProvidedLabel("");
+    // setServiceProvidedDescription("");
     onHide();
+    // e.stopPropagation();
+
+    // setShowModal(!showModal);
     closeEdit();
   };
 
   useEffect(() => {
-    if (serviceList.length > 0 && isEdit) {
-      serviceList.map((item) => {
-        if (item.id === serviceId) {
-          let serviceProvidedLength = item?.service_provided?.length;
-          let newArr = [];
-          let i = 0;
-          while (i !== serviceProvidedLength) {
-            newArr.push(i + 1);
-            i++;
-          }
-          item.service_type.map((element) => {
-            if (element === "ONLINE") {
-              setDefaultOnline(true);
-            } else if (element === "ON-SITE") {
-              setDefaultOnSite(true);
-            } else if (element === "PICK AND DROP") {
-              setDefaultPickDrop(true);
-            }
-          });
+    // if (serviceList && serviceList.length > 0 && isEdit) {
+    //   serviceList.map((item) => {
+    //     if (item.id === serviceId) {
+    //       let serviceProvidedLength = item?.service_provided?.length;
+    //       let newArr = [];
+    //       let i = 0;
+    //       while (i !== serviceProvidedLength) {
+    //         newArr.push(i + 1);
+    //         i++;
+    //       }
+    //       item.service_type.map((element) => {
+    //         if (element === "ONLINE") {
+    //           setDefaultOnline(true);
+    //         } else if (element === "ON-SITE") {
+    //           setDefaultOnSite(true);
+    //         } else if (element === "PICK AND DROP") {
+    //           setDefaultPickDrop(true);
+    //         }
+    //       });
 
-          setDefaultServiceProvided(item.service_provided);
-          setServiceProvided({
-            totalRows: serviceProvidedLength,
-            rows: newArr,
-            serviceProvidedData: item.service_provided,
-          });
-          setServiceProvidedLabel(
-            item.service_provided[serviceProvidedLength - 1].label
-          );
-          setServiceProvidedDescription(
-            item.service_provided[serviceProvidedLength - 1].description
-          );
-          setServiceType(item.service_type);
-          setDefaultData(item);
-        }
-      });
-    }
+    //       setDefaultServiceProvided(item.service_provided);
+    //       setServiceProvided({
+    //         totalRows: serviceProvidedLength,
+    //         rows: newArr,
+    //         serviceProvidedData: item.service_provided,
+    //       });
+    //       setServiceProvidedLabel(
+    //         item.service_provided[serviceProvidedLength - 1].label
+    //       );
+    //       setServiceProvidedDescription(
+    //         item.service_provided[serviceProvidedLength - 1].description
+    //       );
+    //       setServiceType(item.service_type);
+    //       setDefaultData(item);
+    //     }
+    //   });
+    // }
   }, [isEdit, show]);
 
   const handleChange = (event, field) => {
@@ -294,178 +327,223 @@ export default function NewServiceModal(props) {
     });
   };
 
-  return (
-    <div>
-      <Dialog open={show} onClose={handleCancel} maxWidth="lg" fullWidth={true}>
-        <DialogTitle className="registerModalTitle">
-          {isEdit ? "Edit Service" : "Create Service"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText className="registerModalContentText">
-            Service Information
-          </DialogContentText>
-          <Divider />
-          <div className="registerModalBody">
-            <div className="registerModalBodyField">
-              <TextField
-                required
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Name"
-                type="text"
-                fullWidth
-                variant="standard"
-                defaultValue={isEdit ? defaultData?.name : ""}
-                onChange={(e) => handleChange(e, "name")}
-              />
-            </div>
-            <div className="registerModalBodyField">
-              <DialogContentText className="serviceModalServiceTypeText">
-                Service Type:
-              </DialogContentText>
-              <FormControlLabel
-                control={
-                  isEdit ? (
-                    <Checkbox
-                      // checked={defaultOnSite || defaultOnSiteChecked}
-                      checked={defaultOnSite}
-                      onChange={(e) => handleServiceType(e, "ON-SITE")}
-                    />
-                  ) : (
-                    <Checkbox
-                      // checked={defaultOnSite}
-                      onChange={(e) => handleServiceType(e, "ON-SITE")}
-                    />
-                  )
-                }
-                label="ON-SITE"
-              />
-              <FormControlLabel
-                control={
-                  isEdit ? (
-                    <Checkbox
-                      // checked={defaultOnline || defaultOnlineChecked}
-                      checked={defaultOnline}
-                      onChange={(e) => handleServiceType(e, "ONLINE")}
-                    />
-                  ) : (
-                    <Checkbox
-                      // checked={(!isEdit && defaultOnline) || (isEdit && defaultOnlineChecked)}
-                      onChange={(e) => handleServiceType(e, "ONLINE")}
-                    />
-                  )
-                }
-                label="ONLINE"
-              />
-              <FormControlLabel
-                control={
-                  isEdit ? (
-                    <Checkbox
-                      // checked={defaultPickDrop || defaultPickDropChecked}
-                      checked={defaultPickDrop}
-                      onChange={(e) => handleServiceType(e, "PICK AND DROP")}
-                    />
-                  ) : (
-                    <Checkbox
-                      // checked={defaultPickDrop || (isEdit && defaultPickDropChecked)}
-                      onChange={(e) => handleServiceType(e, "PICK AND DROP")}
-                    />
-                  )
-                }
-                label="PICK AND DROP"
-              />
-            </div>
-            <div className="registerModalBodyField">
-              <TextField
-                id="standard-textarea"
-                label="Description"
-                placeholder="Enter the description"
-                multiline
-                maxRows={4}
-                variant="standard"
-                fullWidth
-                onChange={(e) => handleChange(e, "description")}
-                defaultValue={isEdit ? defaultData?.description : ""}
-              />
-            </div>
-            {serviceProvided.rows.map((item, key) => (
-              <div className="registerModalBodyField">
-                <DialogContentText className="serviceModalServiceProvidedText">
-                  Service Provide:
-                </DialogContentText>
-                <TextField
-                  required
-                  margin="dense"
-                  id='label'
-                  // id={`label ${defaultData?.service_provided[key]?.label}`}
-                  label="Label"
-                  type="text"
-                  fullWidth
-                  variant="standard"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  defaultValue={
-                    isEdit
-                      ? defaultData?.service_provided
-                        ? defaultData?.service_provided[key]?.label
-                        : ""
-                      : ""
-                  }
-                  onChange={(e) => handleChange(e, "label")}
-                />
-                <TextField
-                  margin="dense"
-                  id="name"
-                  label="Description"
-                  type="text"
-                  fullWidth
-                  variant="standard"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  defaultValue={
-                    isEdit
-                      ? defaultData?.service_provided
-                        ? defaultData?.service_provided[key]?.description
-                        : ""
-                      : ""
-                  }
-                  onChange={(e) =>
-                    handleChange(e, "service_provided_description")
-                  }
-                />
+  const onChange = (checkedValues) => {
+    console.log('checked = ', checkedValues);
+  };
 
-                {serviceProvided.totalRows !== item && (
-                  <a
-                    className="serviceModalAddBtn"
-                    onClick={() => handleRemoveServiceProvided(item)}
-                  >
-                    <CloseCircleTwoTone />
-                  </a>
-                )}
-                {serviceProvided.totalRows === item && (
-                  <a
-                    className="serviceModalAddBtn"
-                    onClick={() => handleAddBtn(item)}
-                  >
-                    <PlusCircleTwoTone />
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button className="registerModalBtn" onClick={() => handleCancel()}>
-            Cancel
-          </Button>
-          <Button className="registerModalBtn" onClick={() => handleSubmit()}>
-            {isEdit ? "Save" : "Create"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+  return (
+    <>
+    <Modal width='70%' title={isEdit ? "Edit Service" : "Create Service"} open={show}  onOk={()=> handleCancel()} onCancel={handleCancel}>
+    <Form
+      labelCol={{ span: 4 }}
+      wrapperCol={{ span: 14 }}
+      layout="vertical"
+      style={{ maxWidth: 600 }}
+    >
+    <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+      <Col className="gutter-row">
+      <Form.Item label="Name"
+      rules={[
+        {
+          required: true,
+          message: 'Please input your Service Name!',
+        },
+      ]}>
+        <Input  placeholder="Service Name" />
+      </Form.Item>
+      </Col>
+      </Row>
+      <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+      <Col className="gutter-row">
+      <Form.Item label="Description">
+      <TextArea rows={4} placeholder="maxLength is 300" maxLength={300} />
+      </Form.Item>
+      </Col>
+      </Row>
+      <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+      <Col className="gutter-row">
+      <Form.Item label="Facilities">
+      <Checkbox.Group options={options} defaultValue={['Online']} onChange={onChange} />
+      </Form.Item>
+      </Col>
+      </Row>
+      <Checkbox.Group options={options} defaultValue={['Online']} onChange={onChange} />
+
+      
+    </Form>
+    </Modal>
+    </>
+    // <div>
+    //   <Dialog open={show} onClose={handleCancel} maxWidth="lg" fullWidth={true}>
+    //     <DialogTitle className="registerModalTitle">
+    //       {isEdit ? "Edit Service" : "Create Service"}
+    //     </DialogTitle>
+    //     <DialogContent>
+    //       <DialogContentText className="registerModalContentText">
+    //         Service Information
+    //       </DialogContentText>
+    //       <Divider />
+    //       <div className="registerModalBody">
+    //         <div className="registerModalBodyField">
+    //           <TextField
+    //             required
+    //             autoFocus
+    //             margin="dense"
+    //             id="name"
+    //             label="Name"
+    //             type="text"
+    //             fullWidth
+    //             variant="standard"
+    //             defaultValue={isEdit ? defaultData?.name : ""}
+    //             onChange={(e) => handleChange(e, "name")}
+    //           />
+    //         </div>
+    //         <div className="registerModalBodyField">
+    //           <DialogContentText className="serviceModalServiceTypeText">
+    //             Service Type:
+    //           </DialogContentText>
+    //           <FormControlLabel
+    //             control={
+    //               isEdit ? (
+    //                 <Checkbox
+    //                   // checked={defaultOnSite || defaultOnSiteChecked}
+    //                   checked={defaultOnSite}
+    //                   onChange={(e) => handleServiceType(e, "ON-SITE")}
+    //                 />
+    //               ) : (
+    //                 <Checkbox
+    //                   // checked={defaultOnSite}
+    //                   onChange={(e) => handleServiceType(e, "ON-SITE")}
+    //                 />
+    //               )
+    //             }
+    //             label="ON-SITE"
+    //           />
+    //           <FormControlLabel
+    //             control={
+    //               isEdit ? (
+    //                 <Checkbox
+    //                   // checked={defaultOnline || defaultOnlineChecked}
+    //                   checked={defaultOnline}
+    //                   onChange={(e) => handleServiceType(e, "ONLINE")}
+    //                 />
+    //               ) : (
+    //                 <Checkbox
+    //                   // checked={(!isEdit && defaultOnline) || (isEdit && defaultOnlineChecked)}
+    //                   onChange={(e) => handleServiceType(e, "ONLINE")}
+    //                 />
+    //               )
+    //             }
+    //             label="ONLINE"
+    //           />
+    //           <FormControlLabel
+    //             control={
+    //               isEdit ? (
+    //                 <Checkbox
+    //                   // checked={defaultPickDrop || defaultPickDropChecked}
+    //                   checked={defaultPickDrop}
+    //                   onChange={(e) => handleServiceType(e, "PICK AND DROP")}
+    //                 />
+    //               ) : (
+    //                 <Checkbox
+    //                   // checked={defaultPickDrop || (isEdit && defaultPickDropChecked)}
+    //                   onChange={(e) => handleServiceType(e, "PICK AND DROP")}
+    //                 />
+    //               )
+    //             }
+    //             label="PICK AND DROP"
+    //           />
+    //         </div>
+    //         <div className="registerModalBodyField">
+    //           <TextField
+    //             id="standard-textarea"
+    //             label="Description"
+    //             placeholder="Enter the description"
+    //             multiline
+    //             maxRows={4}
+    //             variant="standard"
+    //             fullWidth
+    //             onChange={(e) => handleChange(e, "description")}
+    //             defaultValue={isEdit ? defaultData?.description : ""}
+    //           />
+    //         </div>
+    //         {serviceProvided.rows.map((item, key) => (
+    //           <div className="registerModalBodyField">
+    //             <DialogContentText className="serviceModalServiceProvidedText">
+    //               Service Provide:
+    //             </DialogContentText>
+    //             <TextField
+    //               required
+    //               margin="dense"
+    //               id='label'
+    //               // id={`label ${defaultData?.service_provided[key]?.label}`}
+    //               label="Label"
+    //               type="text"
+    //               fullWidth
+    //               variant="standard"
+    //               InputLabelProps={{
+    //                 shrink: true,
+    //               }}
+    //               defaultValue={
+    //                 isEdit
+    //                   ? defaultData?.service_provided
+    //                     ? defaultData?.service_provided[key]?.label
+    //                     : ""
+    //                   : ""
+    //               }
+    //               onChange={(e) => handleChange(e, "label")}
+    //             />
+    //             <TextField
+    //               margin="dense"
+    //               id="name"
+    //               label="Description"
+    //               type="text"
+    //               fullWidth
+    //               variant="standard"
+    //               InputLabelProps={{
+    //                 shrink: true,
+    //               }}
+    //               defaultValue={
+    //                 isEdit
+    //                   ? defaultData?.service_provided
+    //                     ? defaultData?.service_provided[key]?.description
+    //                     : ""
+    //                   : ""
+    //               }
+    //               onChange={(e) =>
+    //                 handleChange(e, "service_provided_description")
+    //               }
+    //             />
+
+    //             {serviceProvided.totalRows !== item && (
+    //               <a
+    //                 className="serviceModalAddBtn"
+    //                 onClick={() => handleRemoveServiceProvided(item)}
+    //               >
+    //                 <CloseCircleTwoTone />
+    //               </a>
+    //             )}
+    //             {serviceProvided.totalRows === item && (
+    //               <a
+    //                 className="serviceModalAddBtn"
+    //                 onClick={() => handleAddBtn(item)}
+    //               >
+    //                 <PlusCircleTwoTone />
+    //               </a>
+    //             )}
+    //           </div>
+    //         ))}
+    //       </div>
+    //     </DialogContent>
+    //     <DialogActions>
+    //       <Button className="registerModalBtn" onClick={() => handleCancel()}>
+    //         Cancel
+    //       </Button>
+    //       <Button className="registerModalBtn" onClick={() => handleSubmit()}>
+    //         {isEdit ? "Save" : "Create"}
+    //       </Button>
+    //     </DialogActions>
+    //   </Dialog>
+    // </div>
   );
 }

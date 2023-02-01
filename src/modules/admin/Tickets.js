@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import moment from "moment";
-import { Button, Tag } from "antd";
+import { Tag } from "antd";
 import UserLayout from "../../layout/User";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -10,6 +10,9 @@ import Check from "@mui/icons-material/Check";
 import Divider from "@mui/material/Divider";
 import TicketModal from "./TicketModal";
 import PaymentConfirmationModal from "./PaymentConfirmationModal";
+import {Card, CardHeader ,Button} from '@mui/material';
+import AddIcon from "@mui/icons-material/Add";
+
 import {
   SET_USER_LIST,
   SET_SERVICE_LIST,
@@ -34,6 +37,12 @@ import Helper from "../../util/helper";
 import { EyeTwoTone } from "@ant-design/icons";
 import TicketViewModal from "./TicketViewModal";
 import TablePagination from '@mui/material/TablePagination';
+import {
+  PlusOutlined
+  } from '@ant-design/icons';
+  // import {Card, Typography } from 'antd';
+// const { Text } = Typography;
+// const { Meta } = Card;
 
 const Tickets = () => {
   const dispatch = useDispatch();
@@ -238,19 +247,17 @@ const Tickets = () => {
   return (
     <>
       <UserLayout>
-        <div className="">
-          <div className="user-management-card">
-            <div className="ticket-heading">
-              <h3>Tickets</h3>
-              <Button
-                className="new-ticket-btn"
-                type="primary"
-                ghost
-                onClick={() => handleNewTicketBtn()}
-              >
-                New Ticket
-              </Button>
-            </div>
+      <Card
+    sx={{
+      margin: '4% 0%',
+      padding: '20px 10px',
+      borderRadius: '8px',
+      height : 'calc(100vh - 90px)'
+    }}
+    >
+      <CardHeader title="Tickets" action={<Button variant="contained"  startIcon={<AddIcon />} onClick={() => handleNewTicketBtn()}>
+      New Ticket
+     </Button>}></CardHeader>
             {error ? (
               <>Oh no, there was an error</>
             ) : isLoading ? (
@@ -467,8 +474,7 @@ const Tickets = () => {
                 <h2>No Tickets Found</h2>
               </>
             )}
-          </div>
-        </div>
+           
         <TicketModal
           show={ticketModalShow}
           onHide={() => setTicketModalShow(false)}
@@ -485,6 +491,8 @@ const Tickets = () => {
           closeEdit={() => setForPaymentModalEdit(false)}
           isEdit={forPaymentModalEdit}
         />
+         </Card>
+        
       </UserLayout>
     </>
   );

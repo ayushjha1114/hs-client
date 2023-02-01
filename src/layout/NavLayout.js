@@ -1,91 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { DistributorLink, AdminLink } from '../config/sideNav';
-
-let Navigation = props => {
-
-    const { isAdminLogin } = props;
-
-
-    let links;
-    if (isAdminLogin === 'admin') {
-        links = AdminLink;
-    } else {
-        links = DistributorLink;
+import {
+  DashboardOutlined,
+  CustomerServiceOutlined,
+    UserOutlined,
+    DatabaseOutlined,
+    ExclamationCircleOutlined,
+  } from '@ant-design/icons';
+  import { Menu } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+  import React ,{useState}from 'react';
+  function getItem(label, key, icon, children, type) {
+    return {
+      key,
+      icon,
+      children,
+      label,
+      type,
+    };
+  }
+  const items = [
+    getItem('DashBoard','dashboard',<DashboardOutlined />),
+    getItem('User', 'user-management', <UserOutlined />),
+    getItem('Tickets', 'tickets', <ExclamationCircleOutlined />),
+    getItem('Brand', 'brand', <DatabaseOutlined />),
+    getItem('Services', 'service', <CustomerServiceOutlined />),
+  ];
+  const Navigation = (props) => {
+    const navigate = useNavigate();
+    const {collapsed} = props;
+    const [isAdmin] = useState(props.isAdminLogin);
+    const handleMenuItems = ({ item, key, keyPath, domEvent }) => {
+      navigate(`/admin/${key}`);
     }
-    let screenWidth = window.screen.width;
-    const toggleNavbar = () => {
-        if (screenWidth <= 767) {
-            document.querySelector('body').classList.remove('show-sidebar');
-        } else {
-            document.querySelector('body').classList.add('hide-sidebar');
-        }
-    }
-
-    useEffect(() => {
-        if (screenWidth <= 767) {
-            document.addEventListener('mousedown', toggleNavbar);
-        }
-        return () => document.removeEventListener('mousedown', toggleNavbar);
-    });
-
     return (
-        <div className="left-sidebar">
-            <div id="nav-icon" className="nav-icon" onClick={toggleNavbar}>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div className="menu">
-                <ul>
-                    {
-                        isAdminLogin === 'admin' ?
-                            <>
-                                <li>
-                                    <Link to={'/admin/dashboard'}>
-                                        {/* <i class="fa-solid fa-house"></i> */}
-                                        Dashboard
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to={'/admin/user-management'}>
-                                        {/* <i class="fa-solid fa-user"></i> */}
-                                        User Management
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to={'/admin/tickets'}>
-                                        {/* <i class="fa-solid fa-user"></i> */}
-                                        Tickets
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to={'/admin/brand'}>
-                                        {/* <i class="fa-solid fa-user"></i> */}
-                                        Brand
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to={'/admin/service'}>
-                                        {/* <i class="fa-solid fa-user"></i> */}
-                                        Service
-                                    </Link>
-                                </li>
-                            </>
-                            :
-                            <>
-                                <li>
-                                    <Link to={'/dashboard'}>
-                                        <img src="/assets/images/so-icon.svg" alt="" />
-                                        Text
-                                    </Link>
-                                </li>
-                            </>
-                    }
-                </ul>
-            </div>
+      <>
+      { isAdmin === "admin" ? 
+      <div 
+          
+        >
+          <Menu
+            defaultSelectedKeys={['dashboard']}
+            defaultOpenKeys={['dashboard']}
+            mode="inline"
+            theme="light"
+            inlineCollapsed={collapsed}
+            items={items}
+            onClick={handleMenuItems}
+            // selectedKeys={['dashboard','user-management']}
+            
+          />
         </div>
-    )
-}
+        : ""
+      }
+      </>
+      
+    );
+  };
 
 export default Navigation;

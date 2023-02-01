@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UserLayout from "../../layout/User";
 import { useGetAllUserQuery } from "../../services/admin";
+import {Card, CardHeader } from '@mui/material';
 
 const AdminDashboard = (props) => {
   const { data, error, isLoading } = useGetAllUserQuery({ limit: 10, offset: 0});
@@ -8,13 +9,17 @@ const AdminDashboard = (props) => {
   return (
     <>
         <UserLayout>
-          <div className="">
-            {/* <div className="distributor-info-block">Hi there yo man!!!</div> */}
-            <div className="card">
-              <div className="card-row">
-                <div className="card-row-col">
-                  <h3>ADMIN DASHBOARD</h3>
-                  {error ? (
+       
+    <Card
+      sx={{
+        margin: '4% 0%',
+        padding: '20px 10px',
+        borderRadius: '8px',
+        height : 'calc(100vh - 90px)'
+      }}
+    >
+      <CardHeader title="Dashboard"></CardHeader>
+     {error ? (
                     <>Oh no, there was an error</>
                     ) : isLoading ? (
                       <>Loading...</>
@@ -39,10 +44,7 @@ const AdminDashboard = (props) => {
                         </table>
                     </>
                   ) : null}
-                </div>
-              </div>
-            </div>
-          </div>
+    </Card>
         </UserLayout>
     </>
   );

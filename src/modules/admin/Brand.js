@@ -6,7 +6,7 @@ import {
   useCreateBrandMutation,
   useUpdateBrandDetailMutation,
 } from "../../services/admin";
-import { Button, Input, notification } from "antd";
+import { Input, notification } from "antd";
 import {
   EditTwoTone,
   DeleteTwoTone,
@@ -15,6 +15,9 @@ import {
   CheckOutlined
 } from "@ant-design/icons";
 import TablePagination from '@mui/material/TablePagination';
+import {Card, CardHeader ,Button} from '@mui/material';
+import AddIcon from "@mui/icons-material/Add";
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 const Brand = () => {
   const [createBrand] = useCreateBrandMutation();
@@ -149,24 +152,17 @@ const Brand = () => {
   return (
     <>
       <UserLayout>
-        <div className="">
-          <div className="user-management-card">
-            <div className="brandHeading">
-              <h3>Brand</h3>
-              <Button
-                type="primary"
-                ghost
-                className="brandAddIcon"
-                onClick={() => handleAddBtn()}
-              >
-                {!isAddOpen ? (
-                  <PlusOutlined style={{ paddingTop: '2px' }}/>
-                ) : (
-                  <CheckOutlined style={{ paddingTop: '2px' }}/>
-                )}
-                {!isAddOpen ? "ADD BRAND" : "SAVE BRAND"}
-              </Button>
-            </div>
+      <Card
+    sx={{
+      margin: '4% 0%',
+      padding: '20px 10px',
+      borderRadius: '8px',
+      height : 'calc(100vh - 90px)'
+    }}
+    >
+      <CardHeader title="Brands" action={<Button variant="contained"  startIcon={!isAddOpen? <AddIcon />: <TaskAltIcon/>} onClick={() => handleAddBtn()}>
+      {!isAddOpen ? "Add Brand" : "Save Brand"}
+     </Button>}></CardHeader>
             {error ? (
               <>Oh no, there was an error</>
             ) : isLoading ? (
@@ -277,8 +273,7 @@ const Brand = () => {
             ) : (
               <></>
             )}
-          </div>
-        </div>
+            </Card>
       </UserLayout>
     </>
   );

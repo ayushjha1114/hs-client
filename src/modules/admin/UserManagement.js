@@ -11,9 +11,23 @@ import {
 } from "./adminSlice";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { EditTwoTone, EyeTwoTone } from "@ant-design/icons";
 import Helper from "../../util/helper";
 import TablePagination from '@mui/material/TablePagination';
+// import { Card ,Table} from 'antd';
+import {
+  PlusOutlined
+  } from '@ant-design/icons';
+  // import { Button } from 'antd';
+  import { Typography } from 'antd';
+const { Text } = Typography;
+// const { Meta } = Card;
+
+import {Card, CardHeader ,Button} from '@mui/material';
+import { DataGrid, GridActionsCellItem ,GridToolbar} from '@mui/x-data-grid';
+
 
 const UserManagement = () => {
   const dispatch = useDispatch();
@@ -39,29 +53,19 @@ const UserManagement = () => {
     setPage(0);
   };
 
-  const handleEditBtn = (mobile) => {
-    if (userList.length > 0) {
-      userList.map((user) => {
-        if (user.mobile === mobile) {
-          amcList.map((amc) => {
-            if (amc.user_profile_id === user.id) {
-              dispatch(SET_DEFAULT_USER_DATA({ data: { ...user, ...amc } }));
-            } else {
-              dispatch(SET_DEFAULT_USER_DATA({ data: user }));
-            }
-          });
-        }
-      });
-    }
+  const handleEditBtn = React.useCallback((user)=> () => {
+   console.log(user);
+    dispatch(SET_DEFAULT_USER_DATA({ data: user }));
     navigate("/admin/register-user", {
       state: {
-        mobile,
+        mobile:user.mobile,
         forEdit: true,
       },
     });
-  };
+  });
 
-  const handleViewBtn = (mobile) => {
+  const handleViewBtn = React.useCallback(
+     (mobile) =>() => {
     if (userList.length > 0) {
       userList.map((item) => {
         if (item.mobile === mobile) {
@@ -72,7 +76,7 @@ const UserManagement = () => {
     setForView(true);
     setMobile(mobile);
     setRegisterModalShow(true);
-  };
+  });
 
   const handlePlusBtn = () => {
     navigate("/admin/register-user");
@@ -83,23 +87,78 @@ const UserManagement = () => {
     dispatch(SET_AMC_LIST({ data: data?.data?.amcList }));
   }, [data, forView]);
 
+  const columns = React.useMemo(
+    () =>  [
+    { field: 'user_id', headerName: 'ID', width: 150, },
+    {
+      field: 'fullName',
+      headerName: 'Name',
+      description: 'This column has a value getter and is not sortable.',
+      width: 400,
+      sortable: false,
+      valueGetter: (params) =>
+        `${Helper.transformUserName(params.row)}`,
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      type: 'email',
+      width: 200,
+    },
+    {
+      field: 'mobile',
+      headerName: 'Contact Number',
+      type: 'mobile',
+      width: 150,
+    },
+    {
+      field: 'role',
+      headerName: 'User Role',
+      width: 150,
+    },
+  
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      type: 'actions',
+      width: 100,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<ModeEditIcon color="primary"/>}
+          label="Edit Details"
+          onClick={handleEditBtn(params.row)}
+        />,
+        <GridActionsCellItem
+          icon={<VisibilityIcon color="primary" />}
+          label="View details"
+          onClick={handleViewBtn(params.mobile)}
+        />,
+      ]
+    },
+  ],
+ );
+
   return (
     <>
       <UserLayout>
-        <div className="">
-          <div className="user-management-card">
-            <h3>User Management</h3>
-            {error ? (
+      <Card
+    sx={{
+      margin: '4% 0%',
+      padding: '20px 10px',
+      borderRadius: '8px',
+      height : 'calc(100vh - 90px)'
+    }}
+    >
+      <CardHeader title="User Management" action={<Button variant="contained"  startIcon={<AddIcon />} onClick={() => handlePlusBtn()}>
+      Add User
+     </Button>}></CardHeader>
+      {error ? (
               <>Oh no, there was an error</>
             ) : isLoading ? (
               <>Loading...</>
             ) : data ? (
               <>
-                <h5>
-                  {data?.data?.totalCount ? data?.data?.totalCount : 0} records
-                  found
-                </h5>
-                <div className="user-management-table">
+                {/* <div className="user-management-table">
                   <table>
                     <thead>
                       <tr>
@@ -155,22 +214,12 @@ const UserManagement = () => {
                   onPageChange={handleChangePage}
                   rowsPerPage={rowsPerPage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
-                />
+                /> */}
+                 <DataGrid autoHeight={true} columns={columns} rows={data.data.rows} components={{ Toolbar: GridToolbar }} />
               </>
             ) : (
               <></>
             )}
-          </div>
-          <div class="plus-btn-block">
-            <Fab
-              color="primary"
-              aria-label="add"
-              onClick={() => handlePlusBtn()}
-            >
-              <AddIcon />
-            </Fab>
-          </div>
-        </div>
         <RegisterUserModal
           forView={forView}
           mobile={mobile}
@@ -180,8 +229,9 @@ const UserManagement = () => {
           closeEdit={() => setForEdit(false)}
           closeView={() => setForView(false)}
         />
+      </Card>
       </UserLayout>
-    </>
+      </>
   );
 };
 
