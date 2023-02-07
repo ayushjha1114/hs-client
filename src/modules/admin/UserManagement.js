@@ -60,6 +60,7 @@ const UserManagement = () => {
       state: {
         mobile:user.mobile,
         forEdit: true,
+        id: user.id,
       },
     });
   });
