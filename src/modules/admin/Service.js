@@ -12,6 +12,8 @@ import {
   } from '@ant-design/icons';
 import {Card, CardHeader ,Button} from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
+import { DataGrid, GridActionsCellItem, GridToolbar } from "@mui/x-data-grid";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 
 const Service = () => {
@@ -77,6 +79,48 @@ const Service = () => {
     return result.substring(0, result.length - 2);
   };
 
+  const columns = React.useMemo(() => [
+    { field: "name", headerName: "Name", width: 150 },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 200,
+    },
+    {
+      field: "service_provided",
+      headerName: "Service Provide",
+      width: 500,
+      renderCell: (params) => {
+        return Helper.removeCommaFromServiceProvide(
+          params.row.service_provided
+        );
+      },
+    },
+    {
+      field: "service_type",
+      headerName: "Service Type",
+      width: 300,
+      renderCell: (params) => {
+        return Helper.removeCommaFromServiceType(
+          params.row.service_type
+        );
+      },
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      width: 100,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<ModeEditIcon color="primary" />}
+          label="Edit Details"
+          onClick={() => handleEditBtn(params.row.id)}
+        />,
+      ],
+    },
+  ]);
+
   return (
     <>
       <UserLayout>
@@ -98,11 +142,11 @@ const Service = () => {
               <>Loading...</>
             ) : data ? (
               <>
-                <h5>
+                {/* <h5>
                   {data?.data?.totalCount ? data?.data?.totalCount : 0} services
                   found
-                </h5>
-                <div className="user-management-table">
+                </h5> */}
+                {/* <div className="user-management-table">
                   <table>
                     <thead>
                       <tr>
@@ -145,24 +189,19 @@ const Service = () => {
                                 >
                                   <EditTwoTone />
                                 </a>
-                                {/* <a
-                                  onClick={() =>
-                                    handleEditBtn(
-                                      item.name,
-                                      item.description,
-                                      i
-                                    )
-                                  }
-                                >
-                                  <DeleteTwoTone />
-                                </a> */}
                               </td>
                             </tr>
                           );
                         })}
                     </tbody>
                   </table>
-                </div>
+                </div> */}
+                  <DataGrid
+                autoHeight={true}
+                columns={columns}
+                rows={data.data.rows}
+                components={{ Toolbar: GridToolbar }}
+              />
               </>
             ) : (
               <></>
