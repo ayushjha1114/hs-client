@@ -20,6 +20,7 @@ import { devices } from '../../config/constant';
 import { Card,InputLabel,Select,
   MenuItem, IconButton,OutlinedInput,CardHeader,
    InputAdornment,Button ,Radio,RadioGroup,FormControlLabel,
+   FormHelperText,
    FormControl,FormLabel,FormGroup,Checkbox,CardActions,CardContent,Paper} from '@mui/material';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import MailIcon from '@mui/icons-material/Mail';
@@ -281,6 +282,7 @@ const RegisterUser = (props) => {
   //New Features
   const { data, error, isLoading } = useGetUserByIdQuery(id);
   console.log(data);
+  const  emailPattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -318,6 +320,7 @@ const UserType = [{
   };
 
   const [userType, setUserType] = React.useState('');
+  const [user, setUser] = React.useState({});
 
   const handleSelectChange = (event) => {
     setUserType(event.target.value);
@@ -330,33 +333,45 @@ const UserType = [{
     "email": '',
     "mobile": '',
     "password": '',
-    "date_of_birth": '',
-    "date_of_registration": '',
+    "date_of_birth":'',
+    "director_email":'',
+    "date_of_registration": moment().format(),
     "gender": '',
     "img_url": '',
     "role": '',
     "aadhaar_number": '',
+    "gst_number":'',
     "current_address": '',
     "current_state": '',
     "current_city": '',
     "current_pincode":'',
+    "company_name":'',
+    "contact_person_name":'',
+    "contact_person_number":'',
     "permanent_address": '',
     "permanent_state": '',
     "permanent_city": '',
     "permanent_pincode": '',
-    "amcDetail": {"device": []}
+    "pan_number":'',
+    "admin_email":'',
+    "amcDetail": {"device": [],
+    "plan_activation_date":moment().format(),
+    "plan_expired_date":moment().format(),
+    "user_plan":''
+  }
 }
 
   const {register,handleSubmit, control,reset,setValue,watch} = useForm({
     defaultValues,
-    values : data?.data?.userDetail
-
+    values : user
   }
   );
   const onSubmit = async(data) => {
+    console.log(data);
     if (forEdit) {
           let modifiedData = data;
           modifiedData.mobile = mobile;
+          modifiedData.amcDetail.device = JSON.stringify(modifiedData.amcDetail?.device);
           const response = await updateUserDetail(modifiedData);
           if (response?.data?.success) {
             notification.success({
@@ -382,10 +397,6 @@ const UserType = [{
     let userData = {};
             userData.userDetail = data;
             data.amcDetail.device = JSON.stringify(data.amcDetail?.device);
-            // if (!AMCData.date_of_registration) {
-            //   AMCData.date_of_registration = currentDate;
-            // }
-            // userData.amcDetail = AMCData;
             const response = await registerUser(data);
             if (response?.data?.success) {
               notification.success({
@@ -429,6 +440,11 @@ const UserType = [{
           setMobile(location.state.mobile);
           setId(location.state.id)
         }
+      if(data?.data?.userDetail?.amcDetail){
+      let user = JSON.parse(JSON.stringify(data?.data?.userDetail));
+        user.amcDetail.device= JSON.parse(data?.data?.userDetail.amcDetail.device);
+        setUser(user);
+      }
     // if(data?.data?.userDetail) {
     //   const detail = data.data.userDetail;
     //         if(detail?.amcDetail){
@@ -439,7 +455,7 @@ const UserType = [{
     //   reset(JSON.parse(JSON.stringify(data?.data?.rows?.userDetail)));
     // }
     // reset(JSON.parse(JSON.stringify({first_name:'Jitendra'})));
-  }, [location?.state?.forEdit,location?.state?.id,isLoading]);
+  }, [location?.state?.forEdit,location?.state?.id,data]);
 const watchUserType = watch('role');
 const watchUser = watch();
 console.log(watchUser);
@@ -454,7 +470,7 @@ console.log(watchUser);
             height: 'auto',
           }}
         >
-          <CardHeader title='Register User'></CardHeader>
+          <CardHeader title={forEdit? 'Edit User': 'Register User'}></CardHeader>
           <Divider />
             <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent>
@@ -468,19 +484,20 @@ console.log(watchUser);
               control={control}
               render ={({
                 field: { onChange, value, name },
-                fieldState: { invalid, isTouched, isDirty, error },
-                formState,
+                fieldState: { error }
+                
               }) => (
               <TextField id='firstName' 
                size="small" fullWidth 
                label='First Name'
                value={value}
                variant='outlined'
+               error ={!!error}
+               helperText = {error?.message}
               onChange={onChange}
-              inputRef={{...register('first_name')}}
               />
               )}
-              rules={{ required: true }}
+              rules={{ required:{value: true,message:"First Name is required."} }}
               />
 
             </Grid>
@@ -488,6 +505,7 @@ console.log(watchUser);
             <Controller
               name='middle_name'
               control={control}
+             
               render ={({
                 field: { onChange, value},
               }) => (
@@ -500,55 +518,68 @@ console.log(watchUser);
             <Controller
               name='last_name'
               control={control}
+              rules={{ required:{value: true,message:"Last Name is required."} }}
               render ={({
                 field: { onChange,value },
+                fieldState: { error }
               }) => (
-              <TextField id='lastname' value={value} onChange={onChange} size="small" fullWidth label='Last Name' variant='outlined' />
+              <TextField id='lastname' 
+              error={!!error} 
+              helperText={error?.message} value={value} onChange={onChange} size="small" fullWidth label='Last Name' variant='outlined' />
   )}/> </Grid>
             <Grid item xs={12} sm={4}>
             <Controller
               name='email'
               control={control}
+              rules={{ required:{value: true, message:"Email is required."}, pattern:{ value: emailPattern, message:'Email Id is not valid.'} }}
               render ={({
                 field: { onChange,value },
+                fieldState: { error }
               }) => (
               <TextField id='email' 
                onChange={onChange} 
                value={value}
+               error={!!error}
+               helperText = {error?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <MailIcon />
                   </InputAdornment>
                 ),
-              }} type="email" size="small" fullWidth label='Email Address' variant='outlined' />
+              }} type="text" size="small" fullWidth label='Email Address' variant='outlined' />
               )}/>
             </Grid>
             <Grid item xs={12} sm={4}>
             <Controller
               name='mobile'
               control={control}
+              rules={{ required:{value: true, message:"Mobile Number is required."}, maxLength: { value:10,message:'Mobile Number should be length of 10'} ,minLength: { value:10,message:'Mobile Number should be length of 10'}}}
               render ={({
                 field: { onChange,value },
+                fieldState: { error }
               }) => (
               <TextField id='mobileNumber' 
               onChange={onChange} 
               value={value}
+              error={!!error}
+               helperText = {error?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <PhoneIphoneIcon />
                   </InputAdornment>
                 ),
-              }} type='mobile' size="small" fullWidth label='Mobile Number' variant='outlined' />
+              }} type='number' size="small" fullWidth label='Mobile Number' variant='outlined' />
               )}/>
             </Grid>
             <Grid item xs={12} sm={4}>
             <Controller
               name='date_of_birth'
               control={control}
+              rules={{ required:{value: true,message:"Date Of Birth is required."} }}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
               <TextField
                   id="dob"
@@ -558,10 +589,9 @@ console.log(watchUser);
                   size='small'
                   fullWidth
                   format='dd-mm-yyyy'
-                  // InputLabelProps={{
-                  //   shrink: true,
-                  // }}
                   onChange={onChange} 
+                  error={!!error}
+                  helperText = {error?.message}
                 />)}/>
                 </Grid>
             
@@ -569,16 +599,18 @@ console.log(watchUser);
             <Controller
               name='password'
               control={control}
+              rules={{ required:{value: !forEdit ,message:"Password is required."} ,maxLength: { value:18,message:'Please enter valid password of maximum 18 characters in length.'} ,minLength: { value:6,message:'Please enter valid password of minimum 6 characters in length.'} }}
               render ={({
-                field: { onChange,value },
+                field: { onChange,value},fieldState: { error },
               }) => (
-            <FormControl fullWidth  size="small"  variant="outlined">
+            <FormControl fullWidth  size="small" error={!!error}  variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
           <OutlinedInput
             id="outlined-adornment-password"
             type={showPassword ? 'text' : 'password'}
             value={value}
             onChange={onChange} 
+            error={!!error}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -593,6 +625,7 @@ console.log(watchUser);
             }
             label="Password"
           />
+          <FormHelperText>{error?.message}</FormHelperText>
         </FormControl>)}/>
             </Grid>
 
@@ -600,12 +633,15 @@ console.log(watchUser);
             <Controller
               name='aadhaar_number'
               control={control}
+              rules={{ maxLength: { value:12 ,message:'Please enter valid aadhaar number.'} ,minLength: { value:12,message:'Please enter valid aadhaar number.'} }}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
               <TextField id='aadhaar_number' 
               onChange={onChange} 
               value={value}
+              error={!!error}
+              helperText = {error?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -618,32 +654,37 @@ console.log(watchUser);
             <Controller
               name='role'
               control={control}
+              rules={{ required:{value: true,message:"User Type is required."} }}
+
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
-            <FormControl size='small' fullWidth>
+            <FormControl size='small' fullWidth  error={!!error} >
         <InputLabel id="demo-simple-select-label">User Type</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={value}UserType
+          value={value}
           label="userType"
           onChange={onChange} 
+          error={!!error}
         >
           {UserType.map((type) => (
               <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
                         ))}
         </Select>
+        <FormHelperText>{error?.message}</FormHelperText>
       </FormControl>)}/>
             </Grid>
             <Grid item xs={12} sm={4}>
             <Controller
               name='gender'
               control={control}
+              rules={{ required:{value: true,message:"Gender is required."} }}
               render ={({
-                field: { onChange,value },
+                field: { onChange,value },fieldState: { error }
               }) => (
-            <FormControl>
+            <FormControl error={!!error} >
                 <FormLabel id="demo-row-radio-buttons-group-label">Gender</FormLabel>
                 <RadioGroup
                   row
@@ -651,12 +692,14 @@ console.log(watchUser);
                   name="row-radio-buttons-group"
                   onChange={onChange}
                   value={value}
-
+                  error={!!error}
+                  helperText = {error?.message}
                 >
                    {genderOption.map((option) => (
                            <FormControlLabel  key={option.value} value={option.value} control={<Radio />} label={option.label} />
                         ))}
                 </RadioGroup>
+                <FormHelperText>{error?.message}</FormHelperText>
               </FormControl>
               )}/>
             </Grid>
@@ -669,10 +712,13 @@ console.log(watchUser);
           <Controller
               name='company_name'
               control={control}
+              rules={{ required:{value: watchUserType === 'AMC',message:"Company Name is required."} }}
               render ={({
-                field: { onChange,value },
+                field: { onChange,value },fieldState: { error },
               }) => (
               <TextField id='company_name' 
+              error={!!error}
+              helperText = {error?.message}
               onChange={onChange} size="small" value ={value} fullWidth label='Company Name' variant='outlined' />
               )} />
             </Grid>
@@ -680,13 +726,15 @@ console.log(watchUser);
             <Controller
               name='director_email'
               control={control}
+              rules={{pattern:{ value: emailPattern, message:'Email Id is not valid.'} }}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
               <TextField id='director_email' 
               onChange={onChange}
               value={value}
-
+              error={!!error}
+              helperText = {error?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -699,13 +747,15 @@ console.log(watchUser);
             <Controller
               name='admin_email'
               control={control}
+              rules={{pattern:{ value: emailPattern, message:'Email Id is not valid.'} }}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
               <TextField id='admin_email' 
               onChange={onChange}
               value={value}
-
+              error={!!error}
+              helperText = {error?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -719,20 +769,27 @@ console.log(watchUser);
             <Controller
               name='gst_number'
               control={control}
+              rules={{ required: { value:watchUserType === 'AMC',message:"GST Number is required."}, maxLength: { value:15 ,message:'Please enter valid GST Number.'} ,minLength: { value:15,message:'Please enter valid GST Number.'} }}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
           
-          <TextField id='gst_number' value={value} onChange={onChange} size="small" fullWidth label='GST Number' variant='outlined' />
+          <TextField id='gst_number' 
+          error={!!error}
+              helperText = {error?.message} value={value} onChange={onChange} size="small" fullWidth label='GST Number' variant='outlined' />
                )} /> </Grid>
             <Grid item xs={12} sm={4}>
               <Controller
               name='pan_number'
               control={control}
+              rules={{ required: { value:watchUserType === 'AMC',message:"PAN Number is required."}, maxLength: { value:10 ,message:'Please enter valid GST Number.'} ,minLength: { value:10,message:'Please enter valid PAN Number.'} }}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
-              <TextField id='pan_number' value={value} onChange={onChange} size="small" fullWidth label='PAN Number' variant='outlined' />
+              <TextField id='pan_number' 
+              error={!!error}
+              helperText = {error?.message}
+              value={value} onChange={onChange} size="small" fullWidth label='PAN Number' variant='outlined' />
               )} />
               </Grid>
             <Grid item xs={12} sm={4}>
@@ -740,7 +797,7 @@ console.log(watchUser);
               name='date_of_registration'
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
             <TextField
                   id="registration"
@@ -748,8 +805,10 @@ console.log(watchUser);
                   type="date"
                   size='small'
                   fullWidth
+                  error={!!error}
+              helperText = {error?.message}
                   onChange={onChange}
-                  value={moment(value).format('YYYY-MM-DD')}
+                  value={value ? moment(value).format('YYYY-MM-DD') : moment().format()}
                 />)} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
@@ -757,21 +816,26 @@ console.log(watchUser);
               name='contact_person_name'
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
-              <TextField id='contact_person_name' value={value} onChange={onChange} size="small" fullWidth label='Contact Person Name' variant='outlined' />
+              <TextField id='contact_person_name'
+              error={!!error}
+              helperText = {error?.message} value={value} onChange={onChange} size="small" fullWidth label='Contact Person Name' variant='outlined' />
                )} />
                 </Grid>
             <Grid item xs={12} sm={4}>
               <Controller
               name='contact_person_number'
+              rules={{ maxLength: { value:10,message:'Mobile Number should be length of 10'} ,minLength: { value:10,message:'Mobile Number should be length of 10'}}}
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
               <TextField id='contact_person_number' 
               onChange={onChange}
               value={value}
+              error={!!error}
+              helperText = {error?.message}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -789,18 +853,24 @@ console.log(watchUser);
           <Controller
               name='amcDetail.user_plan'
               control={control}
+              rules={{ required:{value: true,message:"User Plan is required."} }}
+
               render ={({
-                field: { onChange,value },
+                field: { onChange,value },fieldState: { error },
               }) => (
               <TextField id='user_plan' value={value}
+              error={!!error}
+              helperText = {error?.message}
               onChange={onChange}  size="small" fullWidth label='Customer Plan' variant='outlined' />
               )} /></Grid>
             <Grid item xs={12} sm={4}>
               <Controller
               name='amcDetail.plan_activation_date'
+              rules={{ required:{value: true,message:"Plan Activation Date is required."} }}
+
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
             <TextField
                   id="activationDate"
@@ -809,6 +879,8 @@ console.log(watchUser);
                   type="date"
                   size='small'
                   fullWidth
+                  error={!!error}
+              helperText = {error?.message}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -820,13 +892,16 @@ console.log(watchUser);
                   <Controller
               name='amcDetail.plan_expired_date'
               control={control}
+              rules={{ required:{value: true,message:"Plan Expired Date is required."} }}
               render ={({
-                field: { onChange,value },
+                field: { onChange,value },fieldState: { error },
               }) => (
             <TextField
                   id="expireDate"
                   label="Plan Expired Date"
                   type="date"
+                  error={!!error}
+              helperText = {error?.message}
                   fullWidth
                   value={moment(value).format('YYYY-MM-DD')}
                   size='small'
@@ -837,9 +912,11 @@ console.log(watchUser);
                   <Controller
               name='amcDetail.device'
               control={control}
+              rules={{ required:{value: true,message:"Device is required."} }}
+
               defaultValue={[]}
               render ={({
-                field: { onChange,value },
+                field: { onChange,value },fieldState: { error },
               }) => (
                 <FormControl size='small' fullWidth>
                       <InputLabel id="demo-multiple-name-label">
@@ -850,6 +927,8 @@ console.log(watchUser);
                         id="demo-multiple-name"
                         multiple
                         value={value ? value : []}
+                        error={!!error}
+              helperText = {error?.message}
                         onChange={onChange}
                         input={<OutlinedInput label="Device" />}
                       >
@@ -877,6 +956,8 @@ console.log(watchUser);
           id="current_address"
           label="Current Address"
           multiline
+          error={!!error}
+              helperText = {error?.message}
           rows={2}
           value={value}
           onChange={onChange}
@@ -889,7 +970,8 @@ console.log(watchUser);
               render ={({
                 field: { onChange,value },
               }) => (
-              <TextField id='current_city' value={value} onChange={onChange} size="small" fullWidth label='Current City' variant='outlined' />
+              <TextField id='current_city' 
+              value={value} onChange={onChange} size="small" fullWidth label='Current City' variant='outlined' />
               )} />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -899,7 +981,8 @@ console.log(watchUser);
               render ={({
                 field: { onChange,value },
               }) => (
-              <TextField id='current_state' value={value} onChange={onChange} size="small" fullWidth label='Current State' variant='outlined' />
+              <TextField id='current_state'
+               value={value} onChange={onChange} size="small" fullWidth label='Current State' variant='outlined' />
               )} />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -907,9 +990,10 @@ console.log(watchUser);
               name='current_pincode'
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
-              <TextField id='current_pincode' value={value} onChange={onChange} size="small" fullWidth label='Current Pincode' variant='outlined' />
+              <TextField id='current_pincode' 
+              value={value} onChange={onChange} size="small" fullWidth label='Current Pincode' variant='outlined' />
 )} />
               </Grid>
               <Grid item xs={12} sm={8}>
@@ -923,7 +1007,7 @@ console.log(watchUser);
               name='permanent_address'
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
             <TextField size='small' fullWidth
           id="permanent_address"
@@ -940,9 +1024,10 @@ console.log(watchUser);
               name='permanent_city'
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
-              <TextField id='permanent_city' value={value} onChange={onChange} size="small" fullWidth label='Visit City' variant='outlined' />
+              <TextField id='permanent_city' 
+             value={value} onChange={onChange} size="small" fullWidth label='Visit City' variant='outlined' />
               )} />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -952,7 +1037,8 @@ console.log(watchUser);
               render ={({
                 field: { onChange,value },
               }) => (
-              <TextField id='permanent_state' value={value} onChange={onChange} size="small" fullWidth label='Visit State' variant='outlined' />
+              <TextField id='permanent_state'
+              value={value} onChange={onChange} size="small" fullWidth label='Visit State' variant='outlined' />
               )} />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -960,9 +1046,10 @@ console.log(watchUser);
               name='permanent_pincode'
               control={control}
               render ={({
-                field: { onChange ,value},
+                field: { onChange ,value},fieldState: { error },
               }) => (
-              <TextField id='permanent_pincode' value={value} onChange={onChange} size="small" fullWidth label='Visit Pincode' variant='outlined' />
+              <TextField id='permanent_pincode'
+              value={value} onChange={onChange} size="small" fullWidth label='Visit Pincode' variant='outlined' />
               )} />
               </Grid>
             </Grid>
