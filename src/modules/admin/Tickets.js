@@ -10,15 +10,16 @@ import Check from "@mui/icons-material/Check";
 import Divider from "@mui/material/Divider";
 import TicketModal from "./TicketModal";
 import PaymentConfirmationModal from "./PaymentConfirmationModal";
-import {Card, CardHeader ,Button} from '@mui/material';
+import { Card, CardHeader, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { DataGrid, GridActionsCellItem, GridToolbar } from "@mui/x-data-grid";
 
 import {
   SET_USER_LIST,
   SET_SERVICE_LIST,
   SET_BRAND_LIST,
   SET_PAYMENT_DETAIL_LIST,
-  SET_AMC_LIST
+  SET_AMC_LIST,
 } from "./adminSlice";
 import {
   useGetAllUserQuery,
@@ -36,23 +37,21 @@ import { notification } from "antd";
 import Helper from "../../util/helper";
 import { EyeTwoTone } from "@ant-design/icons";
 import TicketViewModal from "./TicketViewModal";
-import TablePagination from '@mui/material/TablePagination';
-import {
-  PlusOutlined
-  } from '@ant-design/icons';
-  // import {Card, Typography } from 'antd';
+import TablePagination from "@mui/material/TablePagination";
+import { PlusOutlined } from "@ant-design/icons";
+// import {Card, Typography } from 'antd';
 // const { Text } = Typography;
 // const { Meta } = Card;
 
 const Tickets = () => {
   const dispatch = useDispatch();
 
-  const { data: userData } = useGetAllUserQuery({ limit: 10, offset: 0});
+  const { data: userData } = useGetAllUserQuery({ limit: 10, offset: 0 });
   const { data: serviceData } = useGetAllServiceQuery();
-  const { data: brandData } = useGetAllBrandQuery({ limit: 10, offset: 0});
-  
+  const { data: brandData } = useGetAllBrandQuery({ limit: 10, offset: 0 });
+
   const [updateTicket] = useUpdateTicketMutation();
-  
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [status, setStatus] = useState("");
   const [statusColor, setStatusColor] = useState("");
@@ -71,10 +70,16 @@ const Tickets = () => {
     data: paymentData,
     isLoading: isPaymentLoading,
     refetch: paymentRefetch,
-  } = useGetAllPaymentDetailQuery({ limit: rowsPerPage, offset: page * rowsPerPage});
-  
-  const { data, error, isLoading, refetch } = useGetAllTicketQuery({ limit: rowsPerPage, offset: page * rowsPerPage});
-  
+  } = useGetAllPaymentDetailQuery({
+    limit: rowsPerPage,
+    offset: page * rowsPerPage,
+  });
+
+  const { data, error, isLoading, refetch } = useGetAllTicketQuery({
+    limit: rowsPerPage,
+    offset: page * rowsPerPage,
+  });
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -160,7 +165,7 @@ const Tickets = () => {
   const handlePaymentStatus = (ticketId, status) => {
     dispatch(SET_PAYMENT_DETAIL_LIST({ data: paymentData?.data?.rows }));
     setPaymentModalShow(true);
-    if (status === 'Closed') {
+    if (status === "Closed") {
       setTicketId(ticketId);
       setForPaymentModalEdit(true);
     }
@@ -244,27 +249,243 @@ const Tickets = () => {
     return priorityIcon;
   };
 
+  const columns = React.useMemo(() => [
+    { field: "ticket_number", headerName: "Ticket Number", width: 150 },
+    {
+      field: "customer",
+      headerName: "Customer",
+      width: 400,
+    },
+    {
+      field: "customer_plan",
+      headerName: "User Plan",
+      width: 200,
+      renderCell: (params) => {
+        return params.row.customer_plan ? params.row.customer_plan : "-";
+      },
+    },
+    {
+      field: "service_provided",
+      headerName: "Service",
+      width: 150,
+    },
+    {
+      field: "engineer",
+      headerName: "Engineer",
+      width: 150,
+    },
+
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      renderCell: (params) => {
+        return <Tag color={params.row.status_color}>{params.row.status}</Tag>;
+      },
+    },
+
+    {
+      field: "payment_status",
+      headerName: "Payment Status",
+      width: 150,
+      renderCell: (params) => {
+        return paymentStatusList[params.row.id]
+          ? paymentStatusList[params.row.id]
+          : "-";
+      },
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      width: 150,
+      renderCell: (params) => {
+        return moment(params.row.createdAt).format("DD/MM/YYYY");
+      },
+    },
+    {
+      field: "last_modified",
+      headerName: "Last Modified",
+      width: 150,
+      renderCell: (params) => {
+        return moment(params.row.updatedAt).fromNow();
+      },
+    },
+
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      width: 100,
+      getActions: (params) => [
+        <a
+          className="ticket-ellipsis-btn"
+          onClick={(e) =>
+            handleClick({
+              event: e,
+              id: params.row.id,
+              status: params.row.status,
+              priority: params.row.priority,
+              statusColor: params.row.status_color,
+            })
+          }
+        >
+          <i class="fa-solid fa-ellipsis"></i>
+        </a>,
+        <a onClick={() => handleViewBtn(params.row)}>
+          <EyeTwoTone />
+        </a>,
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+        >
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handlePriority("URGENT", params.row.status)}
+          >
+            {priority === "URGENT" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set priority to Urgent
+            <KeyboardDoubleArrowUpIcon className="priority-urgent" />
+          </MenuItem>
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handlePriority("HIGH")}
+          >
+            {priority === "HIGH" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set priority to High <NorthIcon className="priority-high" />
+          </MenuItem>
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handlePriority("MEDIUM")}
+          >
+            {priority === "MEDIUM" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set priority to Medium
+            <FiberManualRecordIcon className="priority-medium" />
+          </MenuItem>
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handlePriority("LOW")}
+          >
+            {priority === "LOW" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set priority to Low <SouthIcon className="priority-low" />
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handleStatus("Open", "green")}
+          >
+            {statusColor === "green" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set as Open
+          </MenuItem>
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handleStatus("Pending", "blue")}
+          >
+            {statusColor === "blue" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set as Pending
+          </MenuItem>
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handleStatus("On Hold", "orange")}
+          >
+            {statusColor === "orange" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set as On hold
+          </MenuItem>
+          <MenuItem
+            disabled={status === "Closed"}
+            onClick={() => handleStatus("Closed", "red")}
+          >
+            {statusColor === "red" && (
+              <ListItemIcon>
+                <Check />
+              </ListItemIcon>
+            )}
+            Set as Closed
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            disabled={status !== "Closed"}
+            onClick={() => handlePaymentStatus(params.row.id, status)}
+          >
+            Payment Status
+          </MenuItem>
+        </Menu>,
+        // <GridActionsCellItem
+        //   icon={<ModeEditIcon color="primary" />}
+        //   label="Edit Details"
+        //   onClick={handleEditBtn(params.row)}
+        // />,
+        // <GridActionsCellItem
+        //   icon={<VisibilityIcon color="primary" />}
+        //   label="View details"
+        //   onClick={handleViewBtn(params.mobile)}
+        // />,
+      ],
+    },
+  ]);
+
   return (
     <>
       <UserLayout>
-      <Card
-    sx={{
-      margin: '4% 0%',
-      padding: '20px 10px',
-      borderRadius: '8px',
-      height : 'calc(100vh - 90px)'
-    }}
-    >
-      <CardHeader title="Tickets" action={<Button variant="contained"  startIcon={<AddIcon />} onClick={() => handleNewTicketBtn()}>
-      New Ticket
-     </Button>}></CardHeader>
-            {error ? (
-              <>Oh no, there was an error</>
-            ) : isLoading ? (
-              <>Loading...</>
-            ) : data?.data && data?.data?.rows?.length > 0 ? (
-              <>
-                <h5>
+        <Card
+          sx={{
+            margin: "4% 0%",
+            padding: "20px 10px",
+            borderRadius: "8px",
+            height: "calc(100vh - 90px)",
+          }}
+        >
+          <CardHeader
+            title="Tickets"
+            action={
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => handleNewTicketBtn()}
+              >
+                New Ticket
+              </Button>
+            }
+          ></CardHeader>
+          {error ? (
+            <>Oh no, there was an error</>
+          ) : isLoading ? (
+            <>Loading...</>
+          ) : data?.data && data?.data?.rows?.length > 0 ? (
+            <>
+              {/* <h5>
                   {data?.data?.totalCount ? data?.data?.totalCount : 0} tickets
                 </h5>
                 <div className="user-management-table">
@@ -467,32 +688,37 @@ const Tickets = () => {
                   onPageChange={handleChangePage}
                   rowsPerPage={rowsPerPage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </>
-            ) : (
-              <>
-                <h2>No Tickets Found</h2>
-              </>
-            )}
-           
-        <TicketModal
-          show={ticketModalShow}
-          onHide={() => setTicketModalShow(false)}
-        />
-        <TicketViewModal
-          show={ticketViewModalShow}
-          data={ticketDetailForView}
-          onHide={() => setTicketViewModalShow(false)}
-        />
-        <PaymentConfirmationModal
-          show={paymentModalShow}
-          ticketId={ticketId}
-          onHide={() => setPaymentModalShow(false)}
-          closeEdit={() => setForPaymentModalEdit(false)}
-          isEdit={forPaymentModalEdit}
-        />
-         </Card>
-        
+                /> */}
+              <DataGrid
+                autoHeight={true}
+                columns={columns}
+                rows={data.data.rows}
+                components={{ Toolbar: GridToolbar }}
+              />
+            </>
+          ) : (
+            <>
+              <h2>No Tickets Found</h2>
+            </>
+          )}
+
+          <TicketModal
+            show={ticketModalShow}
+            onHide={() => setTicketModalShow(false)}
+          />
+          <TicketViewModal
+            show={ticketViewModalShow}
+            data={ticketDetailForView}
+            onHide={() => setTicketViewModalShow(false)}
+          />
+          <PaymentConfirmationModal
+            show={paymentModalShow}
+            ticketId={ticketId}
+            onHide={() => setPaymentModalShow(false)}
+            closeEdit={() => setForPaymentModalEdit(false)}
+            isEdit={forPaymentModalEdit}
+          />
+        </Card>
       </UserLayout>
     </>
   );
