@@ -28,6 +28,16 @@ export const adminApi = createApi({
         method: "GET",
       }),
     }),
+    getServiceById: builder.query({
+      query: (id) => ({
+        headers: {
+          "Content-type": "application/json",
+          Authorization: Auth.getAdminAccessToken(),
+        },
+        url: `service/${id}`,
+        method: "GET",
+      }),
+    }),
     getAllBrand: builder.query({
       query: (data) => ({
         headers: {
@@ -197,6 +207,7 @@ export const {
   useRegisterUserMutation,
   useUpdateUserDetailMutation,
   useGetUserByIdQuery,
+  useGetServiceByIdQuery,
   useGetAllBrandQuery,
   useCreateBrandMutation, 
   useUpdateBrandDetailMutation,

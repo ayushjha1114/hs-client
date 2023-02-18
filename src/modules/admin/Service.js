@@ -64,7 +64,10 @@ const Service = () => {
   console.log(isModalOpen);
 
   const handleNewServiceBtn = () => {
+    setIsEdit(false);
+    setServiceId("");
     setServiceModalShow(true);
+    
   };
 
   useEffect(() => {
@@ -142,60 +145,6 @@ const Service = () => {
               <>Loading...</>
             ) : data ? (
               <>
-                {/* <h5>
-                  {data?.data?.totalCount ? data?.data?.totalCount : 0} services
-                  found
-                </h5> */}
-                {/* <div className="user-management-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Service Provide</th>
-                        <th>Service Type</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data?.data &&
-                        data?.data?.rows?.length > 0 &&
-                        data.data.rows.map((item, i) => {
-                          return (
-                            <tr key={i}>
-                              <td>{item.name}</td>
-                              <td>{item.description}</td>
-                              <td style={{ cursor: "pointer" }}>
-                                <Tooltip
-                                  color="#108ee9"
-                                  title={getCombineServiceProvideDescription(
-                                    item.service_provided
-                                  )}
-                                >
-                                  {Helper.removeCommaFromServiceProvide(
-                                    item.service_provided
-                                  )}
-                                </Tooltip>
-                              </td>
-                              <td>
-                                {Helper.removeCommaFromServiceType(
-                                  item.service_type
-                                )}
-                              </td>
-                              <td className="admin-actions">
-                                <a
-                                  className="serviceEditBtn"
-                                  onClick={() => handleEditBtn(item.id)}
-                                >
-                                  <EditTwoTone />
-                                </a>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                </div> */}
                   <DataGrid
                 autoHeight={true}
                 columns={columns}
@@ -207,16 +156,17 @@ const Service = () => {
               <></>
             )}
             
-        <NewServiceModal
+        
+        </Card>
+       
+      </UserLayout>
+      {serviceModalShow ? <NewServiceModal
           show={serviceModalShow}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
           isEdit={isEdit}
           serviceId={serviceId}
           onHide={handleclose}
           closeEdit={() => setIsEdit(false)}
-        />
-        </Card>
-       
-      </UserLayout>
+        />: ''}
     </>
   );
 };
