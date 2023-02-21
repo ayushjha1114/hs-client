@@ -162,7 +162,8 @@ const UserType = [{
     if (forEdit) {
           let modifiedData = data;
           modifiedData.mobile = mobile;
-          modifiedData.amcDetail.device = JSON.stringify(modifiedData.amcDetail?.device);
+          if(modifiedData?.amcDetail?.device)
+             modifiedData.amcDetail.device = JSON.stringify(modifiedData.amcDetail?.device);
           const response = await updateUserDetail(modifiedData);
           if (response?.data?.success) {
             notification.success({
@@ -187,6 +188,7 @@ const UserType = [{
     data.password = encryptedPassword;
     let userData = {};
             userData.userDetail = data;
+            if(data?.amcDetail?.device)
             data.amcDetail.device = JSON.stringify(data.amcDetail?.device);
             const response = await registerUser(data);
             if (response?.data?.success) {
@@ -231,8 +233,9 @@ const UserType = [{
           setMobile(location.state.mobile);
           setId(location.state.id)
         }
-      if(data?.data?.userDetail?.amcDetail){
+      if(data?.data?.userDetail){
       let user = JSON.parse(JSON.stringify(data?.data?.userDetail));
+      if(user?.amcDetail?.device)
         user.amcDetail.device= JSON.parse(data?.data?.userDetail.amcDetail.device);
         setUser(user);
       }

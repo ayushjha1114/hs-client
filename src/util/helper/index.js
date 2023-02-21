@@ -33,7 +33,7 @@ const Helper = {
   removeCommaFromServiceProvide(data) {
     let label = '';
     data.map(type => {
-      label += `${type.label}, `;
+      label += `${type.name}, `;
     })
     return label.substring(0, label.length - 2);
   },

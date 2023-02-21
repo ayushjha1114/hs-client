@@ -164,65 +164,11 @@ const UserManagement = () => {
             <>Loading...</>
           ) : data ? (
             <>
-              {/* <div className="user-management-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Email Address</th>
-                        <th>Contact Number</th>
-                        <th>User Role</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data?.data &&
-                        data?.data?.rows?.length > 0 &&
-                        data.data.rows.map((item, i) => {
-                          return (
-                            <tr key={i}>
-                              <td>{item.user_id ? item.user_id : "-"}</td>
-                              <td>
-                                {Helper.transformUserName(item)}
-                              </td>
-                              <td>{item.email}</td>
-                              <td>{item.mobile}</td>
-                              <td>
-                                {item.role === "AMC"
-                                  ? `${item.role} Customer`
-                                  : item.role === "USER"
-                                  ? `Customer`
-                                  : item.role}
-                              </td>
-                              <td className="admin-actions">
-                                <a
-                                  className="user-mngt-edit-btn"
-                                  onClick={() => handleEditBtn(item.mobile)}
-                                >
-                                  <EditTwoTone />
-                                </a>
-                                <a onClick={() => handleViewBtn(item.mobile)}>
-                                  <EyeTwoTone />
-                                </a>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                </div>
-                <TablePagination
-                  className="userManagementPagination"
-                  component="div"
-                  count={data?.data?.totalCount ? data?.data?.totalCount : 0}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                /> */}
+              
               <DataGrid
-                autoHeight={true}
+                sx={{
+                  height: "calc(100vh - 180px)",
+                }}
                 columns={columns}
                 rows={data.data.rows}
                 components={{ Toolbar: GridToolbar }}

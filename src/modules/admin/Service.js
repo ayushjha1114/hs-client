@@ -87,7 +87,7 @@ const Service = () => {
     {
       field: "description",
       headerName: "Description",
-      width: 200,
+      width: 300,
     },
     {
       field: "service_provided",
@@ -102,7 +102,7 @@ const Service = () => {
     {
       field: "service_type",
       headerName: "Service Type",
-      width: 300,
+      width: 100,
       renderCell: (params) => {
         return Helper.removeCommaFromServiceType(
           params.row.service_type
@@ -146,7 +146,9 @@ const Service = () => {
             ) : data ? (
               <>
                   <DataGrid
-                autoHeight={true}
+                sx={{
+                  height: "calc(100vh - 180px)",
+                }}
                 columns={columns}
                 rows={data.data.rows}
                 components={{ Toolbar: GridToolbar }}

@@ -22,6 +22,7 @@ import {
 } from "../../services/admin";
 import { notification } from "antd";
 import Helper from "../../util/helper";
+import Grid from '@mui/material/Grid';
 
 export default function TicketModal(props) {
   const { show, onHide, forEdit, forView, mobile, closeEdit, closeView } =
@@ -286,8 +287,8 @@ export default function TicketModal(props) {
         <DialogTitle className="registerModalTitle">New Ticket</DialogTitle>
         <DialogContent>
           <Divider />
-          <div className="registerModalBody">
-            <div className="registerModalBodyField">
+            <Grid container sx={{padding:'2%'}} spacing={2}>
+            <Grid item xs={12} sm={4}>
               <Autocomplete
                 options={customerList}
                 sx={{ width: 500 }}
@@ -295,10 +296,12 @@ export default function TicketModal(props) {
                 autoComplete
                 includeInputInList
                 renderInput={(params) => (
-                  <TextField {...params} label="Customer" variant="standard" />
+                  <TextField {...params} label="Customer" variant="outlined" />
                 )}
                 onSelect={(e) => handleChange(e, "customer")}
               />
+              </Grid>
+              </Grid>
               <FormControl variant="standard" sx={{ width: 580 }}>
                 <InputLabel id="demo-simple-select-standard-label">
                   Parent Service
@@ -316,8 +319,6 @@ export default function TicketModal(props) {
                   ))}
                 </Select>
               </FormControl>
-            </div>
-            <div className="registerModalBodyField">
               <FormControlLabel
                 control={
                   <Checkbox onChange={(e) => handleServiceType(e, "ON-SITE")} />
@@ -338,33 +339,6 @@ export default function TicketModal(props) {
                 }
                 label="PICK AND DROP"
               />
-            </div>
-            {/* <FormControl style={{ marginTop: "10px" }}>
-              <RadioGroup
-                row
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                name="row-radio-buttons-group"
-                defaultValue="ONSITE"
-                onChange={(e) => handleChange(e, "service_type")}
-              >
-                <FormControlLabel
-                  value="ONSITE"
-                  control={<Radio />}
-                  label="On site service"
-                />
-                <FormControlLabel
-                  value="ONLINE"
-                  control={<Radio />}
-                  label="Online service"
-                />
-                <FormControlLabel
-                  value="PICK AND DROP"
-                  control={<Radio />}
-                  label="Pickup drop service"
-                />
-              </RadioGroup>
-            </FormControl> */}
-            <div className="registerModalBodyField">
               <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
                 <InputLabel id="demo-simple-select-standard-label">
                   Brand
@@ -391,8 +365,6 @@ export default function TicketModal(props) {
                 variant="standard"
                 onChange={(e) => handleChange(e, "serial_number")}
               />
-            </div>
-            <div className="registerModalBodyField">
               <TextField
                 margin="dense"
                 id="name"
@@ -419,8 +391,6 @@ export default function TicketModal(props) {
                   ))}
                 </Select>
               </FormControl>
-            </div>
-            <div className="registerModalBodyField">
               <TextField
                 style={{ marginTop: "8px" }}
                 disabled={forView}
@@ -454,9 +424,6 @@ export default function TicketModal(props) {
                   <MenuItem value="URGENT">URGENT</MenuItem>
                 </Select>
               </FormControl>
-            </div>
-          </div>
-          <div className="registerModalBody" style={{ marginTop: "10px" }}>
             <TextField
               disabled={forView}
               id="standard-textarea"
@@ -472,7 +439,6 @@ export default function TicketModal(props) {
               }
             />
             {forView && (
-              <div className="registerModalBodyField">
                 <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
                   <InputLabel id="demo-simple-select-standard-label">
                     Assign Engineer
@@ -490,21 +456,8 @@ export default function TicketModal(props) {
                     ))}
                   </Select>
                 </FormControl>
-                {/* <TextField
-                  disabled
-                  margin="dense"
-                  id="name"
-                  label="Date"
-                  type="text"
-                  fullWidth
-                  variant="standard"
-                  defaultValue={
-                    Date.now()
-                  }
-                /> */}
-              </div>
+               
             )}
-            <div className="registerModalBodyField">
               <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
                 <InputLabel id="demo-simple-select-standard-label">
                   Assign Engineer
@@ -548,7 +501,6 @@ export default function TicketModal(props) {
                 }}
                 value={defaultUserDetail?.email}
               />
-            </div>
             <TextField
               disabled
               margin="dense"
@@ -595,7 +547,6 @@ export default function TicketModal(props) {
               onChange={(e) => handleChange(e, "visit_address")}
               value={visitAddress}
             />
-            <div className="registerModalBodyField">
               <TextField
                 margin="dense"
                 id="name"
@@ -626,22 +577,7 @@ export default function TicketModal(props) {
                 onChange={(e) => handleChange(e, "visit_pincode")}
                 value={visitPincode}
               />
-            </div>
-            {/* <div className="registerModalBodyField">
-              <DialogContentText className="ticketModalAttachmentText">
-                Attachment:
-              </DialogContentText>
-              <Button
-                variant="contained"
-                component="label"
-                className="ticketUploadBtn"
-              >
-                Upload
-                <input hidden accept="image/*" multiple type="file"  onChange={(e) => handleUploadFile(e)}/>
-              </Button>
-              <span className="ticketFileNameSpan">{fileName}</span>
-            </div> */}
-          </div>
+            
         </DialogContent>
         <DialogActions>
           <Button className="registerModalBtn" onClick={() => handleCancel()}>

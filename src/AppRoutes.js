@@ -15,6 +15,7 @@ import Tickets from "./modules/admin/Tickets";
 import Brand from "./modules/admin/Brand";
 import RegisterUser from "./modules/admin/RegisterUser";
 import Service from "./modules/admin/Service";
+import NewTicket from "./modules/admin/NewTicket";
 
 // import httpService from './axios-interceptors';
 
@@ -36,6 +37,7 @@ const AppRoutes = (props) => {
           <Route path="tickets" element={<Tickets />} />
           <Route path="brand" element={<Brand />} />
           <Route path="service" element={<Service />} />
+          <Route path="new-ticket" element={<NewTicket />} />
       </Route>
       <Route path="no-access" element={<NoAccess />} />
     </Routes>
