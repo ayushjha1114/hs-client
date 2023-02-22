@@ -1,25 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  value: 0,
+  isLoading: false,
+  snackBar: {
+    open: false,
+    mesaage: '',
+    variant: 'success',
+  }
 }
 
 export const AuthSlice = createSlice({
   name: 'Auth',
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value += 1
+    SET_LOADING: (state, action) => {
+      state.isLoading = action.payload.data;
     },
-    decrement: (state) => {
-      state.value -= 1
-    },
-    incrementByAmount: (state, action) => {
-      state.value += action.payload
+    SET_SNACKBAR: (state, action) => {
+      const { open, message, variant } = action.payload;
+      state.snackBar.open = open;
+      state.snackBar.message = message;
+      state.snackBar.variant = variant;
     },
   },
 })
 
-export const { increment, decrement, incrementByAmount } = AuthSlice.actions
+export const { SET_LOADING, SET_SNACKBAR } = AuthSlice.actions
 
 export default AuthSlice.reducer;

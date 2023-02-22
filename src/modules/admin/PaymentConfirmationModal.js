@@ -22,8 +22,10 @@ import {
 } from "../../services/admin";
 import { notification } from "antd";
 import Helper from "../../util/helper";
+import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
 
 export default function PaymentConfirmationModal(props) {
+  const dispatch = useDispatch();
   const { show, onHide, ticketId, isEdit, closeEdit } = props;
 
   const paymentDetailList = useSelector(
@@ -31,8 +33,11 @@ export default function PaymentConfirmationModal(props) {
   );
   const [savePaymentDetail] = useSavePaymentDetailMutation();
   const [updatePaymentDetail] = useUpdatePaymentDetailMutation();
-  const { refetch } = useGetAllPaymentDetailQuery({ limit: 10, offset: 0});
-  const { refetch: refetchAllTicket } = useGetAllTicketQuery({ limit: 10, offset: 0});
+  const { refetch } = useGetAllPaymentDetailQuery({ limit: 10, offset: 0 });
+  const { refetch: refetchAllTicket } = useGetAllTicketQuery({
+    limit: 10,
+    offset: 0,
+  });
 
   const [data, setData] = useState({});
   const [defaultData, setDefaultData] = useState({});
@@ -62,21 +67,28 @@ export default function PaymentConfirmationModal(props) {
 
   const handleSubmit = async () => {
     if (isEdit) {
+      dispatch(SET_LOADING({ data: true }));
       const response = await updatePaymentDetail({
         ...data,
         id: ticketId,
       });
       if (response?.data?.success) {
-        notification.success({
-          message: "Success",
-          description: "Payment detail Update Successfully !!",
-          duration: 4,
-          className: "notification-green",
-        });
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Payment detail Update Successfully !",
+            variant: "success",
+          })
+        );
       } else {
-        Helper.errorHandler(
-          "Technical Error",
-          "There may be some error occurred while processing the request. Please try after some time."
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Technical Error",
+            variant: "error",
+          })
         );
       }
       refetch();
@@ -84,45 +96,76 @@ export default function PaymentConfirmationModal(props) {
       onHide();
     } else {
       if (!data.invoice_number) {
-        Helper.errorHandler(
-          "Error occurred",
-          "Please enter the invoice number."
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Please enter the invoice number.",
+            variant: "error",
+          })
         );
       } else if (!data.invoice_amount) {
-        Helper.errorHandler(
-          "Error occurred",
-          "Please enter the invoice amount."
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Please enter the invoice amount.",
+            variant: "error",
+          })
         );
       } else if (!/^\d+$/.test(data.invoice_amount)) {
-        Helper.errorHandler(
-          "Error occurred",
-          "Please enter the valid invoice amount."
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Please enter the valid invoice amount.",
+            variant: "error",
+          })
         );
       } else if (!data.invoice_date) {
-        Helper.errorHandler("Error occurred", "Please enter the invoice date.");
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Please enter the invoice date.",
+            variant: "error",
+          })
+        );
       } else if (!data.remark) {
-        Helper.errorHandler("Error occurred", "Please enter the remark.");
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Please enter the remark.",
+            variant: "error",
+          })
+        );
       } else if (!data.payment_status) {
-        Helper.errorHandler(
-          "Error occurred",
-          "Please enter the payment status."
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Please enter the payment status.",
+            variant: "error",
+          })
         );
       } else {
+        dispatch(SET_LOADING({ data: true }));
         const response = await savePaymentDetail({
           ...data,
           ticket_id: ticketId,
         });
         if (response?.data?.success) {
-          notification.success({
-            message: "Success",
-            description: "Payment detail Saved Successfully !!",
-            duration: 4,
-            className: "notification-green",
-          });
+          dispatch(SET_LOADING({ data: false }));
+          dispatch(
+            SET_SNACKBAR({
+              open: true,
+              message: "Payment detail Saved Successfully !",
+              variant: "success",
+            })
+          );
         } else {
-          Helper.errorHandler(
-            "Technical Error",
-            "There may be some error occurred while processing the request. Please try after some time."
+          dispatch(SET_LOADING({ data: false }));
+          dispatch(
+            SET_SNACKBAR({
+              open: true,
+              message: "Technical Error",
+              variant: "error",
+            })
           );
         }
         refetch();

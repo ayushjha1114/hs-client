@@ -1,23 +1,27 @@
-import React from 'react';
-import { Button, Result } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const NoAccess = () => {
-
-	const navigate = useNavigate();
-	const redirectToLogin = () => {
-		navigate(`/login`);
-	}
-  return (
-	<>
-  <Result style={{textAlign : 'center',fontSize: 'x-large', marginTop:'10%'}}
-    status="403"
-    subTitle="Sorry, you are not authorized to access this page."
-    extra={<Button type="primary" onClick={() => redirectToLogin()}>Log In</Button>}
-  />
-  </>
-  );
+  const navigate = useNavigate();
+  const redirectToLogin = () => {
+    navigate(`/login`);
   };
+  return (
+    <>
+      <Result
+        style={{ textAlign: "center", fontSize: "x-large", marginTop: "10%" }}
+        status="403"
+        subTitle="Sorry, you are not authorized to access this page."
+        extra={
+          <Button type="primary" onClick={() => redirectToLogin()}>
+            Log In
+          </Button>
+        }
+      />
+    </>
+  );
+};
 export default NoAccess;
 
 // let NoAccess = () => {

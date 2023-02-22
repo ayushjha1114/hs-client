@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import moment from "moment";
 import { Tag } from "antd";
@@ -13,6 +13,7 @@ import PaymentConfirmationModal from "./PaymentConfirmationModal";
 import { Card, CardHeader, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridActionsCellItem, GridToolbar } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
 
 import {
   SET_USER_LIST,
@@ -33,19 +34,13 @@ import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp
 import NorthIcon from "@mui/icons-material/North";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import SouthIcon from "@mui/icons-material/South";
-import { notification } from "antd";
-import Helper from "../../util/helper";
 import { EyeTwoTone } from "@ant-design/icons";
 import TicketViewModal from "./TicketViewModal";
-import TablePagination from "@mui/material/TablePagination";
-import { PlusOutlined } from "@ant-design/icons";
-// import {Card, Typography } from 'antd';
-// const { Text } = Typography;
-// const { Meta } = Card;
+import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
 
 const Tickets = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const { data: userData } = useGetAllUserQuery({ limit: 10, offset: 0 });
   const { data: serviceData } = useGetAllServiceQuery();
   const { data: brandData } = useGetAllBrandQuery({ limit: 10, offset: 0 });
@@ -103,23 +98,30 @@ const Tickets = () => {
   };
 
   const handlePriority = async (prior) => {
+    dispatch(SET_LOADING({ data: true }));
     const response = await updateTicket({
       priority: prior,
       id: ticketId,
     });
     if (response?.data?.success) {
-      notification.success({
-        message: "Success",
-        description: "Ticket Priority Updated Successfully !!",
-        duration: 4,
-        className: "notification-green",
-      });
+      dispatch(SET_LOADING({ data: false }));
+      dispatch(
+        SET_SNACKBAR({
+          open: true,
+          message: "Ticket Priority Updated Successfully !",
+          variant: "success",
+        })
+      );
       refetch();
       paymentRefetch();
     } else {
-      Helper.errorHandler(
-        "Technical Error",
-        "There may be some error occurred while processing the request. Please try after some time."
+      dispatch(SET_LOADING({ data: false }));
+      dispatch(
+        SET_SNACKBAR({
+          open: true,
+          message: "Technical Error",
+          variant: "error",
+        })
       );
     }
     setPriority(prior);
@@ -130,23 +132,30 @@ const Tickets = () => {
     if (status === "Closed") {
       setPaymentModalShow(true);
     } else {
+      dispatch(SET_LOADING({ data: true }));
       const response = await updateTicket({
         status,
         status_color: color,
         id: ticketId,
       });
       if (response?.data?.success) {
-        notification.success({
-          message: "Success",
-          description: "Ticket Status Updated Successfully !!",
-          duration: 4,
-          className: "notification-green",
-        });
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Ticket Status Updated Successfully !",
+            variant: "success",
+          })
+        );
         refetch();
       } else {
-        Helper.errorHandler(
-          "Technical Error",
-          "There may be some error occurred while processing the request. Please try after some time."
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Technical Error",
+            variant: "error",
+          })
         );
       }
     }
@@ -170,6 +179,16 @@ const Tickets = () => {
       setForPaymentModalEdit(true);
     }
   };
+
+  // const handleEditBtn = useCallback((user) => () => {
+  //   navigate("/admin/register-user", {
+  //     state: {
+  //       mobile: user.mobile,
+  //       forEdit: true,
+  //       id: user.id,
+  //     },
+  //   });
+  // });
 
   useEffect(() => {
     if (data?.data?.rows?.length > 0) {
@@ -483,17 +502,18 @@ const Tickets = () => {
             <>Oh no, there was an error</>
           ) : isLoading ? (
             <>Loading...</>
-)        : (  <>
+          ) : (
+            <>
               <DataGrid
-               sx={{
-                height: "calc(100vh - 180px)",
-              }}
+                sx={{
+                  height: "calc(100vh - 180px)",
+                }}
                 columns={columns}
                 rows={data.data.rows}
                 components={{ Toolbar: GridToolbar }}
               />
             </>
-          )} 
+          )}
 
           <TicketModal
             show={ticketModalShow}

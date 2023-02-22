@@ -9,16 +9,6 @@ const Helper = {
     // /(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
     return re.test(password);
   },
-  errorHandler(message, description) {
-    setTimeout(() => {
-      notification.error({
-        message,
-        description,
-        duration: 8,
-        className: "notification-error",
-      });
-    }, 50);
-  },
   transformUserName(data) {
     console.log(data);
     let userName = data.first_name;

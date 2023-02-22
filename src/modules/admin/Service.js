@@ -2,19 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import UserLayout from "../../layout/User";
 import { useGetAllServiceQuery } from "../../services/admin";
-import { EditTwoTone, DeleteTwoTone } from "@ant-design/icons";
 import { SET_SERVICE_LIST } from "./adminSlice";
 import NewServiceModal from "./NewServiceModal";
 import Helper from "../../util/helper";
-import { Tooltip, Modal } from "antd";
-import {
-  PlusOutlined
-  } from '@ant-design/icons';
-import {Card, CardHeader ,Button} from '@mui/material';
+import { Card, CardHeader, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridActionsCellItem, GridToolbar } from "@mui/x-data-grid";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-
 
 const Service = () => {
   const dispatch = useDispatch();
@@ -25,23 +19,6 @@ const Service = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [serviceId, setServiceId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
- 
-  const handleOk = (event) => {
-    console.log(event);
-    event.stopPropagation();
-    setIsModalOpen(false);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const isOpen = () => {
-    console.log("ttt" + isModalOpen);
-    return isModalOpen;
-  }
 
   const handleEditBtn = (id) => {
     if (serviceList.length > 0) {
@@ -55,19 +32,17 @@ const Service = () => {
     setServiceModalShow(true);
   };
 
-  const handleclose =() =>{
+  const handleclose = () => {
     console.log(serviceModalShow);
     setServiceModalShow(!serviceModalShow);
     console.log(serviceModalShow);
-
-  }
+  };
   console.log(isModalOpen);
 
   const handleNewServiceBtn = () => {
     setIsEdit(false);
     setServiceId("");
     setServiceModalShow(true);
-    
   };
 
   useEffect(() => {
@@ -104,9 +79,7 @@ const Service = () => {
       headerName: "Service Type",
       width: 100,
       renderCell: (params) => {
-        return Helper.removeCommaFromServiceType(
-          params.row.service_type
-        );
+        return Helper.removeCommaFromServiceType(params.row.service_type);
       },
     },
     {
@@ -127,25 +100,34 @@ const Service = () => {
   return (
     <>
       <UserLayout>
-      <Card
-    sx={{
-      margin: '4% 0%',
-      padding: '20px 10px',
-      borderRadius: '8px',
-      height : 'calc(100vh - 90px)'
-    }}
-    >
-      <CardHeader title="Services" action={<Button variant="contained"  startIcon={<AddIcon />} onClick={() => handleNewServiceBtn()}>
-      New Service
-     </Button>}></CardHeader>
-            
-            {error ? (
-              <>Oh no, there was an error</>
-            ) : isLoading ? (
-              <>Loading...</>
-            ) : data ? (
-              <>
-                  <DataGrid
+        <Card
+          sx={{
+            margin: "4% 0%",
+            padding: "20px 10px",
+            borderRadius: "8px",
+            height: "calc(100vh - 90px)",
+          }}
+        >
+          <CardHeader
+            title="Services"
+            action={
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => handleNewServiceBtn()}
+              >
+                New Service
+              </Button>
+            }
+          ></CardHeader>
+
+          {error ? (
+            <>Oh no, there was an error</>
+          ) : isLoading ? (
+            <>Loading...</>
+          ) : data ? (
+            <>
+              <DataGrid
                 sx={{
                   height: "calc(100vh - 180px)",
                 }}
@@ -153,22 +135,23 @@ const Service = () => {
                 rows={data.data.rows}
                 components={{ Toolbar: GridToolbar }}
               />
-              </>
-            ) : (
-              <></>
-            )}
-            
-        
+            </>
+          ) : (
+            <></>
+          )}
         </Card>
-       
       </UserLayout>
-      {serviceModalShow ? <NewServiceModal
-          show={serviceModalShow}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+      {serviceModalShow ? (
+        <NewServiceModal
+          show={serviceModalShow}
           isEdit={isEdit}
           serviceId={serviceId}
           onHide={handleclose}
           closeEdit={() => setIsEdit(false)}
-        />: ''}
+        />
+      ) : (
+        ""
+      )}
     </>
   );
 };

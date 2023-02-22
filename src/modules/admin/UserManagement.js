@@ -54,7 +54,6 @@ const UserManagement = () => {
   };
 
   const handleEditBtn = React.useCallback((user) => () => {
-    console.log(user);
     dispatch(SET_DEFAULT_USER_DATA({ data: user }));
     navigate("/admin/register-user", {
       state: {
@@ -164,7 +163,6 @@ const UserManagement = () => {
             <>Loading...</>
           ) : data ? (
             <>
-              
               <DataGrid
                 sx={{
                   height: "calc(100vh - 180px)",

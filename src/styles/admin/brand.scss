@@ -1,8 +1,16 @@
 .brandDelete {
-    color: #00aeef;
+    color: #d32f2f;
     cursor: pointer;
 } 
 .brandHeading {
     display: flex;
     justify-content:space-between;
+}
+
+.brandTxtField div {
+    height: 40px;
+}
+
+.brandTxtField label {
+    top: -6px;
 }

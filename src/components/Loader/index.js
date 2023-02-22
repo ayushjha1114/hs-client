@@ -1,20 +1,16 @@
-import React from 'react'
-import './index.css';
+import React from 'react';
+import { useSelector } from "react-redux";
 
-let Loader = props => {
+const Loader = () => {
 
-    const { isLoading } = props
-    // const { isLoad, text = '' } = isLoading;
+    const isLoading = useSelector((state) => state.auth.isLoading);
+
     return (
         <>
-            {(isLoading /* || isLoad */) &&
+            {(isLoading) &&
             <>
                 <div className="loader-container">
-                    {/* <img src={loaderImg} /> */}
-                    <img src="/assets/images/small-loader.gif" alt="" />
-                    {/* {
-                        text && <p className="loader-text">{text}</p> 
-                    } */}
+                    <img src="/assets/images/DG.svg" alt="" />
                 </div>
                 </>
             }

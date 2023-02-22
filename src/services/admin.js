@@ -14,7 +14,7 @@ export const adminApi = createApi({
           "Content-type": "application/json",
           Authorization: Auth.getAdminAccessToken(),
         },
-        url: `user-list?limit=${data.limit}&offset=${data.offset}`,
+        url: `user-list?limit=${data.limit}&offset=${data.offset}${data.search ? `&search=${data.search}&isTypeCustomer=${data.isTypeCustomer ? data.isTypeCustomer : ''}` : ''}`,
         method: "GET",
       }),
     }),
@@ -219,5 +219,6 @@ export const {
   useSavePaymentDetailMutation,
   useGetAllPaymentDetailQuery,
   useUpdatePaymentDetailMutation,
-  useUpdateTicketMutation
+  useUpdateTicketMutation,
+  useLazyGetAllUserQuery
 } = adminApi;
