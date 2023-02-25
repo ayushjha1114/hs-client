@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
-import { styled } from "@mui/material/styles";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   DialogContent,
   TextField,
@@ -22,9 +20,10 @@ import {
   Select,
   MenuItem,
   Box,
+  RadioGroup,
+  Radio,
+  FormHelperText,
 } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -33,95 +32,176 @@ import { BoyOutlined } from "@mui/icons-material";
 import UserLayout from "../../layout/User";
 import CircularProgress from "@mui/material/CircularProgress";
 import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
-import { useLazyGetAllUserQuery } from "../../services/admin";
+import {
+  useGetUserListBySearchMutation,
+  useGetAllTicketQuery,
+  useCreateTicketMutation,
+  useUpdateTicketMutation,
+} from "../../services/admin";
 import Helper from "../../util/helper";
 import moment from "moment";
 
 const NewTicket = (props) => {
   const dispatch = useDispatch();
-  const [forEdit, setForEdit] = useState(/* location?.state?.forEdit */ false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const serviceList = useSelector((state) => state.admin.serviceList);
+  const brandList = useSelector((state) => state.admin.brandList);
+  const userList = useSelector((state) => state.admin.userList);
+  const amcList = useSelector((state) => state.admin.amcList);
+
+  const [createTicket] = useCreateTicketMutation();
+  const [updateTicket] = useUpdateTicketMutation();
+  const { refetch } = useGetAllTicketQuery({ limit: 99999999, offset: 0 });
+
   const [customerList, setCustomerList] = useState([]);
   const [customerType, setCustomerType] = useState("");
+  const [customerValue, setCustomerValue] = useState("");
   const [isCustomerLoading, setIsCustomerLoading] = useState(false);
   const [defaultUserDetail, setDefaultUserDetail] = useState({});
+  const [parentServiceList, setParentServiceList] = useState([]);
+  const [serviceProvidedList, setServiceProvidedList] = useState([]);
+  const [serviceType, setServiceType] = useState([]);
+  const [brandData, setBrandData] = useState([]);
+  const [isEngineerLoading, setIsEngineerLoading] = useState(false);
+  const [engineerList, setEngineerList] = useState([]);
+  const [engineerName, setEngineerName] = useState('');
+  const [ticket, setTicket] = React.useState({});
+  const [forEdit, setForEdit] = useState(location?.state?.forEdit);
+  const [id, setId] = useState(location?.state?.id);
 
-  const [trigger, result] = useLazyGetAllUserQuery();
+  const [getUserListBySearch] = useGetUserListBySearchMutation();
 
-  const { handleSubmit, control, reset, setValue, watch } = useForm();
-
-  const onSubmit = async (data) => {
-    console.log("🚀 ~ file: NewTicket.js:42 ~ onSubmit ~ data:", data);
-    // if (forEdit) {
-    //   let modifiedData = data;
-    //   modifiedData.mobile = mobile;
-    //   if (modifiedData?.amcDetail?.device)
-    //     modifiedData.amcDetail.device = JSON.stringify(
-    //       modifiedData.amcDetail?.device
-    //     );
-    //   dispatch(SET_LOADING({ data: true }));
-    //   const response = await updateUserDetail(modifiedData);
-    //   if (response?.data?.success) {
-    //     dispatch(SET_LOADING({ data: false }));
-    //     dispatch(
-    //       SET_SNACKBAR({
-    //         open: true,
-    //         message: "Update Successfully !",
-    //         variant: "success",
-    //       })
-    //     );
-    //     refetch();
-    //     navigate("/admin/user-management");
-    //   } else {
-    //     dispatch(SET_LOADING({ data: false }));
-    //     dispatch(
-    //       SET_SNACKBAR({
-    //         open: true,
-    //         message: "Technical Error",
-    //         variant: "error",
-    //       })
-    //     );
-    //   }
-    // } else {
-    //   console.log(data);
-    //   const encryptedPassword = AES.encrypt(
-    //     data?.password,
-    //     baseConfig.encryptionKey
-    //   ).toString();
-    //   data.password = encryptedPassword;
-    //   let userData = {};
-    //   userData.userDetail = data;
-    //   if (data?.amcDetail?.device)
-    //     data.amcDetail.device = JSON.stringify(data.amcDetail?.device);
-    //   dispatch(SET_LOADING({ data: true }));
-    //   const response = await registerUser(data);
-    //   if (response?.data?.success) {
-    //     dispatch(SET_LOADING({ data: false }));
-    //     dispatch(
-    //       SET_SNACKBAR({
-    //         open: true,
-    //         message: "User Registration Successfully !",
-    //         variant: "success",
-    //       })
-    //     );
-    //     refetch();
-    //     navigate("/admin/user-management");
-    //   } else {
-    //     dispatch(SET_LOADING({ data: false }));
-    //     dispatch(
-    //       SET_SNACKBAR({
-    //         open: true,
-    //         message: "Technical Error",
-    //         variant: "error",
-    //       })
-    //     );
-    //   }
-    // }
+  const defaultValues = {
+    customer: "",
+    engineer: "",
+    brand: "",
+    description: "",
+    model_number: "",
+    parent_service: "",
+    priority: "",
+    remark: "",
+    serial_number: "",
+    service_provided: "",
+    service_type: "",
+    address: {
+      visit_address: "",
+      visit_city: "",
+      visit_pincode: "",
+      visit_state: "",
+    },
   };
 
-  const { data, error, isError, isLoading, isFetching } = result;
+  const { handleSubmit, control, reset, setValue, watch } = useForm({
+    defaultValues,
+    values: ticket,
+  });
+
+  const parentService = watch("parent_service");
+  const serviceProvided = watch("service_provided");
+  const watchTicket = watch();
+
+  const onSubmit = async (data) => {
+    console.log("🚀 ~ file: NewTicket.js:42 ~ onSubmit ~ data:", data, engineerName);
+    data.engineer = engineerName;
+    if (forEdit) {
+      dispatch(SET_LOADING({ data: true }));
+      const response = await updateTicket(data);
+      if (response?.data?.success) {
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Update Ticket Successfully !",
+            variant: "success",
+          })
+        );
+        refetch();
+        navigate("/admin/tickets");
+      } else {
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Technical Error",
+            variant: "error",
+          })
+        );
+      }
+    } else {
+      dispatch(SET_LOADING({ data: true }));
+      let finalTicketData = data;
+      finalTicketData.customer = customerValue;
+      finalTicketData.email = defaultUserDetail.email;
+      finalTicketData.mobile = defaultUserDetail.mobile;
+      finalTicketData.address = JSON.stringify(finalTicketData.address);
+      finalTicketData.customer_plan = defaultUserDetail?.amc?.user_plan ? defaultUserDetail?.amc?.user_plan : '';
+      console.log(
+        "🚀 ~ file: NewTicket.js:130 ~ onSubmit ~ finalTicketData:",
+        finalTicketData
+      );
+      const response = await createTicket(finalTicketData);
+      if (response?.data?.success) {
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Ticket Created Successfully !",
+            variant: "success",
+          })
+        );
+        refetch();
+        navigate("/admin/tickets");
+      } else {
+        dispatch(SET_LOADING({ data: false }));
+        dispatch(
+          SET_SNACKBAR({
+            open: true,
+            message: "Technical Error",
+            variant: "error",
+          })
+        );
+      }
+    }
+  };
+
   useEffect(() => {
-    if (data?.success) {
-      const userList = data?.data?.rows.map((user) => {
+    setTicket(location?.state?.editData);
+    setForEdit(location?.state?.forEdit);
+    let userDataById = {};
+    userList.map((user) => {
+      if (
+        Helper.transformUserName(user) === location?.state?.editData.customer
+      ) {
+        userDataById = user;
+        if (location?.state?.editData.customer_plan) {
+          amcList.map((amc) => {
+            if (amc.user_profile_id === user.id)
+            userDataById = Object.assign({}, user, { amc: { ...amc } });
+          });
+          setDefaultUserDetail(userDataById);
+          setCustomerType(user.role);
+        }
+      }
+    });
+    setEngineerName(location?.state?.editData.engineer)
+
+    console.log(
+      "🚀 ~ file: NewTicket.js:169 ~ useEffect ~ location?.state?.editData:",
+      location?.state?.editData
+    );
+  }, [location?.state?.forEdit, location?.state?.id]);
+
+  const handleCustomerSearch = async (event, value) => {
+    setIsCustomerLoading(true);
+    const response = await getUserListBySearch({
+      searchTerm: value,
+      isTypeCustomer: true,
+    });
+    if (response?.data?.success) {
+      setIsCustomerLoading(false);
+      const userList = response?.data?.data?.rows.map((user) => {
         return {
           label: Helper.transformUserName(user),
           type: user.role,
@@ -129,25 +209,93 @@ const NewTicket = (props) => {
         };
       });
       setCustomerList(userList);
+    } else {
       setIsCustomerLoading(false);
+      // dispatch(
+      //   SET_SNACKBAR({
+      //     open: true,
+      //     message: "Technical Error",
+      //     variant: "error",
+      //   })
+      // );
     }
-  }, [isCustomerLoading, data, isLoading]);
-
-  const handleCustomerSearch = (event) => {
-    trigger({
-      limit: 99999,
-      offset: 0,
-      search: event.target.value,
-      isTypeCustomer: true,
-    });
-    setIsCustomerLoading(true);
   };
 
   const handleCustomerSelect = (e) => {
     customerList.map((customer) => {
       if (customer.label === e.target.value) {
         setDefaultUserDetail(customer);
+        setCustomerValue(e.target.value);
         setCustomerType(customer.role);
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (serviceList.length > 0) {
+      const data = serviceList.map((item) => {
+        return item.name;
+      });
+      setParentServiceList(data);
+    }
+    if (brandList.length > 0) {
+      const data = brandList.map((item) => {
+        return item.name;
+      });
+      setBrandData(data);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (serviceList.length > 0) {
+      serviceList.map((item) => {
+        if (item.name === parentService) {
+          setServiceProvidedList(item.service_provided);
+        }
+      });
+    }
+  }, [parentService]);
+
+  useEffect(() => {
+    serviceProvidedList.map((item) => {
+      if (item.name === serviceProvided) {
+        setServiceType(item.serviceType);
+      }
+    });
+  }, [serviceProvided]);
+
+  const handleEngineerSearch = async (event, value) => {
+    setIsEngineerLoading(true);
+    const response = await getUserListBySearch({
+      searchTerm: value,
+      isTypeCustomer: false,
+    });
+    if (response?.data?.success) {
+      setIsEngineerLoading(false);
+      const userList = response?.data?.data?.rows.map((user) => {
+        return {
+          label: Helper.transformUserName(user),
+          type: user.role,
+          ...user,
+        };
+      });
+      setEngineerList(userList);
+    } else {
+      setIsEngineerLoading(false);
+      // dispatch(
+      //   SET_SNACKBAR({
+      //     open: true,
+      //     message: "Technical Error",
+      //     variant: "error",
+      //   })
+      // );
+    }
+  };
+
+  const handleEngineerSelect = (e) => {
+    engineerList.map((engineer) => {
+      if (engineer.label === e.target.value) {
+        setEngineerName(e.target.value);
       }
     });
   };
@@ -163,7 +311,7 @@ const NewTicket = (props) => {
             height: "auto",
           }}
         >
-          <CardHeader title={"New Ticket"}></CardHeader>
+          <CardHeader title={forEdit ? "Edit Ticket": "New Ticket"}></CardHeader>
           <Divider />
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
@@ -175,57 +323,88 @@ const NewTicket = (props) => {
                 </legend>
                 <Grid container sx={{ padding: "2%" }} spacing={2}>
                   <Grid item xs={12} sm={4}>
-                    <Autocomplete
-                      id="customer"
-                      options={customerList}
-                      size="small"
-                      onSelect={(e) => handleCustomerSelect(e)}
-                      noOptionsText="No Customer Found"
-                      onInputChange={(event) => handleCustomerSearch(event)}
-                      fullWidth
-                      renderOption={(props, option) => (
-                        <li {...props}>
-                          <Grid container alignItems="center">
-                            <Grid
-                              item
-                              sx={{
-                                width: "calc(100% - 44px)",
-                                wordWrap: "break-word",
+                    <Controller
+                      name="customer"
+                      control={control}
+                      render={({
+                        field: { onChange, value, name },
+                        fieldState: { error },
+                      }) => (
+                        <Autocomplete
+                          id="customer"
+                          options={customerList}
+                          size="small"
+                          onSelect={(e) => handleCustomerSelect(e)}
+                          noOptionsText="No Customer Found"
+                          value={value}
+                          onChange={(event, value) => onChange(value)}
+                          onInputChange={(event, value) =>
+                            handleCustomerSearch(event, value)
+                          }
+                          fullWidth
+                          renderOption={(props, option) => (
+                            <li {...props}>
+                              <Grid container alignItems="center">
+                                <Grid
+                                  item
+                                  sx={{
+                                    width: "calc(100% - 44px)",
+                                    wordWrap: "break-word",
+                                  }}
+                                >
+                                  <Box component="span">{option.label}</Box>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {option.type === "AMC"
+                                      ? "AMC Customer"
+                                      : "Customer"}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </li>
+                          )}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Customer"
+                              error={!!error}
+                              helperText={error?.message}
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {isCustomerLoading ? (
+                                      <CircularProgress
+                                        color="primary"
+                                        size={20}
+                                      />
+                                    ) : null}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
                               }}
-                            >
-                              <Box component="span">{option.label}</Box>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                {option.type === "AMC"
-                                  ? "AMC Customer"
-                                  : "Customer"}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </li>
-                      )}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Customer"
-                          InputProps={{
-                            ...params.InputProps,
-                            endAdornment: (
-                              <>
-                                {isCustomerLoading ? (
-                                  <CircularProgress color="primary" size={20} />
-                                ) : null}
-                                {params.InputProps.endAdornment}
-                              </>
-                            ),
-                          }}
+                            />
+                          )}
                         />
                       )}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: "Customer is required.",
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
+                    {/* <Typography variant="subtitle1" gutterBottom align='center'>
+                  Registration Date: {defaultUserDetail?.date_of_registration
+                          ? moment(
+                              defaultUserDetail?.date_of_registration
+                            ).format("DD/MM/YYYY")
+                          : "-"}
+                  </Typography> */}
                     <TextField
                       disabled
                       id="Registration Date"
@@ -315,15 +494,15 @@ const NewTicket = (props) => {
                   <Grid item xs={12} sm={4}>
                     <TextField
                       disabled
-                      id="Contact Person Email"
+                      id="Contact Person Number"
                       value={
-                        defaultUserDetail?.contact_person_email
-                          ? defaultUserDetail?.contact_person_email
+                        defaultUserDetail?.contact_person_number
+                          ? defaultUserDetail?.contact_person_number
                           : "-"
                       }
                       size="small"
                       fullWidth
-                      label="Contact Person Email"
+                      label="Contact Person Number"
                       variant="outlined"
                     />
                   </Grid>
@@ -399,95 +578,145 @@ const NewTicket = (props) => {
                 <Grid container sx={{ padding: "2%" }} spacing={2}>
                   <Grid item xs={12} sm={4}>
                     <Controller
-                      name="first_name"
+                      name="parent_service"
                       control={control}
                       render={({
                         field: { onChange, value, name },
                         fieldState: { error },
                       }) => (
                         <Autocomplete
-                          // options={customerList}
+                          options={parentServiceList}
                           size="small"
                           id="auto-complete"
                           autoComplete
+                          value={value}
+                          onChange={(event, value) => onChange(value)}
                           includeInputInList
                           renderInput={(params) => (
                             <TextField
                               {...params}
+                              error={!!error}
+                              helperText={error?.message}
                               label="Parent Service"
                               variant="outlined"
                             />
                           )}
-                          onSelect={(e) => handleChange(e, "customer")}
                         />
                       )}
                       rules={{
                         required: {
                           value: true,
-                          message: "Customer is required.",
+                          message: "Parent Service is required.",
                         },
                       }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <Autocomplete
-                      // options={customerList}
-                      size="small"
-                      id="auto-complete"
-                      autoComplete
-                      includeInputInList
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Service Provide"
-                          variant="outlined"
-                        />
-                      )}
-                      onSelect={(e) => handleChange(e, "customer")}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <FormControlLabel
-                      control={<Checkbox disabled />}
-                      label="ON-SITE"
-                    />
-                    <FormControlLabel
-                      control={<Checkbox disabled />}
-                      label="ONLINE"
-                    />
-                    <FormControlLabel
-                      control={<Checkbox disabled />}
-                      label="PICK AND DROP"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
                     <Controller
-                      name="first_name"
+                      name="service_provided"
                       control={control}
                       render={({
                         field: { onChange, value, name },
                         fieldState: { error },
                       }) => (
                         <Autocomplete
-                          // options={customerList}
+                          options={serviceProvidedList.map((item) => item.name)}
                           size="small"
                           id="auto-complete"
                           autoComplete
+                          value={value}
+                          onChange={(event, value) => onChange(value)}
                           includeInputInList
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="Brand"
+                              error={!!error}
+                              helperText={error?.message}
+                              label="Service Provide"
                               variant="outlined"
                             />
                           )}
-                          onSelect={(e) => handleChange(e, "customer")}
                         />
                       )}
                       rules={{
                         required: {
                           value: true,
-                          message: "First Name is required.",
+                          message: "Service Provide is required.",
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    {serviceProvided && (
+                      <Controller
+                        name="service_type"
+                        control={control}
+                        render={({
+                          field: { onChange, value, name },
+                          fieldState: { error },
+                        }) => (
+                          <FormControl error={error}>
+                            <RadioGroup
+                              row
+                              aria-labelledby="demo-error-radios"
+                              name="row-radio-buttons-group"
+                              value={value}
+                              onChange={(event, value) => onChange(value)}
+                            >
+                              {Object.keys(serviceType).map(
+                                (type) =>
+                                  serviceType[type] && (
+                                    <FormControlLabel
+                                      value={type}
+                                      control={<Radio />}
+                                      label={type}
+                                    />
+                                  )
+                              )}
+                            </RadioGroup>
+                            <FormHelperText>{error?.message}</FormHelperText>
+                          </FormControl>
+                        )}
+                        rules={{
+                          required: {
+                            value: true,
+                            message: "Service Type is required.",
+                          },
+                        }}
+                      />
+                    )}
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="brand"
+                      control={control}
+                      render={({
+                        field: { onChange, value, name },
+                        fieldState: { error },
+                      }) => (
+                        <Autocomplete
+                          options={brandData}
+                          size="small"
+                          id="auto-complete"
+                          autoComplete
+                          value={value}
+                          onChange={(event, value) => onChange(value)}
+                          includeInputInList
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={!!error}
+                              helperText={error?.message}
+                              label="Brand"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      )}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: "Brand is required.",
                         },
                       }}
                     />
@@ -516,43 +745,14 @@ const NewTicket = (props) => {
                         </FormControl>
                       )}
                     />
-                    {/* <FormControl variant="outlined" size="small" fullWidth>
-                      <InputLabel id="demo-simple-select-standard-label">
-                        Priority
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-standard-label"
-                        id="demo-simple-select-standard"
-                        // onChange={(e) => handleChange(e, "priority")}
-                        label="Priority"
-                        // defaultValue={forEdit || forView ? defaultData?.type : ""}
-                        // disabled={forView}
-                      >
-                        <MenuItem value="LOW">LOW</MenuItem>
-                        <MenuItem value="MEDIUM">MEDIUM</MenuItem>
-                        <MenuItem value="HIGH">HIGH</MenuItem>
-                        <MenuItem value="URGENT">URGENT</MenuItem>
-                      </Select>
-                    </FormControl> */}
                   </Grid>
                   <Grid item xs={12} sm={4}>
                     <Controller
                       name="serial_number"
                       control={control}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: "Serial Number is required.",
-                        },
-                      }}
-                      render={({
-                        field: { onChange, value },
-                        fieldState: { error },
-                      }) => (
+                      render={({ field: { onChange, value } }) => (
                         <TextField
                           id="Serial Number"
-                          error={!!error}
-                          helperText={error?.message}
                           value={value}
                           onChange={onChange}
                           size="small"
@@ -564,118 +764,173 @@ const NewTicket = (props) => {
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Model Number"
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item sm={4} xs={6} md={8}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Description"
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item sm={4} xs={6} md={8}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Remark"
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Autocomplete
-                      // options={customerList}
-                      size="small"
-                      id="auto-complete"
-                      autoComplete
-                      includeInputInList
-                      renderInput={(params) => (
+                    <Controller
+                      name="model_number"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
                         <TextField
-                          {...params}
-                          label="Assign Engineer"
+                          id="model_number"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Model Number"
                           variant="outlined"
                         />
                       )}
-                      // onSelect={(e) => handleChange(e, "customer")}
+                    />
+                  </Grid>
+                  <Grid item sm={4} xs={6} md={8}>
+                    <Controller
+                      name="description"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          id="description"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Description"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item sm={4} xs={6} md={8}>
+                    <Controller
+                      name="remark"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          id="remark"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Remark"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="engineer"
+                      control={control}
+                      render={({
+                        field: { onChange, value, name },
+                        fieldState: { error },
+                      }) => (
+                        <Autocomplete
+                          id="engineer"
+                          options={engineerList}
+                          size="small"
+                          onSelect={(e) => handleEngineerSelect(e)}
+                          noOptionsText="No Engineer Found"
+                          fullWidth
+                          value={value}
+                          onChange={(event, value) => onChange(value)}
+                          onInputChange={(event, value) =>
+                            handleEngineerSearch(event, value)
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Assign Engineer"
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {isEngineerLoading ? (
+                                      <CircularProgress
+                                        color="primary"
+                                        size={20}
+                                      />
+                                    ) : null}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
+                              }}
+                            />
+                          )}
+                        />
+                      )}
                     />
                   </Grid>
                   <Grid item sm={4} xs={6} md={12}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Visit Address"
-                      variant="outlined"
+                    <Controller
+                      name="address.visit_address"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          id="visit_address"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Visit Address"
+                          variant="outlined"
+                        />
+                      )}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Visit City"
-                      variant="outlined"
+                    <Controller
+                      name="address.visit_city"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          id="visit_city"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Visit City"
+                          variant="outlined"
+                        />
+                      )}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Visit State"
-                      variant="outlined"
+                    <Controller
+                      name="address.visit_state"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          id="visit_state"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Visit State"
+                          variant="outlined"
+                        />
+                      )}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <TextField
-                      id="email"
-                      // onChange={onChange}
-                      // value={value}
-                      // error={!!error}
-                      // helperText={error?.message}
-                      type="text"
-                      size="small"
-                      fullWidth
-                      label="Visit Pincode"
-                      variant="outlined"
+                    <Controller
+                      name="address.visit_pincode"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          id="visit_pincode"
+                          onChange={onChange}
+                          value={value}
+                          type="text"
+                          size="small"
+                          fullWidth
+                          label="Visit Pincode"
+                          variant="outlined"
+                        />
+                      )}
                     />
                   </Grid>
                 </Grid>

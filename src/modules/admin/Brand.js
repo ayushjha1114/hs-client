@@ -28,7 +28,7 @@ const Brand = () => {
   const [defaultName, setDefaultName] = useState("");
   const [defaultDescription, setDefaultDescription] = useState("");
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(100);
 
   const { data, error, isLoading, refetch } = useGetAllBrandQuery({
     limit: rowsPerPage,
@@ -43,6 +43,23 @@ const Brand = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  useEffect(() => {
+    if (isLoading) {
+      dispatch(SET_LOADING({ data: true }));
+    } else if (error) {
+      dispatch(SET_LOADING({ data: false }));
+      dispatch(
+        SET_SNACKBAR({
+          open: true,
+          message: "Technical Error",
+          variant: "error",
+        })
+      );
+    } else if (data) {
+      dispatch(SET_LOADING({ data: false }));
+    }
+  }, [data, isLoading, error]);
 
   const handleAddBtn = async () => {
     if (isAddOpen) {
@@ -186,11 +203,7 @@ const Brand = () => {
               </Button>
             }
           ></CardHeader>
-          {error ? (
-            <>Oh no, there was an error</>
-          ) : isLoading ? (
-            <>Loading...</>
-          ) : data ? (
+          {data ? (
             <>
               <div className="user-management-table">
                 <table>
@@ -323,7 +336,7 @@ const Brand = () => {
               />
             </>
           ) : (
-            <></>
+            <><h2>No Brand Found</h2></>
           )}
         </Card>
       </UserLayout>

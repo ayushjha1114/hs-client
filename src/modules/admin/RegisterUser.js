@@ -48,8 +48,8 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import { useForm, Controller } from "react-hook-form";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
-import state from '../../config/state-city/state.json'
-import city from '../../config/state-city/city.json'
+import state from "../../config/state-city/state.json";
+import city from "../../config/state-city/city.json";
 
 const baseConfig = config[config.serviceServerName["auth"]];
 
@@ -178,8 +178,10 @@ const RegisterUser = (props) => {
         modifiedData.amcDetail.device = JSON.stringify(
           modifiedData.amcDetail?.device
         );
+      modifiedData.date_of_registration = moment(modifiedData.date_of_registration).format("YYYY-MM-DD")
       dispatch(SET_LOADING({ data: true }));
       const response = await updateUserDetail(modifiedData);
+      console.log("🚀 ~ file: RegisterUser.js:184 ~ onSubmit ~ response:", response)
       if (response?.data?.success) {
         dispatch(SET_LOADING({ data: false }));
         dispatch(
@@ -212,6 +214,7 @@ const RegisterUser = (props) => {
       userData.userDetail = data;
       if (data?.amcDetail?.device)
         data.amcDetail.device = JSON.stringify(data.amcDetail?.device);
+        data.date_of_registration = moment(data.date_of_registration).format("YYYY-MM-DD")
       dispatch(SET_LOADING({ data: true }));
       const response = await registerUser(data);
       if (response?.data?.success) {
@@ -279,12 +282,12 @@ const RegisterUser = (props) => {
     //   reset(JSON.parse(JSON.stringify(data?.data?.rows?.userDetail)));
     // }
     // reset(JSON.parse(JSON.stringify({first_name:'Jitendra'})));
-  }, [location?.state?.forEdit,location?.state?.id,data]);
-const watchUserType = watch('role');
-const currentState = watch('current_state');
-const visitState = watch('permanent_state');
-const watchUser = watch();
-console.log(watchUser);
+  }, [location?.state?.forEdit, location?.state?.id, data]);
+  const watchUserType = watch("role");
+  const currentState = watch("current_state");
+  const visitState = watch("permanent_state");
+  const watchUser = watch();
+  console.log(watchUser);
   return (
     <>
       <UserLayout>
@@ -358,20 +361,20 @@ console.log(watchUser);
                     <Controller
                       name="last_name"
                       control={control}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: "Last Name is required.",
-                        },
-                      }}
+                      // rules={{
+                      //   required: {
+                      //     value: true,
+                      //     message: "Last Name is required.",
+                      //   },
+                      // }}
                       render={({
                         field: { onChange, value },
                         fieldState: { error },
                       }) => (
                         <TextField
                           id="lastname"
-                          error={!!error}
-                          helperText={error?.message}
+                          // error={!!error}
+                          // helperText={error?.message}
                           value={value}
                           onChange={onChange}
                           size="small"
@@ -385,6 +388,7 @@ console.log(watchUser);
                   <Grid item xs={12} sm={4}>
                     <Controller
                       name="email"
+                      
                       control={control}
                       rules={{
                         required: {
@@ -402,6 +406,7 @@ console.log(watchUser);
                       }) => (
                         <TextField
                           id="email"
+                          disabled={forEdit}
                           onChange={onChange}
                           value={value}
                           error={!!error}
@@ -448,6 +453,7 @@ console.log(watchUser);
                           id="mobileNumber"
                           onChange={onChange}
                           value={value}
+                          disabled={forEdit}
                           error={!!error}
                           helperText={error?.message}
                           InputProps={{
@@ -470,12 +476,12 @@ console.log(watchUser);
                     <Controller
                       name="date_of_birth"
                       control={control}
-                      rules={{
-                        required: {
-                          value: true,
-                          message: "Date Of Birth is required.",
-                        },
-                      }}
+                      // rules={{
+                      //   required: {
+                      //     value: true,
+                      //     message: "Date Of Birth is required.",
+                      //   },
+                      // }}
                       render={({
                         field: { onChange, value },
                         fieldState: { error },
@@ -489,8 +495,8 @@ console.log(watchUser);
                           fullWidth
                           format="dd-mm-yyyy"
                           onChange={onChange}
-                          error={!!error}
-                          helperText={error?.message}
+                          // error={!!error}
+                          // helperText={error?.message}
                         />
                       )}
                     />
@@ -535,6 +541,7 @@ console.log(watchUser);
                             value={value}
                             onChange={onChange}
                             error={!!error}
+                            disabled={forEdit}
                             endAdornment={
                               <InputAdornment position="end">
                                 <IconButton
@@ -559,462 +566,758 @@ console.log(watchUser);
                     />
                   </Grid>
 
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='aadhaar_number'
-              control={control}
-              rules={{ maxLength: { value:12 ,message:'Please enter valid aadhaar number.'} ,minLength: { value:12,message:'Please enter valid aadhaar number.'} }}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='aadhaar_number' 
-              onChange={onChange} 
-              value={value}
-              error={!!error}
-              helperText = {error?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FingerprintIcon />
-                  </InputAdornment>
-                ),
-              }} type='number' size="small" fullWidth label='Aadhaar Number' variant='outlined' />)}/>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='role'
-              control={control}
-              rules={{ required:{value: true,message:"User Type is required."} }}
-
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-            <FormControl size='small' fullWidth  error={!!error} >
-        <InputLabel id="demo-simple-select-label">User Type</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={value}
-          label="userType"
-          onChange={onChange} 
-          error={!!error}
-        >
-          {UserType.map((type) => (
-              <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
-                        ))}
-        </Select>
-        <FormHelperText>{error?.message}</FormHelperText>
-      </FormControl>)}/>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='gender'
-              control={control}
-              rules={{ required:{value: true,message:"Gender is required."} }}
-              render ={({
-                field: { onChange,value },fieldState: { error }
-              }) => (
-            <FormControl error={!!error} >
-                <FormLabel id="demo-row-radio-buttons-group-label">Gender</FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby="demo-row-radio-buttons-group-label"
-                  name="row-radio-buttons-group"
-                  onChange={onChange}
-                  value={value}
-                  error={!!error}
-                  helperText = {error?.message}
-                >
-                   {genderOption.map((option) => (
-                           <FormControlLabel  key={option.value} value={option.value} control={<Radio />} label={option.label} />
-                        ))}
-                </RadioGroup>
-                <FormHelperText>{error?.message}</FormHelperText>
-              </FormControl>
-              )}/>
-            </Grid>
-          </Grid>
-          </fieldset>
-          { watchUserType && watchUserType !== 'ADMIN' && watchUserType !== 'ENGINEER' ?  <fieldset style={{border:'1px solid #e0e0e0', marginTop:'20px', borderRadius:'10px'}}>
-          <legend style={{width:'fit-content', textAlign:'center'}}>Company Information</legend>
-          <Grid container sx={{padding:'2%'}} spacing={2}>
-          <Grid item xs={12} sm={4}>
-          <Controller
-              name='company_name'
-              control={control}
-              rules={{ required:{value: watchUserType === 'AMC',message:"Company Name is required."} }}
-              render ={({
-                field: { onChange,value },fieldState: { error },
-              }) => (
-              <TextField id='company_name' 
-              error={!!error}
-              helperText = {error?.message}
-              onChange={onChange} size="small" value ={value} fullWidth label='Company Name' variant='outlined' />
-              )} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='director_email'
-              control={control}
-              rules={{pattern:{ value: emailPattern, message:'Email Id is not valid.'} }}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='director_email' 
-              onChange={onChange}
-              value={value}
-              error={!!error}
-              helperText = {error?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailIcon />
-                  </InputAdornment>
-                ),
-              }} type="email" size="small" fullWidth label='Director Email Address' variant='outlined' />
-               )} /> </Grid>
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='admin_email'
-              control={control}
-              rules={{pattern:{ value: emailPattern, message:'Email Id is not valid.'} }}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='admin_email' 
-              onChange={onChange}
-              value={value}
-              error={!!error}
-              helperText = {error?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MailIcon />
-                  </InputAdornment>
-                ),
-              }} type="email" size="small" fullWidth label='Admin Email Address' variant='outlined' />
-              )} />
-              </Grid>
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='gst_number'
-              control={control}
-              rules={{ required: { value:watchUserType === 'AMC',message:"GST Number is required."}, maxLength: { value:15 ,message:'Please enter valid GST Number.'} ,minLength: { value:15,message:'Please enter valid GST Number.'} }}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-          
-          <TextField id='gst_number' 
-          error={!!error}
-              helperText = {error?.message} value={value} onChange={onChange} size="small" fullWidth label='GST Number' variant='outlined' />
-               )} /> </Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-              name='pan_number'
-              control={control}
-              rules={{ required: { value:watchUserType === 'AMC',message:"PAN Number is required."}, maxLength: { value:10 ,message:'Please enter valid GST Number.'} ,minLength: { value:10,message:'Please enter valid PAN Number.'} }}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='pan_number' 
-              error={!!error}
-              helperText = {error?.message}
-              value={value} onChange={onChange} size="small" fullWidth label='PAN Number' variant='outlined' />
-              )} />
-              </Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-              name='date_of_registration'
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-            <TextField
-                  id="registration"
-                  label="Date Of Registration"
-                  type="date"
-                  size='small'
-                  fullWidth
-                  error={!!error}
-              helperText = {error?.message}
-                  onChange={onChange}
-                  value={value ? moment(value).format('YYYY-MM-DD') : moment().format()}
-                />)} />
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="aadhaar_number"
+                      control={control}
+                      rules={{
+                        maxLength: {
+                          value: 12,
+                          message: "Please enter valid aadhaar number.",
+                        },
+                        minLength: {
+                          value: 12,
+                          message: "Please enter valid aadhaar number.",
+                        },
+                      }}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <TextField
+                          id="aadhaar_number"
+                          onChange={onChange}
+                          value={value}
+                          error={!!error}
+                          helperText={error?.message}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <FingerprintIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                          type="number"
+                          size="small"
+                          fullWidth
+                          label="Aadhaar Number"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="role"
+                      control={control}
+                      rules={{
+                        required: {
+                          value: true,
+                          message: "User Type is required.",
+                        },
+                      }}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <FormControl size="small" fullWidth error={!!error}>
+                          <InputLabel id="demo-simple-select-label">
+                            User Type
+                          </InputLabel>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={value}
+                            label="userType"
+                            onChange={onChange}
+                            error={!!error}
+                          >
+                            {UserType.map((type) => (
+                              <MenuItem key={type.value} value={type.value}>
+                                {type.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          <FormHelperText>{error?.message}</FormHelperText>
+                        </FormControl>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="gender"
+                      control={control}
+                      // rules={{
+                      //   required: {
+                      //     value: true,
+                      //     message: "Gender is required.",
+                      //   },
+                      // }}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <FormControl /* error={!!error} */>
+                          <FormLabel id="demo-row-radio-buttons-group-label">
+                            Gender
+                          </FormLabel>
+                          <RadioGroup
+                            row
+                            aria-labelledby="demo-row-radio-buttons-group-label"
+                            name="row-radio-buttons-group"
+                            onChange={onChange}
+                            value={value}
+                            // error={!!error}
+                            // helperText={error?.message}
+                          >
+                            {genderOption.map((option) => (
+                              <FormControlLabel
+                                key={option.value}
+                                value={option.value}
+                                control={<Radio />}
+                                label={option.label}
+                              />
+                            ))}
+                          </RadioGroup>
+                          <FormHelperText>{error?.message}</FormHelperText>
+                        </FormControl>
+                      )}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={4}>
-                <Controller
-              name='contact_person_name'
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='contact_person_name'
-              error={!!error}
-              helperText = {error?.message} value={value} onChange={onChange} size="small" fullWidth label='Contact Person Name' variant='outlined' />
-               )} />
-                </Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-              name='contact_person_number'
-              rules={{ maxLength: { value:10,message:'Mobile Number should be length of 10'} ,minLength: { value:10,message:'Mobile Number should be length of 10'}}}
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='contact_person_number' 
-              onChange={onChange}
-              value={value}
-              error={!!error}
-              helperText = {error?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PhoneIphoneIcon />
-                  </InputAdornment>
-                ),
-              }} type='number' size="small" fullWidth label='Contact Person Number' variant='outlined' />
-               )}/>
-                </Grid>
-            
-          </Grid>
-          {watchUserType === 'AMC'? 
-          <Grid container spacing={2} sx={{padding:'2%'}}>
-          <Grid item xs={12} sm={4}>
-          <Controller
-              name='amcDetail.user_plan'
-              control={control}
-              rules={{ required:{value: true,message:"User Plan is required."} }}
-
-              render ={({
-                field: { onChange,value },fieldState: { error },
-              }) => (
-              <TextField id='user_plan' value={value}
-              error={!!error}
-              helperText = {error?.message}
-              onChange={onChange}  size="small" fullWidth label='Customer Plan' variant='outlined' />
-              )} /></Grid>
-            <Grid item xs={12} sm={4}>
-              <Controller
-              name='amcDetail.plan_activation_date'
-              rules={{ required:{value: true,message:"Plan Activation Date is required."} }}
-
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-            <TextField
-                  id="activationDate"
-                  value={moment(value).format('YYYY-MM-DD')}
-                  label="Plan Activation Date"
-                  type="date"
-                  size='small'
-                  fullWidth
-                  error={!!error}
-              helperText = {error?.message}
-                  InputLabelProps={{
-                    shrink: true,
+              </fieldset>
+              {watchUserType &&
+              watchUserType !== "ADMIN" &&
+              watchUserType !== "ENGINEER" ? (
+                <fieldset
+                  style={{
+                    border: "1px solid #e0e0e0",
+                    marginTop: "20px",
+                    borderRadius: "10px",
                   }}
-                  onChange={onChange}
-               
-                />)} />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Controller
-              name='amcDetail.plan_expired_date'
-              control={control}
-              rules={{ required:{value: true,message:"Plan Expired Date is required."} }}
-              render ={({
-                field: { onChange,value },fieldState: { error },
-              }) => (
-            <TextField
-                  id="expireDate"
-                  label="Plan Expired Date"
-                  type="date"
-                  error={!!error}
-              helperText = {error?.message}
-                  fullWidth
-                  value={moment(value).format('YYYY-MM-DD')}
-                  size='small'
-                  onChange={onChange}
-                /> )} />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Controller
-              name='amcDetail.device'
-              control={control}
-              rules={{ required:{value: true,message:"Device is required."} }}
-
-              defaultValue={[]}
-              render ={({
-                field: { onChange,value },fieldState: { error },
-              }) => (
-                <FormControl size='small' fullWidth>
-                      <InputLabel id="demo-multiple-name-label">
-                        Device
-                      </InputLabel>
-                      <Select
-                        labelId="demo-multiple-name-label"
-                        id="demo-multiple-name"
-                        multiple
-                        value={value ? value : []}
-                        error={!!error}
-              helperText = {error?.message}
-                        onChange={onChange}
-                        input={<OutlinedInput label="Device" />}
-                      >
-                        {devices.map((device) => (
-                          <MenuItem key={device} value={device}>
-                            {device}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>)} />
-                </Grid>
-            </Grid>: ''}
-            </fieldset> : ''}
-            <fieldset style={{border:'1px solid #e0e0e0',marginTop:'20px', borderRadius:'10px'}}>
-          <legend style={{width:'fit-content', textAlign:'center'}}>Address Information</legend>
-            <Grid container sx={{padding:'2%'}} spacing={2} >
-            <Grid item xs={12} sm={4}>
-            <Controller
-              name='current_address'
-              control={control}
-              render ={({
-                field: { onChange,value },
-              }) => (
-            <TextField size='small' fullWidth
-          id="current_address"
-          label="Current Address"
-          multiline
-          error={!!error}
-              helperText = {error?.message}
-          rows={2}
-          value={value}
-          onChange={onChange}
-        />)} />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Controller
-              name='current_state'
-              control={control}
-              render ={({
-                field: { onChange,value },
-              }) => (
-                <Autocomplete
-                disablePortal
-                freeSolo
-                  id="current_state"
-                  options={state ? state : []}
-                  value={value} onChange={(event,item)=>onChange(item)} size="small" fullWidth
-                  renderInput={(params) => <TextField {...params} label="Current State" variant='outlined'/>}
-                />
-              )} />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-              <Controller
-              name='current_city'
-              control={control}
-              render ={({
-                field: { onChange,value },
-              }) => (
-
-                <Autocomplete
-                disablePortal
-                freeSolo
-                  id="current_city"
-                  options={currentState ? city[currentState] :[]}
-                  value={value} onChange={(event,item)=>onChange(item)} size="small" fullWidth
-                  renderInput={(params) => <TextField {...params} label="Current City" variant='outlined'/>}
-                />
-              )} />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Controller
-              name='current_pincode'
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='current_pincode' 
-              value={value} onChange={onChange} size="small" fullWidth label='Current Pincode' variant='outlined' />
-)} />
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox  
-                    onChange={handleCheckBoxClicked} checked={isCurrentSame}/>} label="Visit address same as Current address" />
-              </FormGroup> 
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Controller
-              name='permanent_address'
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-            <TextField size='small' fullWidth
-            disabled = {isCurrentSame}
-          id="permanent_address"
-          label="Visit Address"
-          multiline
-          rows={2}
-          value={value}
-          onChange={onChange}
-        />
-        )} />
-              </Grid>
-              
-              <Grid item xs={12} sm={4}>
-              <Controller
-              name='permanent_state'
-              control={control}
-              render ={({
-                field: { onChange,value },
-              }) => (
-                <Autocomplete
-                disablePortal
-                freeSolo
-                disabled = {isCurrentSame}
-                  id="permanent_state"
-                  options={state ? state : []}
-                  value={value} onChange={(event,item)=>onChange(item)} size="small" fullWidth
-                  renderInput={(params) => <TextField {...params} label="Visit State" variant='outlined'/>}
-                />
+                >
+                  <legend style={{ width: "fit-content", textAlign: "center" }}>
+                    Company Information
+                  </legend>
+                  <Grid container sx={{ padding: "2%" }} spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="company_name"
+                        control={control}
+                        // rules={{
+                        //   required: {
+                        //     value: watchUserType === "AMC",
+                        //     message: "Company Name is required.",
+                        //   },
+                        // }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="company_name"
+                            // error={!!error}
+                            // helperText={error?.message}
+                            onChange={onChange}
+                            size="small"
+                            value={value}
+                            fullWidth
+                            label="Company Name"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="director_email"
+                        control={control}
+                        // rules={{
+                        //   pattern: {
+                        //     value: emailPattern,
+                        //     message: "Email Id is not valid.",
+                        //   },
+                        // }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="director_email"
+                            onChange={onChange}
+                            value={value}
+                            // error={!!error}
+                            // helperText={error?.message}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <MailIcon />
+                                </InputAdornment>
+                              ),
+                            }}
+                            type="email"
+                            size="small"
+                            fullWidth
+                            label="Director Email Address"
+                            variant="outlined"
+                          />
+                        )}
+                      />{" "}
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="admin_email"
+                        control={control}
+                        // rules={{
+                        //   pattern: {
+                        //     value: emailPattern,
+                        //     message: "Email Id is not valid.",
+                        //   },
+                        // }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="admin_email"
+                            onChange={onChange}
+                            value={value}
+                            // error={!!error}
+                            // helperText={error?.message}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <MailIcon />
+                                </InputAdornment>
+                              ),
+                            }}
+                            type="email"
+                            size="small"
+                            fullWidth
+                            label="Admin Email Address"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="gst_number"
+                        control={control}
+                        // rules={{
+                        //   required: {
+                        //     value: watchUserType === "AMC",
+                        //     message: "GST Number is required.",
+                        //   },
+                        //   maxLength: {
+                        //     value: 15,
+                        //     message: "Please enter valid GST Number.",
+                        //   },
+                        //   minLength: {
+                        //     value: 15,
+                        //     message: "Please enter valid GST Number.",
+                        //   },
+                        // }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="gst_number"
+                            // error={!!error}
+                            // helperText={error?.message}
+                            value={value}
+                            onChange={onChange}
+                            size="small"
+                            fullWidth
+                            label="GST Number"
+                            variant="outlined"
+                          />
+                        )}
+                      />{" "}
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="pan_number"
+                        control={control}
+                        // rules={{
+                        //   required: {
+                        //     value: watchUserType === "AMC",
+                        //     message: "PAN Number is required.",
+                        //   },
+                        //   maxLength: {
+                        //     value: 10,
+                        //     message: "Please enter valid GST Number.",
+                        //   },
+                        //   minLength: {
+                        //     value: 10,
+                        //     message: "Please enter valid PAN Number.",
+                        //   },
+                        // }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="pan_number"
+                            // error={!!error}
+                            // helperText={error?.message}
+                            value={value}
+                            onChange={onChange}
+                            size="small"
+                            fullWidth
+                            label="PAN Number"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="date_of_registration"
+                        control={control}
+                                 rules={{
+                        required: {
+                          value: true,
+                          message: "Date Of Registration is required.",
+                        },
+                      }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="registration"
+                            label="Date Of Registration"
+                            type="date"
+                            size="small"
+                            fullWidth
+                            error={!!error}
+                            helperText={error?.message}
+                            onChange={onChange}
+                            value={
+                              value
+                                ? moment(value).format("YYYY-MM-DD")
+                                : moment().format()
+                            }
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="contact_person_name"
+                        control={control}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="contact_person_name"
+                            // error={!!error}
+                            // helperText={error?.message}
+                            value={value}
+                            onChange={onChange}
+                            size="small"
+                            fullWidth
+                            label="Contact Person Name"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="contact_person_number"
+                        // rules={{
+                        //   maxLength: {
+                        //     value: 10,
+                        //     message: "Mobile Number should be length of 10",
+                        //   },
+                        //   minLength: {
+                        //     value: 10,
+                        //     message: "Mobile Number should be length of 10",
+                        //   },
+                        // }}
+                        control={control}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <TextField
+                            id="contact_person_number"
+                            onChange={onChange}
+                            value={value}
+                            // error={!!error}
+                            // helperText={error?.message}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <PhoneIphoneIcon />
+                                </InputAdornment>
+                              ),
+                            }}
+                            type="number"
+                            size="small"
+                            fullWidth
+                            label="Contact Person Number"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                  {watchUserType === "AMC" ? (
+                    <Grid container spacing={2} sx={{ padding: "2%" }}>
+                      <Grid item xs={12} sm={4}>
+                        <Controller
+                          name="amcDetail.user_plan"
+                          control={control}
+                          // rules={{
+                          //   required: {
+                          //     value: true,
+                          //     message: "User Plan is required.",
+                          //   },
+                          // }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <TextField
+                              id="user_plan"
+                              value={value}
+                              // error={!!error}
+                              // helperText={error?.message}
+                              onChange={onChange}
+                              size="small"
+                              fullWidth
+                              label="Customer Plan"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Controller
+                          name="amcDetail.plan_activation_date"
+                          rules={{
+                            required: {
+                              value: true,
+                              message: "Plan Activation Date is required.",
+                            },
+                          }}
+                          control={control}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <TextField
+                              id="activationDate"
+                              value={moment(value).format("YYYY-MM-DD")}
+                              label="Plan Activation Date"
+                              type="date"
+                              size="small"
+                              fullWidth
+                              error={!!error}
+                              helperText={error?.message}
+                              InputLabelProps={{
+                                shrink: true,
+                              }}
+                              onChange={onChange}
+                            />
+                          )}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Controller
+                          name="amcDetail.plan_expired_date"
+                          control={control}
+                          rules={{
+                            required: {
+                              value: true,
+                              message: "Plan Expired Date is required.",
+                            },
+                          }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <TextField
+                              id="expireDate"
+                              label="Plan Expired Date"
+                              type="date"
+                              error={!!error}
+                              helperText={error?.message}
+                              fullWidth
+                              value={moment(value).format("YYYY-MM-DD")}
+                              size="small"
+                              onChange={onChange}
+                            />
+                          )}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Controller
+                          name="amcDetail.device"
+                          control={control}
+                          rules={{
+                            required: {
+                              value: true,
+                              message: "Device is required.",
+                            },
+                          }}
+                          defaultValue={[]}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <FormControl size="small" fullWidth>
+                              <InputLabel id="demo-multiple-name-label">
+                                Device
+                              </InputLabel>
+                              <Select
+                                labelId="demo-multiple-name-label"
+                                id="demo-multiple-name"
+                                multiple
+                                value={value ? value : []}
+                                error={!!error}
+                                helperText={error?.message}
+                                onChange={onChange}
+                                input={<OutlinedInput label="Device" />}
+                              >
+                                {devices.map((device) => (
+                                  <MenuItem key={device} value={device}>
+                                    {device}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          )}
+                        />
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    ""
+                  )}
+                </fieldset>
+              ) : (
+                ""
               )}
-              />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Controller
-              name='permanent_city'
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-                <Autocomplete
-                disablePortal
-                freeSolo
-                disabled = {isCurrentSame}
-                  id="permanent_city"
-                  options={visitState ? city[visitState] :[]}
-                  value={value} onChange={(event,item)=>onChange(item)} size="small" fullWidth
-                  renderInput={(params) => <TextField {...params} label="Visit City" variant='outlined'/>}
-                />
-              )} />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Controller
-              name='permanent_pincode'
-              control={control}
-              render ={({
-                field: { onChange ,value},fieldState: { error },
-              }) => (
-              <TextField id='permanent_pincode' disabled = {isCurrentSame}
-              value={value} onChange={onChange} size="small" fullWidth label='Visit Pincode' variant='outlined' />
-              )} />
-              </Grid>
-            </Grid>
-            </fieldset>
-            
+              <fieldset
+                style={{
+                  border: "1px solid #e0e0e0",
+                  marginTop: "20px",
+                  borderRadius: "10px",
+                }}
+              >
+                <legend style={{ width: "fit-content", textAlign: "center" }}>
+                  Address Information
+                </legend>
+                <Grid container sx={{ padding: "2%" }} spacing={2}>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="current_address"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <TextField
+                          size="small"
+                          fullWidth
+                          id="current_address"
+                          label="Current Address"
+                          multiline
+                          error={!!error}
+                          helperText={error?.message}
+                          rows={2}
+                          value={value}
+                          onChange={onChange}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="current_state"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <Autocomplete
+                          disablePortal
+                          freeSolo
+                          id="current_state"
+                          options={state ? state : []}
+                          value={value}
+                          onChange={(event, item) => onChange(item)}
+                          size="small"
+                          fullWidth
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Current State"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="current_city"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <Autocomplete
+                          disablePortal
+                          freeSolo
+                          id="current_city"
+                          options={currentState ? city[currentState] : []}
+                          value={value}
+                          onChange={(event, item) => onChange(item)}
+                          size="small"
+                          fullWidth
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Current City"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="current_pincode"
+                      control={control}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <TextField
+                          id="current_pincode"
+                          value={value}
+                          onChange={onChange}
+                          size="small"
+                          fullWidth
+                          label="Current Pincode"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={8}>
+                    <FormGroup>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            onChange={handleCheckBoxClicked}
+                            checked={isCurrentSame}
+                          />
+                        }
+                        label="Visit address same as Current address"
+                      />
+                    </FormGroup>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="permanent_address"
+                      control={control}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <TextField
+                          size="small"
+                          fullWidth
+                          disabled={isCurrentSame}
+                          id="permanent_address"
+                          label="Visit Address"
+                          multiline
+                          rows={2}
+                          value={value}
+                          onChange={onChange}
+                        />
+                      )}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="permanent_state"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <Autocomplete
+                          disablePortal
+                          freeSolo
+                          disabled={isCurrentSame}
+                          id="permanent_state"
+                          options={state ? state : []}
+                          value={value}
+                          onChange={(event, item) => onChange(item)}
+                          size="small"
+                          fullWidth
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Visit State"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="permanent_city"
+                      control={control}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <Autocomplete
+                          disablePortal
+                          freeSolo
+                          disabled={isCurrentSame}
+                          id="permanent_city"
+                          options={visitState ? city[visitState] : []}
+                          value={value}
+                          onChange={(event, item) => onChange(item)}
+                          size="small"
+                          fullWidth
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Visit City"
+                              variant="outlined"
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Controller
+                      name="permanent_pincode"
+                      control={control}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <TextField
+                          id="permanent_pincode"
+                          disabled={isCurrentSame}
+                          value={value}
+                          onChange={onChange}
+                          size="small"
+                          fullWidth
+                          label="Visit Pincode"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                </Grid>
+              </fieldset>
             </CardContent>
             <Divider />
             <CardActions>

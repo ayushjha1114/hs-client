@@ -24,7 +24,7 @@ import NewTicket from "./modules/admin/NewTicket";
 const AppRoutes = (props) => {
   return (
     <Routes>
-      <Route path="/" element={<PublicPage />} />
+      <Route path="/" element={<WelcomePage />} />
       <Route path="amc-plans-details" element={<AMCPlanDetails />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="dashboard" element={<Dashboard />} />

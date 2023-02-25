@@ -12,13 +12,16 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Divider from "@mui/material/Divider";
 import { useGetUserByIdQuery } from "../../services/admin";
+import Helper from "../../util/helper";
 
 export default function RegisterUserModal(props) {
   const { show, onHide, forView, mobile, closeView, userId } = props;
 
   const { data, error, isLoading } = useGetUserByIdQuery(userId);
-
-  useEffect(() => {}, [forView, show]);
+  console.log(
+    "🚀 ~ file: RegisterUserModal.js:21 ~ RegisterUserModal ~ data:",
+    data
+  );
 
   const handleCancel = () => {
     onHide();
@@ -53,7 +56,7 @@ export default function RegisterUserModal(props) {
                     fullWidth
                     variant="standard"
                     defaultValue={
-                      forView ? data?.data?.rows?.userDetail?.first_name : ""
+                      forView ? data?.data?.userDetail?.first_name : ""
                     }
                     onChange={(e) => handleChange(e, "first_name")}
                   />
@@ -67,9 +70,9 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     defaultValue={
                       forView
-                        ? data?.data?.rows?.userDetail?.middle_name === null
+                        ? data?.data?.userDetail?.middle_name === null
                           ? ""
-                          : data?.data?.rows?.userDetail?.middle_name
+                          : data?.data?.userDetail?.middle_name
                         : ""
                     }
                     onChange={(e) => handleChange(e, "middle_name")}
@@ -84,9 +87,9 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     defaultValue={
                       forView
-                        ? data?.data?.rows?.userDetail?.last_name === null
+                        ? data?.data?.userDetail?.last_name === null
                           ? ""
-                          : data?.data?.rows?.userDetail?.last_name
+                          : data?.data?.userDetail?.last_name
                         : ""
                     }
                     onChange={(e) => handleChange(e, "last_name")}
@@ -102,9 +105,7 @@ export default function RegisterUserModal(props) {
                     type="email"
                     fullWidth
                     variant="standard"
-                    defaultValue={
-                      forView ? data?.data?.rows?.userDetail?.email : ""
-                    }
+                    defaultValue={forView ? data?.data?.userDetail?.email : ""}
                     onChange={(e) => handleChange(e, "email")}
                   />
                   <TextField
@@ -132,50 +133,38 @@ export default function RegisterUserModal(props) {
                     type="text"
                     fullWidth
                     variant="standard"
-                    defaultValue={
-                      forView ? data?.data?.rows?.userDetail?.mobile : ""
-                    }
+                    defaultValue={forView ? data?.data?.userDetail?.mobile : ""}
                     onChange={(e) => handleChange(e, "mobile_number")}
                   />
                   <TextField
                     id="date"
                     disabled={forView}
+                    margin="dense"
+                    variant="standard"
                     label="Date Of Birth"
-                    type="date"
-                    sx={{ width: 220 }}
+                    type="text"
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    onChange={(e) => handleChange(e, "dob")}
                     defaultValue={
                       forView
-                        ? data?.data?.rows?.userDetail?.date_of_birth === null
-                          ? "1997-05-24"
-                          : data?.data?.rows?.userDetail?.date_of_birth.split(
-                              "T"
-                            )[0]
-                        : "1997-05-24"
+                        ? data?.data?.userDetail?.date_of_birth === null
+                          ? "-"
+                          : data?.data?.userDetail?.date_of_birth.split("T")[0]
+                        : "-"
                     }
                   />
-                  <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel id="demo-simple-select-standard-label">
-                      Gender
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-standard-label"
-                      id="demo-simple-select-standard"
-                      onChange={(e) => handleChange(e, "gender")}
-                      label="Gender"
-                      defaultValue={
-                        forView ? data?.data?.rows?.userDetail?.gender : ""
-                      }
-                      disabled={forView}
-                    >
-                      <MenuItem value="male">Male</MenuItem>
-                      <MenuItem value="female">Female</MenuItem>
-                      <MenuItem value="other">Other</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <TextField
+                    required
+                    disabled={forView}
+                    margin="dense"
+                    id="Gender"
+                    label="Gender"
+                    type="text"
+                    variant="standard"
+                    value={forView ? data?.data?.userDetail?.gender : ""}
+                    onChange={(e) => handleChange(e, "mobile_number")}
+                  />
                 </div>
                 <div
                   className="registerModalBodyField"
@@ -189,36 +178,28 @@ export default function RegisterUserModal(props) {
                     type="text"
                     fullWidth
                     variant="standard"
-                    onChange={(e) => handleChange(e, "aadhaar")}
                     defaultValue={
+                      forView ? data?.data?.userDetail?.aadhaar_number : ""
+                    }
+                  />
+                  <TextField
+                    disabled={forView}
+                    margin="dense"
+                    id="name"
+                    label="User Type"
+                    type="text"
+                    // fullWidth
+                    variant="standard"
+                    value={
                       forView
-                        ? data?.data?.rows?.userDetail?.aadhaar_number
+                        ? Helper.transformUserType(data?.data?.userDetail?.role)
                         : ""
                     }
                   />
-                  <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                    <InputLabel id="demo-simple-select-standard-label">
-                      User Type
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-standard-label"
-                      id="demo-simple-select-standard"
-                      onChange={(e) => handleChange(e, "role")}
-                      label="User Type"
-                      defaultValue={
-                        forView ? data?.data?.rows?.userDetail?.role : ""
-                      }
-                      disabled={forView}
-                    >
-                      <MenuItem value="ADMIN">ADMIN</MenuItem>
-                      <MenuItem value="USER">USER</MenuItem>
-                      <MenuItem value="AMC">AMC</MenuItem>
-                      <MenuItem value="ENGINEER">ENGINEER</MenuItem>
-                    </Select>
-                  </FormControl>
                 </div>
               </div>
-              {data?.data?.rows?.userDetail?.role === "AMC" && (
+              {(data?.data?.userDetail?.role === "AMC" ||
+                data?.data?.userDetail?.role === "USER") && (
                 <>
                   <DialogContentText
                     className="registerModalContentText"
@@ -244,90 +225,112 @@ export default function RegisterUserModal(props) {
                         variant="standard"
                         defaultValue={
                           forView
-                            ? data?.data?.rows?.amcDetail?.company_name === null
-                              ? ""
-                              : data?.data?.rows?.amcDetail?.company_name
-                            : ""
+                            ? data?.data?.userDetail?.company_name === "null"
+                              ? "-"
+                              : data?.data?.userDetail?.company_name
+                            : "-"
                         }
                         onChange={(e) => handleChange(e, "company_name")}
                       />
                       <TextField
                         id="date"
                         label="Date of Registration"
-                        type="date"
-                        disabled={forView}
-                        sx={{ width: 220 }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        onChange={(e) =>
-                          handleChange(e, "date_of_registration")
-                        }
-                        defaultValue={
-                          forView
-                            ? data?.data?.rows?.amcDetail?.date_of_registration.split(
-                                "T"
-                              )[0]
-                            : "1997-05-24"
-                        }
-                      />
-                      <TextField
-                        id="date"
-                        label="Plan Activation Date"
-                        type="date"
-                        disabled={forView}
-                        sx={{ width: 220 }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        onChange={(e) =>
-                          handleChange(e, "plan_activation_date")
-                        }
-                        defaultValue={
-                          forView
-                            ? data?.data?.rows?.amcDetail?.plan_activation_date.split(
-                                "T"
-                              )[0]
-                            : "1997-05-24"
-                        }
-                      />
-                    </div>
-                    <div
-                      className="registerModalBodyField"
-                      style={{ marginTop: "15px" }}
-                    >
-                      <TextField
-                        margin="dense"
-                        id="name"
-                        label="User Plan"
                         type="text"
                         disabled={forView}
-                        fullWidth
+                        margin="dense"
                         variant="standard"
-                        defaultValue={
-                          forView ? data?.data?.rows?.amcDetail?.user_plan : ""
-                        }
-                        onChange={(e) => handleChange(e, "user_plan")}
-                      />
-                      <TextField
-                        id="date"
-                        label="Plan Expired Date"
-                        type="date"
-                        disabled={forView}
-                        sx={{ width: 220 }}
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => handleChange(e, "plan_expired_date")}
                         defaultValue={
                           forView
-                            ? data?.data?.rows?.amcDetail?.plan_expired_date.split(
+                            ? data?.data?.userDetail?.date_of_registration.split(
                                 "T"
                               )[0]
-                            : "1997-05-24"
+                            : "-"
                         }
                       />
+                      {data?.data?.userDetail?.role === "AMC" && (
+                        <>
+                          <TextField
+                            id="date"
+                            label="Plan Activation Date"
+                            type="text"
+                            disabled={forView}
+                            margin="dense"
+                            variant="standard"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            defaultValue={
+                              forView
+                                ? data?.data?.userDetail?.amcDetail?.plan_activation_date.split(
+                                    "T"
+                                  )[0]
+                                : "-"
+                            }
+                          />
+                          <TextField
+                            id="date"
+                            margin="dense"
+                            label="Plan Expired Date"
+                            type="text"
+                            disabled={forView}
+                            variant="standard"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            value={
+                              forView
+                                ? data?.data?.userDetail?.amcDetail?.plan_expired_date.split(
+                                    "T"
+                                  )[0]
+                                : "-"
+                            }
+                          />
+                        </>
+                      )}
                     </div>
+                    {data?.data?.userDetail?.role === "AMC" && (
+                      <div
+                        className="registerModalBodyField"
+                        style={{ marginTop: "15px" }}
+                      >
+                        <TextField
+                          margin="dense"
+                          id="name"
+                          label="User Plan"
+                          type="text"
+                          disabled={forView}
+                          fullWidth
+                          variant="standard"
+                          defaultValue={
+                            forView
+                              ? data?.data?.userDetail?.amcDetail?.user_plan !==
+                                "null"
+                                ? data?.data?.userDetail?.amcDetail?.user_plan
+                                : "-"
+                              : "-"
+                          }
+                        />
+                        <TextField
+                          margin="dense"
+                          id="name"
+                          label="Device"
+                          type="text"
+                          disabled={forView}
+                          fullWidth
+                          variant="standard"
+                          defaultValue={
+                            forView
+                              ? JSON.parse(
+                                  data?.data?.userDetail?.amcDetail?.device
+                                ).toString()
+                              : ""
+                          }
+                        />
+                      </div>
+                    )}
                     <div
                       className="registerModalBodyField"
                       style={{ marginTop: "15px" }}
@@ -341,9 +344,12 @@ export default function RegisterUserModal(props) {
                         variant="standard"
                         disabled={forView}
                         defaultValue={
-                          forView ? data?.data?.rows?.amcDetail?.gst_number : ""
+                          forView
+                            ? data?.data?.userDetail?.gst_number !== "null"
+                              ? data?.data?.userDetail?.gst_number
+                              : "-"
+                            : "-"
                         }
-                        onChange={(e) => handleChange(e, "gst_number")}
                       />
                       <TextField
                         margin="dense"
@@ -354,32 +360,89 @@ export default function RegisterUserModal(props) {
                         variant="standard"
                         disabled={forView}
                         defaultValue={
-                          forView ? data?.data?.rows?.amcDetail?.pan_number : ""
+                          forView
+                            ? data?.data?.userDetail?.pan_number !== "null"
+                              ? data?.data?.userDetail?.pan_number
+                              : "-"
+                            : "-"
                         }
-                        onChange={(e) => handleChange(e, "pan_number")}
                       />
-                      <FormControl
+                    </div>
+                    <div
+                      className="registerModalBodyField"
+                      style={{ marginTop: "15px" }}
+                    >
+                      <TextField
+                        margin="dense"
+                        id="name"
+                        label="Director Email"
+                        type="text"
+                        fullWidth
                         variant="standard"
-                        sx={{ m: 1, minWidth: 120 }}
-                      >
-                        <InputLabel id="demo-simple-select-standard-label">
-                          Device
-                        </InputLabel>
-                        <Select
-                          labelId="demo-simple-select-standard-label"
-                          id="demo-simple-select-standard"
-                          onChange={(e) => handleChange(e, "device")}
-                          label="Gender"
-                          disabled={forView}
-                          defaultValue={
-                            forView ? data?.data?.rows?.amcDetail?.device : ""
-                          }
-                        >
-                          <MenuItem value="desktop">Desktop</MenuItem>
-                          <MenuItem value="laptop">Laptop</MenuItem>
-                          <MenuItem value="other">Other</MenuItem>
-                        </Select>
-                      </FormControl>
+                        disabled={forView}
+                        defaultValue={
+                          forView
+                            ? data?.data?.userDetail?.director_email !== "null"
+                              ? data?.data?.userDetail?.director_email
+                              : "-"
+                            : "-"
+                        }
+                      />
+                      <TextField
+                        margin="dense"
+                        id="name"
+                        label="Admin Email"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        disabled={forView}
+                        defaultValue={
+                          forView
+                            ? data?.data?.userDetail?.admin_email !== "null"
+                              ? data?.data?.userDetail?.admin_email
+                              : "-"
+                            : "-"
+                        }
+                      />
+                    </div>
+                    <div
+                      className="registerModalBodyField"
+                      style={{ marginTop: "15px" }}
+                    >
+                      <TextField
+                        margin="dense"
+                        id="name"
+                        label="Contact Person Name"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        disabled={forView}
+                        defaultValue={
+                          forView
+                            ? data?.data?.userDetail?.contact_person_name !==
+                              "null"
+                              ? data?.data?.userDetail?.contact_person_name
+                              : "-"
+                            : "-"
+                        }
+                      />
+                      <TextField
+                        margin="dense"
+                        id="name"
+                        label="Contact Person Number"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        disabled={forView}
+                        defaultValue={
+                          forView
+                            ? data?.data?.userDetail?.contact_person_number !==
+                              "null"
+                              ? data?.data?.userDetail?.contact_person_number
+                              : "-"
+                            : "-"
+                        }
+                      />
                     </div>
                   </div>
                 </>
@@ -403,7 +466,7 @@ export default function RegisterUserModal(props) {
                   fullWidth
                   onChange={(e) => handleChange(e, "current_address")}
                   defaultValue={
-                    forView ? data?.data?.rows?.userDetail?.current_address : ""
+                    forView ? data?.data?.userDetail?.current_address : ""
                   }
                 />
                 <div className="registerModalBodyField">
@@ -417,7 +480,7 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     onChange={(e) => handleChange(e, "current_city")}
                     defaultValue={
-                      forView ? data?.data?.rows?.userDetail?.current_city : ""
+                      forView ? data?.data?.userDetail?.current_city : ""
                     }
                   />
                   <TextField
@@ -430,7 +493,7 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     onChange={(e) => handleChange(e, "current_state")}
                     defaultValue={
-                      forView ? data?.data?.rows?.userDetail?.current_state : ""
+                      forView ? data?.data?.userDetail?.current_state : ""
                     }
                   />
                   <TextField
@@ -443,9 +506,7 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     onChange={(e) => handleChange(e, "current_pincode")}
                     defaultValue={
-                      forView
-                        ? data?.data?.rows?.userDetail?.current_pincode
-                        : ""
+                      forView ? data?.data?.userDetail?.current_pincode : ""
                     }
                   />
                 </div>
@@ -460,9 +521,7 @@ export default function RegisterUserModal(props) {
                   fullWidth
                   onChange={(e) => handleChange(e, "permanent_address")}
                   defaultValue={
-                    forView
-                      ? data?.data?.rows?.userDetail?.permanent_address
-                      : ""
+                    forView ? data?.data?.userDetail?.permanent_address : ""
                   }
                 />
                 <div className="registerModalBodyField">
@@ -476,9 +535,7 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     onChange={(e) => handleChange(e, "permanent_city")}
                     defaultValue={
-                      forView
-                        ? data?.data?.rows?.userDetail?.permanent_city
-                        : ""
+                      forView ? data?.data?.userDetail?.permanent_city : ""
                     }
                   />
                   <TextField
@@ -491,9 +548,7 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     onChange={(e) => handleChange(e, "permanent_state")}
                     defaultValue={
-                      forView
-                        ? data?.data?.rows?.userDetail?.permanent_state
-                        : ""
+                      forView ? data?.data?.userDetail?.permanent_state : ""
                     }
                   />
                   <TextField
@@ -506,9 +561,7 @@ export default function RegisterUserModal(props) {
                     variant="standard"
                     onChange={(e) => handleChange(e, "permanent_pincode")}
                     defaultValue={
-                      forView
-                        ? data?.data?.rows?.userDetail?.permanent_pincode
-                        : ""
+                      forView ? data?.data?.userDetail?.permanent_pincode : ""
                     }
                   />
                 </div>

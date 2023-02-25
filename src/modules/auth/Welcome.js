@@ -1,5 +1,5 @@
 import React from "react";
-import { Carousel } from "antd";
+import PublicPage from "../../layout/PublicLayout";
 
 let WelcomePage = () => {
   const contentStyle = {
@@ -12,31 +12,23 @@ let WelcomePage = () => {
 
   return (
     <>
-      <div className="homeBody">
-        <h2>Communicate. Collaborate. Create.</h2>
-        <p>
-          XYZ provides an effective and powerful way to manage your projects
-        </p>
-      </div>
-      {/* <div className="homeCarousel"> 
-        <Carousel autoplay dots='false'>
-          <div>
-            <h3 style={contentStyle}>              
-              <i class="fa-brands fa-square-facebook"></i> &nbsp;
-              <i class="fa-brands fa-instagram"></i> &nbsp;
-            </h3>
+      <PublicPage>
+        <div className="homeContainer">
+          <img
+            src="assets/images/home.png"
+            alt=""
+            style={{ maxWidth: "100%", height: "auto", marginBottom: "20px" }}
+          />
+          <div className="homeBody">
+            <h2 style={{ color: '#ffffff', fontSize: '2rem' }}>Affordable And Reliable IT Solution.</h2>
+            <p>
+              DGSOFT is one of the fastest growing organization in distribution
+              of total it solutions. We offer wide range of Hardware & Software
+              solutions.
+            </p>
           </div>
-          <div>
-            <h3 style={contentStyle}>2</h3>
-          </div>
-          <div>
-            <h3 style={contentStyle}>3</h3>
-          </div>
-          <div>
-            <h3 style={contentStyle}>4</h3>
-          </div>
-        </Carousel>
-      </div> */}
+        </div>
+      </PublicPage>
     </>
   );
 };

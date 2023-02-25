@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { Tag } from "antd";
 import UserLayout from "../../layout/User";
@@ -10,11 +10,14 @@ import Check from "@mui/icons-material/Check";
 import Divider from "@mui/material/Divider";
 import TicketModal from "./TicketModal";
 import PaymentConfirmationModal from "./PaymentConfirmationModal";
-import { Card, CardHeader, Button } from "@mui/material";
+import { Card, CardHeader, Button, Chip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridActionsCellItem, GridToolbar } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Helper from "../../util/helper";
 import {
   SET_USER_LIST,
   SET_SERVICE_LIST,
@@ -34,16 +37,25 @@ import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp
 import NorthIcon from "@mui/icons-material/North";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import SouthIcon from "@mui/icons-material/South";
-import { EyeTwoTone } from "@ant-design/icons";
 import TicketViewModal from "./TicketViewModal";
 import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
 
 const Tickets = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { data: userData } = useGetAllUserQuery({ limit: 10, offset: 0 });
+  const paymentDetailDataList = useSelector(
+    (state) => state.admin.paymentDetailList
+  );
+
+  const { data: userData } = useGetAllUserQuery({
+    limit: 99999999999,
+    offset: 0,
+  });
   const { data: serviceData } = useGetAllServiceQuery();
-  const { data: brandData } = useGetAllBrandQuery({ limit: 10, offset: 0 });
+  const { data: brandData } = useGetAllBrandQuery({
+    limit: 9999999999,
+    offset: 0,
+  });
 
   const [updateTicket] = useUpdateTicketMutation();
 
@@ -55,7 +67,6 @@ const Tickets = () => {
   const [paymentModalShow, setPaymentModalShow] = useState(false);
   const [ticketId, setTicketId] = useState("");
   const [forPaymentModalEdit, setForPaymentModalEdit] = useState(false);
-  const [paymentUpdatedAtList, setPaymentUpdatedAtList] = useState([]);
   const [paymentStatusList, setPaymentStatusList] = useState([]);
   const [ticketViewModalShow, setTicketViewModalShow] = useState(false);
   const [ticketDetailForView, setTicketDetailForView] = useState({});
@@ -66,14 +77,15 @@ const Tickets = () => {
     isLoading: isPaymentLoading,
     refetch: paymentRefetch,
   } = useGetAllPaymentDetailQuery({
-    limit: rowsPerPage,
-    offset: page * rowsPerPage,
+    limit: 9999999999999,
+    offset: 0,
   });
 
   const { data, error, isLoading, refetch } = useGetAllTicketQuery({
-    limit: rowsPerPage,
-    offset: page * rowsPerPage,
+    limit: 999999999999,
+    offset: 0,
   });
+  console.log("🚀 ~ file: Tickets.js:88 ~ Tickets ~ data:", data);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -85,6 +97,54 @@ const Tickets = () => {
   };
 
   const open = Boolean(anchorEl);
+
+  const colorCombination = {
+    green: "success",
+    red: "default",
+    orange: "warning",
+    blue: "info",
+  };
+
+  useEffect(() => {
+    refetch();
+    paymentRefetch();
+    if (data?.data?.rows?.length > 0) {
+      let refinedPaymentStatusList = [];
+      data.data.rows.map((item) => {
+        const status = paymentDetailDataList
+          .map((payment) => {
+            if (payment.ticket_id === item.id) {
+              return payment.payment_status;
+            }
+          })
+          .filter((item) => item);
+        refinedPaymentStatusList.push({ id: item.id, status: status });
+      });
+      setPaymentStatusList(refinedPaymentStatusList);
+    }
+  }, [paymentModalShow, forPaymentModalEdit]);
+
+  useEffect(() => {
+    refetch();
+    paymentRefetch();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      dispatch(SET_LOADING({ data: true }));
+    } else if (error) {
+      dispatch(SET_LOADING({ data: false }));
+      dispatch(
+        SET_SNACKBAR({
+          open: true,
+          message: "Technical Error",
+          variant: "error",
+        })
+      );
+    } else if (data) {
+      dispatch(SET_LOADING({ data: false }));
+    }
+  }, [data, isLoading, error]);
 
   const handleClick = ({ event, id, status, priority, statusColor }) => {
     setTicketId(id);
@@ -168,10 +228,11 @@ const Tickets = () => {
     dispatch(SET_AMC_LIST({ data: userData?.data?.amcList }));
     dispatch(SET_BRAND_LIST({ data: brandData?.data?.rows }));
     dispatch(SET_SERVICE_LIST({ data: serviceData?.data?.rows }));
-    setTicketModalShow(true);
+    navigate("/admin/new-ticket");
+    // setTicketModalShow(true);
   };
 
-  const handlePaymentStatus = (ticketId, status) => {
+  const handlePaymentStatus = (status) => {
     dispatch(SET_PAYMENT_DETAIL_LIST({ data: paymentData?.data?.rows }));
     setPaymentModalShow(true);
     if (status === "Closed") {
@@ -180,34 +241,49 @@ const Tickets = () => {
     }
   };
 
-  // const handleEditBtn = useCallback((user) => () => {
-  //   navigate("/admin/register-user", {
-  //     state: {
-  //       mobile: user.mobile,
-  //       forEdit: true,
-  //       id: user.id,
-  //     },
-  //   });
-  // });
+  const modifiedTicketDataForEditView = (rowData) => {
+    let modifiedTicketData = Object.assign({}, rowData);
+    if (Helper.isJson(modifiedTicketData.address)) {
+      modifiedTicketData.address = JSON.parse(modifiedTicketData.address);
+    } else {
+      modifiedTicketData.address = modifiedTicketData.address;
+    }
+
+    let final = { ...modifiedTicketData };
+    data.data.paymentDetailList.map((payment) => {
+      if (modifiedTicketData.id === payment.ticket_id) {
+        final = {
+          ...payment,
+          ...modifiedTicketData,
+          invoice_remark: payment.remark,
+        };
+      }
+    });
+    return final;
+  };
+
+  const handleEditBtn = useCallback((rowData) => () => {
+    dispatch(SET_USER_LIST({ data: userData?.data?.rows }));
+    dispatch(SET_AMC_LIST({ data: userData?.data?.amcList }));
+    dispatch(SET_BRAND_LIST({ data: brandData?.data?.rows }));
+    dispatch(SET_SERVICE_LIST({ data: serviceData?.data?.rows }));
+    const modifiedDetail = modifiedTicketDataForEditView(rowData);
+    setTicketDetailForView(modifiedDetail);
+    navigate("/admin/new-ticket", {
+      state: {
+        forEdit: true,
+        id: rowData.id,
+        editData: modifiedDetail,
+      },
+    });
+  });
 
   useEffect(() => {
     if (data?.data?.rows?.length > 0) {
       dispatch(
         SET_PAYMENT_DETAIL_LIST({ data: data?.data?.paymentDetailList })
       );
-      let refinedUpdatedAtList = [];
       let refinedPaymentStatusList = [];
-      data.data.rows.map((item) => {
-        const date = data.data.paymentDetailList
-          .map((payment) => {
-            if (payment.ticket_id === item.id) {
-              return payment.updatedAt;
-            }
-          })
-          .filter((item) => item);
-        refinedUpdatedAtList.push(date[0]);
-      });
-      setPaymentUpdatedAtList(refinedUpdatedAtList);
       data.data.rows.map((item) => {
         const status = data.data.paymentDetailList
           .map((payment) => {
@@ -216,7 +292,7 @@ const Tickets = () => {
             }
           })
           .filter((item) => item);
-        refinedPaymentStatusList.push(status[0]);
+        refinedPaymentStatusList.push({ id: item.id, status: status });
       });
       setPaymentStatusList(refinedPaymentStatusList);
     }
@@ -224,22 +300,38 @@ const Tickets = () => {
 
   const handleViewBtn = (ticketData) => {
     dispatch(SET_USER_LIST({ data: userData?.data?.rows }));
-    let final = { ...ticketData };
-    data.data.paymentDetailList.map((payment) => {
-      if (ticketData.id === payment.ticket_id) {
-        final = { ...payment, ...ticketData };
-      }
-    });
-    setTicketDetailForView(final);
+    const modifiedDetail = modifiedTicketDataForEditView(ticketData);
+    setTicketDetailForView(modifiedDetail);
     setTicketViewModalShow(true);
   };
 
-  const changePriorityIcon = (priority) => {
+  const getPaymentStatus = (id, paymentStatusList) => {
+    let result = "-";
+    paymentStatusList.map((payment) => {
+      if (id === payment.id) {
+        result = payment.status.length > 0 ? payment.status[0] : "-";
+      }
+    });
+    return result;
+  };
+
+  const selectPaymentUpdatedAt = (paymentData, index) => {
+    let result = "";
+    paymentData.map((payment) => {
+      if (payment.ticket_id === index) {
+        result = payment.updatedAt;
+      }
+    });
+    return result;
+  };
+
+  const changePriorityIcon = (priority, ticket_number) => {
     let priorityIcon = "";
     switch (priority) {
       case "URGENT":
         priorityIcon = (
           <div>
+            {ticket_number}{" "}
             <KeyboardDoubleArrowUpIcon className="priority-urgent" />
           </div>
         );
@@ -247,13 +339,14 @@ const Tickets = () => {
       case "HIGH":
         priorityIcon = (
           <div>
-            <NorthIcon className="priority-high" />
+            {ticket_number} <NorthIcon className="priority-high" />
           </div>
         );
         break;
       case "MEDIUM":
         priorityIcon = (
           <div>
+            {ticket_number}{" "}
             <FiberManualRecordIcon className="priority-medium" />
           </div>
         );
@@ -261,7 +354,7 @@ const Tickets = () => {
       default:
         priorityIcon = (
           <div>
-            <SouthIcon className="priority-low" />
+            {ticket_number} <SouthIcon className="priority-low" />
           </div>
         );
     }
@@ -269,16 +362,26 @@ const Tickets = () => {
   };
 
   const columns = React.useMemo(() => [
-    { field: "ticket_number", headerName: "Ticket Number", width: 150 },
+    {
+      field: "ticket_number",
+      headerName: "Ticket Number",
+      width: 150,
+      renderCell: (params) => {
+        return changePriorityIcon(
+          params.row.priority,
+          params.row.ticket_number
+        );
+      },
+    },
     {
       field: "customer",
       headerName: "Customer",
-      width: 400,
+      width: 250,
     },
     {
       field: "customer_plan",
       headerName: "User Plan",
-      width: 200,
+      width: 100,
       renderCell: (params) => {
         return params.row.customer_plan ? params.row.customer_plan : "-";
       },
@@ -299,18 +402,22 @@ const Tickets = () => {
       headerName: "Status",
       width: 150,
       renderCell: (params) => {
-        return <Tag color={params.row.status_color}>{params.row.status}</Tag>;
+        return (
+          <Chip
+            label={params.row.status}
+            color={colorCombination[params.row.status_color]}
+          />
+        );
+        // <Tag color={params.row.status_color}>{params.row.status}</Tag>;
       },
     },
 
     {
       field: "payment_status",
       headerName: "Payment Status",
-      width: 150,
+      width: 120,
       renderCell: (params) => {
-        return paymentStatusList[params.row.id]
-          ? paymentStatusList[params.row.id]
-          : "-";
+        return getPaymentStatus(params.row.id, paymentStatusList);
       },
     },
     {
@@ -326,7 +433,16 @@ const Tickets = () => {
       headerName: "Last Modified",
       width: 150,
       renderCell: (params) => {
-        return moment(params.row.updatedAt).fromNow();
+        return moment(
+          Helper.getNewestData(
+            params.row.updatedAt,
+            selectPaymentUpdatedAt(
+              data.data.paymentDetailList ? data.data.paymentDetailList : [],
+              params.row.id
+            )
+          )
+        ).fromNow();
+        // return moment(params.row.updatedAt).fromNow();
       },
     },
 
@@ -336,6 +452,14 @@ const Tickets = () => {
       type: "actions",
       width: 100,
       getActions: (params) => [
+        <GridActionsCellItem
+          icon={<ModeEditIcon color="primary" />}
+          label="Edit Details"
+          onClick={handleEditBtn(params.row)}
+        />,
+        <a onClick={() => handleViewBtn(params.row)}>
+          <VisibilityIcon color="primary" />
+        </a>,
         <a
           className="ticket-ellipsis-btn"
           onClick={(e) =>
@@ -348,10 +472,7 @@ const Tickets = () => {
             })
           }
         >
-          <i class="fa-solid fa-ellipsis"></i>
-        </a>,
-        <a onClick={() => handleViewBtn(params.row)}>
-          <EyeTwoTone />
+          <MoreHorizIcon color="primary" />
         </a>,
         <Menu
           id="basic-menu"
@@ -456,7 +577,7 @@ const Tickets = () => {
           <Divider />
           <MenuItem
             disabled={status !== "Closed"}
-            onClick={() => handlePaymentStatus(params.row.id, status)}
+            onClick={() => handlePaymentStatus(status)}
           >
             Payment Status
           </MenuItem>
@@ -498,20 +619,33 @@ const Tickets = () => {
               </Button>
             }
           ></CardHeader>
-          {error ? (
-            <>Oh no, there was an error</>
-          ) : isLoading ? (
-            <>Loading...</>
-          ) : (
+          {data ? (
             <>
               <DataGrid
                 sx={{
                   height: "calc(100vh - 180px)",
                 }}
+                initialState={{
+                  filter: {
+                    filterModel: {
+                      items: [
+                        {
+                          columnField: "status",
+                          operatorValue: "isAnyOf",
+                          value: ["Open", "On Hold", "Pending"],
+                        },
+                      ],
+                    },
+                  },
+                }}
                 columns={columns}
                 rows={data.data.rows}
                 components={{ Toolbar: GridToolbar }}
               />
+            </>
+          ) : (
+            <>
+              <h2>No Tickets Found</h2>
             </>
           )}
 

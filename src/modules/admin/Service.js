@@ -9,11 +9,12 @@ import { Card, CardHeader, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { DataGrid, GridActionsCellItem, GridToolbar } from "@mui/x-data-grid";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
 
 const Service = () => {
   const dispatch = useDispatch();
   const serviceList = useSelector((state) => state.admin.serviceList);
-  const { data, error, isLoading } = useGetAllServiceQuery();
+  const { data, error, isLoading, refetch } = useGetAllServiceQuery();
 
   const [serviceModalShow, setServiceModalShow] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -47,7 +48,29 @@ const Service = () => {
 
   useEffect(() => {
     dispatch(SET_SERVICE_LIST({ data: data?.data?.rows }));
-  }, [data, isEdit]);
+    refetch();
+  }, [data, isEdit, isModalOpen]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      dispatch(SET_LOADING({ data: true }));
+    } else if (error) {
+      dispatch(SET_LOADING({ data: false }));
+      dispatch(
+        SET_SNACKBAR({
+          open: true,
+          message: "Technical Error",
+          variant: "error",
+        })
+      );
+    } else if (data) {
+      dispatch(SET_LOADING({ data: false }));
+    }
+  }, [data, isLoading, error]);
 
   const getCombineServiceProvideDescription = (service) => {
     let result = "";
@@ -74,14 +97,14 @@ const Service = () => {
         );
       },
     },
-    {
-      field: "service_type",
-      headerName: "Service Type",
-      width: 100,
-      renderCell: (params) => {
-        return Helper.removeCommaFromServiceType(params.row.service_type);
-      },
-    },
+    // {
+    //   field: "service_type",
+    //   headerName: "Service Type",
+    //   width: 100,
+    //   renderCell: (params) => {
+    //     return Helper.removeCommaFromServiceType(params.row.service_type);
+    //   },
+    // },
     {
       field: "actions",
       headerName: "Actions",
@@ -121,11 +144,7 @@ const Service = () => {
             }
           ></CardHeader>
 
-          {error ? (
-            <>Oh no, there was an error</>
-          ) : isLoading ? (
-            <>Loading...</>
-          ) : data ? (
+          {data ? (
             <>
               <DataGrid
                 sx={{
@@ -137,7 +156,9 @@ const Service = () => {
               />
             </>
           ) : (
-            <></>
+            <>
+              <h2>No Service Found</h2>
+            </>
           )}
         </Card>
       </UserLayout>

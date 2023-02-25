@@ -23,6 +23,7 @@ import {
   useCreateServiceMutation,
   useUpdateServiceDetailMutation,
   useGetServiceByIdQuery,
+  useGetAllServiceQuery
 } from "../../services/admin";
 import { useDispatch } from "react-redux";
 import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
@@ -85,6 +86,7 @@ export default function NewServiceModal(props) {
     values: serviceDetail,
   });
   const { data, error, isLoading } = useGetServiceByIdQuery(serviceId);
+  const { refetch } = useGetAllServiceQuery(); 
   console.log(data);
   const serviceTypes = [
     { name: "ON-SITE", value: "ON-SITE" },
@@ -114,6 +116,7 @@ export default function NewServiceModal(props) {
           variant: "success",
         })
       );
+      refetch()
       onHide();
     } else {
       dispatch(SET_LOADING({ data: false }));
@@ -165,8 +168,12 @@ export default function NewServiceModal(props) {
                       id="name"
                       size="small"
                       fullWidth
+                      autoFocus
                       label="Service Name"
                       value={value}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
                       variant="outlined"
                       error={!!error}
                       helperText={error?.message}
@@ -199,6 +206,9 @@ export default function NewServiceModal(props) {
                       size="small"
                       fullWidth
                       id="description"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
                       label="Service Description"
                       multiline
                       error={!!error}

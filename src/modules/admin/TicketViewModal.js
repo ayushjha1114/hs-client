@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogTitle,
   Divider,
+  Typography,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
@@ -15,10 +16,9 @@ import Helper from "../../util/helper";
 
 export default function TicketViewModal(props) {
   const { show, onHide, data } = props;
+
   const [defaultUserDetail, setDefaultUserDetail] = useState({});
-  const [isOnsite, setIsOnsite] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
-  const [isPickDrop, setIsPickDrop] = useState(false);
+  const [visitAddress, setVisitAddress] = useState("");
 
   const userList = useSelector((state) => state.admin.userList);
   useEffect(() => {
@@ -27,23 +27,18 @@ export default function TicketViewModal(props) {
         setDefaultUserDetail(item);
       }
     });
-    if (Object.keys(data).length > 0) {
-      JSON.parse(data?.service_type).map((type) => {
-        if (type === "ON-SITE") {
-          setIsOnsite(true);
-        } else if (type === "ONLINE") {
-          setIsOnline(true);
-        } else if (type === "PICK AND DROP") {
-          setIsPickDrop(true);
-        }
-      });
+    if (typeof data?.address === "object") {
+      setVisitAddress(
+        `${data?.address?.visit_address ? data?.address?.visit_address : ""} ${
+          data?.address?.visit_city ? data?.address?.visit_city : ""
+        } ${data?.address?.visit_state ? data?.address?.visit_state : ""} ${
+          data?.address?.visit_pincode ? data?.address?.visit_pincode : ""
+        }`
+      );
     }
   }, [show]);
 
   const handleCancel = () => {
-    setIsOnsite(false);
-    setIsOnline(false);
-    setIsPickDrop(false);
     onHide();
   };
 
@@ -58,7 +53,7 @@ export default function TicketViewModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="mobile"
+                id="customer"
                 label="Customer"
                 type="text"
                 fullWidth
@@ -71,7 +66,7 @@ export default function TicketViewModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="mobile"
+                id="parent_service"
                 label="Parent Service"
                 type="text"
                 fullWidth
@@ -81,26 +76,25 @@ export default function TicketViewModal(props) {
                 }}
                 value={data?.parent_service}
               />
-            </div>
-            <div className="registerModalBodyField">
-              <FormControlLabel
-                control={<Checkbox checked={isOnsite} disabled />}
-                label="ON-SITE"
-              />
-              <FormControlLabel
-                control={<Checkbox checked={isOnline} disabled />}
-                label="ONLINE"
-              />
-              <FormControlLabel
-                control={<Checkbox checked={isPickDrop} disabled />}
-                label="PICK AND DROP"
+              <TextField
+                disabled
+                margin="dense"
+                id="service_type"
+                label="Service Type"
+                type="text"
+                fullWidth
+                variant="standard"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={data?.service_type}
               />
             </div>
             <div className="registerModalBodyField">
               <TextField
                 disabled
                 margin="dense"
-                id="mobile"
+                id="brand"
                 label="Brand"
                 type="text"
                 fullWidth
@@ -113,7 +107,7 @@ export default function TicketViewModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="name"
+                id="serial_number"
                 label="Serial Number"
                 type="text"
                 fullWidth
@@ -125,7 +119,7 @@ export default function TicketViewModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="name"
+                id="model_number"
                 label="Model number"
                 type="text"
                 fullWidth
@@ -138,7 +132,7 @@ export default function TicketViewModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="mobile"
+                id="service_provided"
                 label="Service Provide"
                 type="text"
                 fullWidth
@@ -153,7 +147,7 @@ export default function TicketViewModal(props) {
               <TextField
                 style={{ marginTop: "8px" }}
                 disabled
-                id="standard-textarea"
+                id="standard-description"
                 label="Description"
                 variant="standard"
                 fullWidth
@@ -162,7 +156,7 @@ export default function TicketViewModal(props) {
               <TextField
                 disabled
                 margin="dense"
-                id="mobile"
+                id="priority"
                 label="Priority"
                 type="text"
                 fullWidth
@@ -265,6 +259,18 @@ export default function TicketViewModal(props) {
                     }}
                     value={data?.invoice_date}
                   />
+                  <TextField
+                    disabled
+                    id="name"
+                    label="Invoice Remark"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    value={data?.invoice_remark}
+                  />
                 </>
               )}
             </div>
@@ -325,7 +331,7 @@ export default function TicketViewModal(props) {
               InputLabelProps={{
                 shrink: true,
               }}
-              value={data?.address}
+              value={visitAddress}
             />
           </div>
         </DialogContent>

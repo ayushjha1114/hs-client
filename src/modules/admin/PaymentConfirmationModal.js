@@ -20,9 +20,9 @@ import {
   useUpdatePaymentDetailMutation,
   useGetAllTicketQuery,
 } from "../../services/admin";
-import { notification } from "antd";
 import Helper from "../../util/helper";
 import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
+import { SET_PAYMENT_DETAIL_LIST } from "./adminSlice";
 
 export default function PaymentConfirmationModal(props) {
   const dispatch = useDispatch();
@@ -33,9 +33,9 @@ export default function PaymentConfirmationModal(props) {
   );
   const [savePaymentDetail] = useSavePaymentDetailMutation();
   const [updatePaymentDetail] = useUpdatePaymentDetailMutation();
-  const { refetch } = useGetAllPaymentDetailQuery({ limit: 10, offset: 0 });
+  const { refetch } = useGetAllPaymentDetailQuery({ limit: 9999999999, offset: 0 });
   const { refetch: refetchAllTicket } = useGetAllTicketQuery({
-    limit: 10,
+    limit: 999999999999999999,
     offset: 0,
   });
 
@@ -72,7 +72,9 @@ export default function PaymentConfirmationModal(props) {
         ...data,
         id: ticketId,
       });
+      console.log("🚀 ~ file: PaymentConfirmationModal.js:75 ~ handleSubmit ~ response:", response)
       if (response?.data?.success) {
+        dispatch(SET_PAYMENT_DETAIL_LIST({data: response.data.data.rows}))
         dispatch(SET_LOADING({ data: false }));
         dispatch(
           SET_SNACKBAR({
@@ -150,6 +152,7 @@ export default function PaymentConfirmationModal(props) {
           ticket_id: ticketId,
         });
         if (response?.data?.success) {
+          dispatch(SET_PAYMENT_DETAIL_LIST({data: response.data.data.rows}))
           dispatch(SET_LOADING({ data: false }));
           dispatch(
             SET_SNACKBAR({
@@ -270,6 +273,7 @@ export default function PaymentConfirmationModal(props) {
                   <MenuItem value="Paid">Paid</MenuItem>
                   <MenuItem value="Unpaid">Unpaid</MenuItem>
                   <MenuItem value="AMC">AMC</MenuItem>
+                  <MenuItem value="Warranty">Warranty</MenuItem>
                 </Select>
               </FormControl>
             </div>
