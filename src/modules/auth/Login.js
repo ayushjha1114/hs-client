@@ -325,7 +325,7 @@ console.log(data);
     <ThemeProvider theme={theme}>
       
       <Container  maxWidth="sm">
-      <Card sx={{mt:8,mr:8,mb:2,ml:8 ,borderRadius:2}} >
+      <Card sx={{mt:8,mr:8,mb:2,ml:8 ,borderRadius:2,boxShadow: 5 }} >
       <Container  maxWidth="xs">
         <Box
           sx={{
