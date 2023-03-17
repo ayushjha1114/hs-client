@@ -70,6 +70,8 @@ const NewTicket = (props) => {
   const [ticket, setTicket] = React.useState({});
   const [forEdit, setForEdit] = useState(location?.state?.forEdit);
   const [id, setId] = useState(location?.state?.id);
+  const [engineerEmail, setEngineerEmail] = useState('');
+  const [customerId, setCustomerId] = useState("");
 
   const [getUserListBySearch] = useGetUserListBySearchMutation();
 
@@ -137,6 +139,8 @@ const NewTicket = (props) => {
       finalTicketData.mobile = defaultUserDetail.mobile;
       finalTicketData.address = JSON.stringify(finalTicketData.address);
       finalTicketData.customer_plan = defaultUserDetail?.amc?.user_plan ? defaultUserDetail?.amc?.user_plan : '';
+      finalTicketData.engineerEmail = engineerEmail;
+      finalTicketData.customerId = customerId;
       console.log(
         "🚀 ~ file: NewTicket.js:130 ~ onSubmit ~ finalTicketData:",
         finalTicketData
@@ -158,7 +162,7 @@ const NewTicket = (props) => {
         dispatch(
           SET_SNACKBAR({
             open: true,
-            message: "Technical Error",
+            message: response?.data?.message ? response?.data?.message : 'Technical Error',
             variant: "error",
           })
         );
@@ -225,6 +229,7 @@ const NewTicket = (props) => {
     customerList.map((customer) => {
       if (customer.label === e.target.value) {
         setDefaultUserDetail(customer);
+        setCustomerId(customer.id);
         setCustomerValue(e.target.value);
         setCustomerType(customer.role);
       }
@@ -283,7 +288,7 @@ const NewTicket = (props) => {
     } else {
       setIsEngineerLoading(false);
       // dispatch(
-      //   SET_SNACKBAR({
+        //   SET_SNACKBAR({
       //     open: true,
       //     message: "Technical Error",
       //     variant: "error",
@@ -291,11 +296,12 @@ const NewTicket = (props) => {
       // );
     }
   };
-
+  
   const handleEngineerSelect = (e) => {
     engineerList.map((engineer) => {
       if (engineer.label === e.target.value) {
         setEngineerName(e.target.value);
+        setEngineerEmail(engineer.email);
       }
     });
   };
