@@ -16,32 +16,34 @@ import Brand from "./modules/admin/Brand";
 import RegisterUser from "./modules/admin/RegisterUser";
 import Service from "./modules/admin/Service";
 import NewTicket from "./modules/admin/NewTicket";
+import TicketView from "./modules/admin/TicketView";
 
 // import httpService from './axios-interceptors';
 
 // httpService.setupInterceptors();
 
 const AppRoutes = (props) => {
-  return (
-    <Routes>
-      <Route path="/" element={<WelcomePage />} />
-      <Route path="amc-plans-details" element={<AMCPlanDetails />} />
-      <Route path="login" element={<LoginPage />} />
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="services" element={<Services />} />
-      <Route path="welcome" element={<WelcomePage />}></Route>
-      <Route path="admin" /* element={<UserLayout />} */ >
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="user-management" element={<UserManagement />} />
-          <Route path="register-user" element={<RegisterUser />} />
-          <Route path="tickets" element={<Tickets />} />
-          <Route path="brand" element={<Brand />} />
-          <Route path="service" element={<Service />} />
-          <Route path="new-ticket" element={<NewTicket />} />
-      </Route>
-      <Route path="no-access" element={<NoAccess />} />
-    </Routes>
-  );
+	return (
+		<Routes>
+			<Route path="/" element={<WelcomePage />} />
+			<Route path="amc-plans-details" element={<AMCPlanDetails />} />
+			<Route path="login" element={<LoginPage />} />
+			<Route path="dashboard" element={<Dashboard />} />
+			<Route path="services" element={<Services />} />
+			<Route path="welcome" element={<WelcomePage />}></Route>
+			<Route path="admin" /* element={<UserLayout />} */>
+				<Route path="dashboard" element={<AdminDashboard />} />
+				<Route path="user-management" element={<UserManagement />} />
+				<Route path="register-user" element={<RegisterUser />} />
+				<Route path="tickets" element={<Tickets />} />
+				<Route path="brand" element={<Brand />} />
+				<Route path="service" element={<Service />} />
+				<Route path="new-ticket" element={<NewTicket />} />
+				<Route path="view-ticket" element={<TicketView />} />
+			</Route>
+			<Route path="no-access" element={<NoAccess />} />
+		</Routes>
+	);
 };
 
 export default AppRoutes;
