@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
 	Card,
 	CardHeader,
@@ -13,34 +14,95 @@ import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import AddFollowUpModal from "./AddFollowUpModal";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useGetTicketDetailByIdQuery } from "../../services/admin";
+import moment from "moment";
+import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
 
 const TicketView = (props) => {
+	const dispatch = useDispatch();
 	const [followupModalShow, setFollowupModalShow] = useState(false);
+	const location = useLocation();
+	const [id, setId] = useState(location?.state?.id);
+	const [detail, setDetail] = useState();
 
 	const handleclose = () => {
 		setFollowupModalShow(!followupModalShow);
 	};
+	const { data, error, isLoading } = useGetTicketDetailByIdQuery(id);
+
+	useEffect(() => {
+		if (isLoading) {
+			dispatch(SET_LOADING({ data: true }));
+		} else if (error) {
+			dispatch(SET_LOADING({ data: false }));
+			dispatch(
+				SET_SNACKBAR({
+					open: true,
+					message: "Technical Error",
+					variant: "error",
+				})
+			);
+		} else if (data) {
+			console.log("🚀 ~ file: TicketView.js:47 ~ useEffect ~ data:", data);
+			setDetail(data?.data?.ticket);
+			dispatch(SET_LOADING({ data: false }));
+		}
+	}, [data, isLoading, error]);
 
 	const columns = React.useMemo(() => [
 		{
 			field: "date",
 			headerName: "Date",
-			width: 250,
+			renderCell: (params) => {
+				return moment(params.row.createdAt).format("DD/MM/YYYY");
+			},
+			flex: 1,
 		},
 		{
 			field: "type",
 			headerName: "Follow-up Type",
-			width: 250,
+			flex: 1,
 		},
 		{
 			field: "problem",
 			headerName: "Problem",
-			width: 250,
+			flex: 1,
 		},
 		{
 			field: "remark",
 			headerName: "Remark",
-			width: 250,
+			flex: 1,
+		},
+		{
+			field: "engineer",
+			headerName: "Engineer",
+			flex: 1,
+			renderCell: (params) => {
+				return params.row?.extra_field?.engineer?.label
+					? params.row?.extra_field?.engineer?.label
+					: "";
+			},
+		},
+		{
+			field: "quoteAmount",
+			headerName: "Amount Quote",
+			flex: 1,
+			renderCell: (params) => {
+				return params.row?.extra_field?.quote_amount
+					? params.row?.extra_field?.quote_amount
+					: "";
+			},
+		},
+		{
+			field: "sparePartDetail",
+			headerName: "Spare Part Detail",
+			flex: 1,
+			renderCell: (params) => {
+				return params.row?.extra_field?.spare_part_detail
+					? params.row?.extra_field?.spare_part_detail
+					: "";
+			},
 		},
 	]);
 
@@ -76,7 +138,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Ticket Number :</Typography>
 										</div>
-										<div>DGSOFT123</div>
+										<div>{detail?.ticket_number}</div>
 									</div>
 								</Grid>
 								<Grid item xs={12} sm={6}>
@@ -84,7 +146,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Date :</Typography>
 										</div>
-										<div>30-12-2090</div>
+										<div>{detail?.date}</div>
 									</div>
 								</Grid>
 							</Grid>
@@ -94,7 +156,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Customer :</Typography>
 										</div>
-										<div>Jitendra Singh Prajapati</div>
+										<div>{detail?.customer}</div>
 									</div>
 								</Grid>
 								<Grid item xs={12} sm={6}>
@@ -102,7 +164,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Product :</Typography>
 										</div>
-										<div>CPU</div>
+										<div>{detail?.parent_service}</div>
 									</div>
 								</Grid>
 							</Grid>
@@ -112,7 +174,9 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Customer Type :</Typography>
 										</div>
-										<div>AMC</div>
+										<div>
+											{detail?.customer_plan ? detail?.customer_plan : "Normal"}
+										</div>
 									</div>
 								</Grid>
 								<Grid item xs={12} sm={6}>
@@ -120,7 +184,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Executive :</Typography>
 										</div>
-										<div>Jitendra Singh Prajapati</div>
+										<div>{detail?.engineer}</div>
 									</div>
 								</Grid>
 							</Grid>
@@ -130,7 +194,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Problem :</Typography>
 										</div>
-										<div>DGSOFT123</div>
+										<div>{detail?.service_provided}</div>
 									</div>
 								</Grid>
 								<Grid item xs={12} sm={6}>
@@ -138,7 +202,7 @@ const TicketView = (props) => {
 										<div style={{ width: "30%" }}>
 											<Typography>Remark :</Typography>
 										</div>
-										<div>----------------------</div>
+										<div>{detail?.remark}</div>
 									</div>
 								</Grid>
 							</Grid>
@@ -162,21 +226,33 @@ const TicketView = (props) => {
 								>
 									<AddBoxOutlinedIcon />
 								</IconButton>,
-								<IconButton aria-label="Save" color="inherit" type="submit">
-									<SaveOutlinedIcon />
-								</IconButton>,
 							]}
 						></CardHeader>
 						<Divider />
 						<CardContent>
-							<DataGrid
-								sx={{
-									height: "calc(100vh - 180px)",
-								}}
-								columns={columns}
-								rows={[]}
-								components={{ Toolbar: GridToolbar }}
-							/>
+							{data ? (
+								<>
+									<DataGrid
+										sx={{
+											height: "calc(100vh - 180px)",
+										}}
+										initialState={{
+											columns: {
+												columnVisibilityModel: {
+													sparePartDetail: false,
+													quoteAmount: false,
+													engineer: false,
+												},
+											},
+										}}
+										columns={columns}
+										rows={data?.data?.ticket?.follow_ups}
+										components={{ Toolbar: GridToolbar }}
+									/>
+								</>
+							) : (
+								""
+							)}
 						</CardContent>
 					</Card>
 				</Card>

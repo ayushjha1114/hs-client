@@ -8,7 +8,7 @@ import {
 	TextField,
 	FormControlLabel,
 	Checkbox,
-	Typography,
+	Autocomplete,
 	Grid,
 	Button,
 	DialogActions,
@@ -16,7 +16,7 @@ import {
 	FormHelperText,
 	FormControl,
 	FormLabel,
-	FormGroup,
+	CircularProgress,
 	InputLabel,
 	Select,
 	MenuItem,
@@ -26,6 +26,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { SET_LOADING, SET_SNACKBAR } from "../auth/authSlice";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+	useSaveFollowUpMutation,
+	useGetUserListBySearchMutation,
+} from "../../services/admin";
+import Helper from "../../util/helper";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 	"& .MuiDialogContent-root": {
@@ -68,8 +73,13 @@ BootstrapDialogTitle.propTypes = {
 export default function AddFollowUpModal(props) {
 	const { show, onHide } = props;
 	const location = useLocation();
-	const { handleSubmit, control, setValue } = useForm({});
+	const dispatch = useDispatch();
+	const { handleSubmit, control, setValue, watch } = useForm({});
+	const followUpTypeWatch = watch("type");
 	const [id, setId] = useState(location?.state?.id);
+	const [saveFollowUp] = useSaveFollowUpMutation();
+	const [engineerList, setEngineerList] = useState([]);
+	const [isEngineerLoading, setIsEngineerLoading] = useState(false);
 	const followUpTypes = [
 		{ name: "Diagnose in process", value: "Diagnose in process" },
 		{ name: "Pending for spare", value: "Pending for spare" },
@@ -80,16 +90,60 @@ export default function AddFollowUpModal(props) {
 			name: "Pending for installation of Part",
 			value: "Pending for installation of Part",
 		},
-		{ name: "Pending for dilevery", value: "Pending for dilevery" },
+		{ name: "Pending for delivery", value: "Pending for delivery" },
 		{ name: "Hold", value: "Hold" },
 		{ name: "Quote approved", value: "Quote approved" },
 		{ name: "Pending for pickup", value: "Pending for pickup" },
 		{ name: "As it is return", value: "As it is return" },
 		{ name: "Escallation", value: "Escallation" },
 	];
+	const [getUserListBySearch] = useGetUserListBySearchMutation();
+
+	const handleEngineerSearch = async (event, value) => {
+		setIsEngineerLoading(true);
+		const response = await getUserListBySearch({
+			searchTerm: value,
+			isTypeCustomer: false,
+		});
+		if (response?.data?.success) {
+			setIsEngineerLoading(false);
+			const userList = response?.data?.data?.rows.map((user) => {
+				return {
+					label: Helper.transformUserName(user),
+					type: user.role,
+					id: user.id,
+				};
+			});
+			setEngineerList(userList);
+		} else {
+			setIsEngineerLoading(false);
+		}
+	};
 
 	const onSubmit = async (data) => {
-		console.log(data);
+		dispatch(SET_LOADING({ data: true }));
+		data.ticket_id = id;
+		const response = await saveFollowUp(data);
+		if (response?.data?.success) {
+			dispatch(SET_LOADING({ data: false }));
+			dispatch(
+				SET_SNACKBAR({
+					open: true,
+					message: response?.data?.data,
+					variant: "success",
+				})
+			);
+			onHide();
+		} else {
+			dispatch(SET_LOADING({ data: false }));
+			dispatch(
+				SET_SNACKBAR({
+					open: true,
+					message: "Technical Error",
+					variant: "error",
+				})
+			);
+		}
 	};
 
 	return (
@@ -149,16 +203,7 @@ export default function AddFollowUpModal(props) {
 									name="problem"
 									id="problem"
 									control={control}
-									rules={{
-										required: {
-											value: true,
-											message: "Problem is required.",
-										},
-									}}
-									render={({
-										field: { onChange, value },
-										fieldState: { error },
-									}) => (
+									render={({ field: { onChange, value } }) => (
 										<TextField
 											size="small"
 											fullWidth
@@ -168,8 +213,6 @@ export default function AddFollowUpModal(props) {
 											}}
 											label="Problem"
 											multiline
-											error={!!error}
-											helperText={error?.message}
 											rows={2}
 											value={value}
 											onChange={onChange}
@@ -182,16 +225,7 @@ export default function AddFollowUpModal(props) {
 									name="remark"
 									id="remark"
 									control={control}
-									rules={{
-										required: {
-											value: true,
-											message: "Remark is required.",
-										},
-									}}
-									render={({
-										field: { onChange, value },
-										fieldState: { error },
-									}) => (
+									render={({ field: { onChange, value } }) => (
 										<TextField
 											size="small"
 											fullWidth
@@ -201,14 +235,102 @@ export default function AddFollowUpModal(props) {
 											}}
 											label="Remark"
 											multiline
-											error={!!error}
-											helperText={error?.message}
 											rows={2}
 											value={value}
 											onChange={onChange}
 										/>
 									)}
 								/>
+							</Grid>
+						</Grid>
+						<Grid container sx={{ paddingTop: "1%" }} spacing={2}>
+							<Grid item xs={12} sm={4}>
+								{followUpTypeWatch === "Pending for spare" ? (
+									<Controller
+										name="extra_field.spare_part_detail"
+										control={control}
+										render={({ field: { onChange, value } }) => (
+											<TextField
+												id="extra_field.spare_part_detail"
+												value={value}
+												onChange={onChange}
+												size="small"
+												fullWidth
+												multiline
+												rows={2}
+												label="Spare Part detail"
+												variant="outlined"
+											/>
+										)}
+									/>
+								) : (
+									""
+								)}
+								{followUpTypeWatch === "Pending for quote" ? (
+									<Controller
+										name="extra_field.quote_amount"
+										control={control}
+										render={({ field: { onChange, value } }) => (
+											<TextField
+												id="extra_field.quote_amount"
+												value={value}
+												onChange={onChange}
+												size="small"
+												fullWidth
+												label="Amount Quote"
+												variant="outlined"
+												type="number"
+											/>
+										)}
+									/>
+								) : (
+									""
+								)}
+								{followUpTypeWatch === "Escallation" ? (
+									<Controller
+										name="extra_field.engineer"
+										control={control}
+										render={({
+											field: { onChange, value, name },
+											fieldState: { error },
+										}) => (
+											<Autocomplete
+												id="engineer"
+												options={engineerList}
+												size="small"
+												noOptionsText="No Engineer Found"
+												fullWidth
+												value={value}
+												onChange={(event, value) => onChange(value)}
+												onInputChange={(event, value) =>
+													handleEngineerSearch(event, value)
+												}
+												renderInput={(params) => (
+													<TextField
+														{...params}
+														label="Assign Engineer"
+														InputProps={{
+															...params.InputProps,
+															endAdornment: (
+																<>
+																	{isEngineerLoading ? (
+																		<CircularProgress
+																			color="primary"
+																			size={20}
+																		/>
+																	) : null}
+																	{params.InputProps.endAdornment}
+																</>
+															),
+														}}
+													/>
+												)}
+											/>
+										)}
+									/>
+								) : (
+									""
+								)}
 							</Grid>
 						</Grid>
 					</DialogContent>
