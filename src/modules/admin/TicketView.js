@@ -236,15 +236,6 @@ const TicketView = (props) => {
 										sx={{
 											height: "calc(100vh - 180px)",
 										}}
-										initialState={{
-											columns: {
-												columnVisibilityModel: {
-													sparePartDetail: false,
-													quoteAmount: false,
-													engineer: false,
-												},
-											},
-										}}
 										columns={columns}
 										rows={data?.data?.ticket?.follow_ups}
 										components={{ Toolbar: GridToolbar }}
