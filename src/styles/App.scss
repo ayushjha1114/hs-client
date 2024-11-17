@@ -1,20 +1,20 @@
 // Global
-@import "global";
+@use "global";
 
 // Auth
-@import "./auth/welcome.scss";
-@import "./auth/login.scss";
-@import "./auth/services.scss";
-@import "./auth/publicLayout.scss";
-@import "./auth/amcPlanDetail.scss";
-@import "./auth/loader.scss";
+@use "auth/welcome.scss";
+@use "auth/login.scss";
+@use "auth/services.scss";
+@use "auth/publicLayout.scss";
+@use "auth/amcPlanDetail.scss";
+@use "auth/loader.scss";
 
 // Admin
-@import "./admin/Dashboard.scss";
-@import "./admin/noAccess.scss";
-@import "./admin/userManagement.scss";
-@import "./admin/registerUserModal.scss";
-@import "./admin/brand.scss";
-@import "./admin/service.scss";
-@import "./admin/tickets.scss";
-@import "./admin/viewTicket.scss";
+@use "admin/Dashboard.scss";
+@use "admin/noAccess.scss";
+@use "admin/userManagement.scss";
+@use "admin/registerUserModal.scss";
+@use "admin/brand.scss";
+@use "admin/service.scss";
+@use "admin/tickets.scss";
+@use "admin/viewTicket.scss";

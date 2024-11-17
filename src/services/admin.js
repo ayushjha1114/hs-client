@@ -6,7 +6,7 @@ export const adminApi = createApi({
 	tagTypes: ["User", "Service", "Brand", "Ticket", "Payment", "Follow-up"],
 	baseQuery: fetchBaseQuery({
 		baseUrl: "https://dgsoft.org/auth/admin",
-		// baseUrl: "http://localhost:3002/auth/admin",
+		//baseUrl: "http://localhost:3002/auth/admin",
 	}),
 	endpoints: (builder) => ({
 		getAllUser: builder.query({

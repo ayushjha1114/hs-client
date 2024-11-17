@@ -47,14 +47,17 @@ We follow a standard gitflow.
 REACT_APP_STAGE
 
 Reach your tech lead or infra team to get the required values
+
 #### Build Steps
 
 **_CI/CD_**
 
 To be updated
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Node verion - 19.9.0
 
 ## Available Scripts
 
