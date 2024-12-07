@@ -106,7 +106,8 @@ const NewTicket = (props) => {
 
   const onSubmit = async (data) => {
     console.log("🚀 ~ file: NewTicket.js:42 ~ onSubmit ~ data:", data, engineerName);
-    data.engineer = engineerName;
+    const engineer = data.engineer;
+    data.engineer = engineer?.label;
     if (forEdit) {
       dispatch(SET_LOADING({ data: true }));
       const response = await updateTicket(data);
@@ -139,7 +140,7 @@ const NewTicket = (props) => {
       finalTicketData.mobile = defaultUserDetail.mobile;
       finalTicketData.address = JSON.stringify(finalTicketData.address);
       finalTicketData.customer_plan = defaultUserDetail?.amc?.user_plan ? defaultUserDetail?.amc?.user_plan : '';
-      finalTicketData.engineerEmail = engineerEmail;
+      finalTicketData.engineerEmail = engineer?.email;
       finalTicketData.customerId = customerId;
       console.log(
         "🚀 ~ file: NewTicket.js:130 ~ onSubmit ~ finalTicketData:",
@@ -225,16 +226,12 @@ const NewTicket = (props) => {
     }
   };
 
-  const handleCustomerSelect = (e) => {
-    customerList.map((customer) => {
-      if (customer.label === e.target.value) {
-        setDefaultUserDetail(customer);
-        setCustomerId(customer.id);
-        setCustomerValue(e.target.value);
-        setCustomerType(customer.role);
-      }
-    });
-  };
+ const handleCustomerSelect = (value) => {
+        setDefaultUserDetail(value);
+        setCustomerId(value?.id);
+        setCustomerValue(value);
+        setCustomerType(value?.role);
+ }
 
   useEffect(() => {
     if (serviceList.length > 0) {
@@ -340,10 +337,9 @@ const NewTicket = (props) => {
                           id="customer"
                           options={customerList}
                           size="small"
-                          onSelect={(e) => handleCustomerSelect(e)}
                           noOptionsText="No Customer Found"
                           value={value}
-                          onChange={(event, value) => onChange(value)}
+                          onChange={(event, value) => {handleCustomerSelect(value);onChange(value);}}
                           onInputChange={(event, value) =>
                             handleCustomerSearch(event, value)
                           }
@@ -434,7 +430,7 @@ const NewTicket = (props) => {
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      value={defaultUserDetail?.email}
+                      value={defaultUserDetail ? defaultUserDetail?.email : ''}
                       size="small"
                       fullWidth
                       label="Email"
@@ -448,7 +444,7 @@ const NewTicket = (props) => {
                         shrink: true,
                       }}
                       id="Mobile Number"
-                      value={defaultUserDetail?.mobile}
+                      value={defaultUserDetail ? defaultUserDetail?.mobile : ''}
                       size="small"
                       fullWidth
                       label="Mobile Number"
