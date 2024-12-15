@@ -24,7 +24,7 @@ const Helper = {
 	removeCommaFromServiceProvide(data) {
 		let label = "";
 		// uncomment when run in local machine
-		//const service = data ? JSON.parse(data): [];
+		// const service = data ? JSON.parse(data): [];
 		data?.map((type) => {
 			label += `${type.name}, `;
 		});

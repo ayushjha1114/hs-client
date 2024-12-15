@@ -229,7 +229,7 @@ const NewTicket = (props) => {
  const handleCustomerSelect = (value) => {
         setDefaultUserDetail(value);
         setCustomerId(value?.id);
-        setCustomerValue(value);
+        setCustomerValue(value?.label);
         setCustomerType(value?.role);
  }
 
@@ -252,6 +252,7 @@ const NewTicket = (props) => {
     if (serviceList.length > 0) {
       serviceList.map((item) => {
         if (item.name === parentService) {
+          // setServiceProvidedList(JSON.parse(item.service_provided));
           setServiceProvidedList(item.service_provided);
         }
       });
